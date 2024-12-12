@@ -1,68 +1,288 @@
 "use client";
-import Layout from "../_components/slide-bar";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import interactionPlugin, {
+  Draggable,
+  DropArg,
+} from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { CheckIcon, ExclamationTriangleIcon } from "@heroicons/react/20/solid";
+import { EventSourceInput } from "@fullcalendar/core/index.js";
+import Layout from "../_components/slide-bar";
+import { Button } from "../_components/ui/button";
+import { CalendarPlus, CalendarX2Icon } from "lucide-react";
 
-const Eventos = () => {
-  const [events] = useState([
-    { title: "event 1", id: "1" },
-    { title: "event 2", id: "2" },
-    { title: "event 3", id: "3" },
-    { title: "event 4", id: "4" },
-    { title: "event 5", id: "5" },
-  ]);
+interface Evento {
+  titulo: string;
+  inicio: Date | string;
+  diaTodo: boolean;
+  descricao: string;
+  status: string;
+  cor: string;
+  id: number;
+}
+
+export default function Home() {
+  const [eventos, setEventos] = useState<Evento[]>([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
+  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null);
+  const [novoEvento, setNovoEvento] = useState<Evento>({
+    titulo: "",
+    inicio: "",
+    diaTodo: false,
+    descricao: "",
+    status: "Pendente",
+    cor: "#3788d8",
+    id: 0,
+  });
+
+  useEffect(() => {
+    const elementoArrastavel = document.getElementById("draggable-el");
+    if (elementoArrastavel) {
+      new Draggable(elementoArrastavel, {
+        itemSelector: ".fc-event",
+        eventData: (elemento) => ({
+          title: elemento.getAttribute("title"),
+          id: elemento.getAttribute("data-id"),
+        }),
+      });
+    }
+  }, []);
+
+  function aoClicarData(arg: { date: Date; allDay: boolean }) {
+    setNovoEvento({
+      ...novoEvento,
+      inicio: arg.date,
+      diaTodo: arg.allDay,
+      id: new Date().getTime(),
+    });
+    setMostrarModal(true);
+  }
+
+  function adicionarEvento(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setEventos([...eventos, novoEvento]);
+    setMostrarModal(false);
+    setNovoEvento({
+      titulo: "",
+      inicio: "",
+      diaTodo: false,
+      descricao: "",
+      status: "Pendente",
+      cor: "#3788d8",
+      id: 0,
+    });
+  }
+
+  function abrirModalExcluir(eventoId: number) {
+    setMostrarModalExcluir(true);
+    setIdParaExcluir(eventoId);
+  }
+
+  function excluirEvento() {
+    setEventos(eventos.filter((evento) => evento.id !== idParaExcluir));
+    setMostrarModalExcluir(false);
+    setIdParaExcluir(null);
+  }
+
+  function fecharModal() {
+    setMostrarModal(false);
+    setMostrarModalExcluir(false);
+    setIdParaExcluir(null);
+  }
+  function aoClicarEvento(info: any) {
+    const eventoClicado = eventos.find(
+      (evento) => evento.titulo === info.event.title,
+    );
+    if (eventoClicado) {
+      setNovoEvento(eventoClicado);
+      setMostrarModal(true);
+    }
+  }
+  function aoRedimensionarEvento(info: any) {
+    const eventoAtualizado = eventos.map((evento) => {
+      if (evento.titulo === info.event.title) {
+        return {
+          ...evento,
+          inicio: info.event.start, // Atualiza data de início
+          fim: info.event.end, // Atualiza data de fim (se aplicável)
+        };
+      }
+      return evento;
+    });
+    setEventos(eventoAtualizado);
+  }
+  function aoArrastarEvento(info: any) {
+    const eventoAtualizado = eventos.map((evento) => {
+      if (evento.titulo === info.event.title) {
+        return {
+          ...evento,
+          inicio: info.event.start, // Nova data de início
+        };
+      }
+      return evento;
+    });
+    setEventos(eventoAtualizado);
+  }
+
+  function alterarNovoEvento(
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) {
+    const { name, value } = e.target;
+    setNovoEvento({
+      ...novoEvento,
+      [name]: value,
+    });
+  }
+
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
   return (
     <>
       <Layout>
-        {" "}
-        <main>
-          <h1 style={{ textAlign: "center", margin: "20px 0" }}>Eventos</h1>
+        <main className="flex min-h-screen flex-col items-center justify-center bg-gray-900 text-gray-100">
+          <h1 className="mb-4 text-3xl font-bold">Calendário de Eventos</h1>
+          <div className="flex w-full justify-end px-40">
+            {" "}
+            {/* Aplique o justify-end para alinhar os botões à direita */}
+            <Button
+              className="mr-2 w-40 rounded-xl bg-lime-800 font-bold text-white" // Adicionei "mr-2" para dar um espaçamento entre os botões
+              onClick={() => aoClicarData}
+            >
+              <CalendarPlus />
+              Adicionar Eventos
+            </Button>
+            <Button
+              className="w-40 rounded-xl bg-red-900 font-bold text-white"
+              onClick={() => setDialogIsOpen(true)}
+            >
+              <CalendarX2Icon />
+              Excluir Eventos
+            </Button>
+          </div>
 
-          <div>
+          <div className="w-full max-w-6xl">
             <FullCalendar
-              plugins={[
-                resourceTimelinePlugin,
-                dayGridPlugin,
-                interactionPlugin,
-                timeGridPlugin,
-              ]}
+              plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
               headerToolbar={{
                 left: "prev,next today",
                 center: "title",
-                right: "resourceTimelineWeek,dayGridMonth,timeGridWeek",
+                right: "dayGridMonth,timeGridWeek",
               }}
-              locale="pt-br" // Define o idioma para português
-              initialView="dayGridMonth"
-              nowIndicator={true}
-              editable={true}
-              selectable={true}
-              selectMirror={true}
-            ></FullCalendar>
+              locale="pt-br"
+              events={eventos.map((e) => ({
+                title: e.titulo,
+                start: e.inicio,
+                color: e.cor,
+                description: e.descricao,
+              }))}
+              dateClick={aoClicarData}
+              eventClick={aoClicarEvento}
+              editable={true} // Permite arrastar eventos
+              droppable={true} // Permite soltar eventos
+              eventDrop={aoArrastarEvento} // Função para lidar com mudanças de data
+              eventResize={aoRedimensionarEvento} // Função para lidar com mudanças de duração
+            />
           </div>
 
-          <div
-            id="draggable-el"
-            className="ml-8 mt-16 w-full rounded-md border-2 bg-violet-50 p-2 lg:h-1/2"
-          >
-            <h1 className="text-center text-lg font-bold">Drag Event</h1>
-            {events.map((event) => (
-              <div
-                className="fc-event m-2 ml-auto w-full rounded-md border-2 bg-white p-1 text-center"
-                title={event.title}
-                key={event.id}
+          <Transition.Root show={mostrarModal} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={fecharModal}>
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
               >
-                {event.title}
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+              </Transition.Child>
+              <div className="fixed inset-0 z-10 overflow-y-auto">
+                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg sm:p-6">
+                    <form onSubmit={adicionarEvento}>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        Novo Evento
+                      </h3>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          name="titulo"
+                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          placeholder="Título"
+                          value={novoEvento.titulo}
+                          onChange={alterarNovoEvento}
+                          required
+                        />
+                      </div>
+                      <div className="mt-2">
+                        <input
+                          type="datetime-local"
+                          name="inicio"
+                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          value={novoEvento.inicio.toString()}
+                          onChange={alterarNovoEvento}
+                          required
+                        />
+                      </div>
+                      <div className="mt-2">
+                        <textarea
+                          name="descricao"
+                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          placeholder="Descrição"
+                          value={novoEvento.descricao}
+                          onChange={alterarNovoEvento}
+                        />
+                      </div>
+                      <div className="mt-2">
+                        <select
+                          name="status"
+                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          value={novoEvento.status}
+                          onChange={alterarNovoEvento}
+                        >
+                          <option value="Pendente">Pendente</option>
+                          <option value="Confirmado">Confirmado</option>
+                          <option value="Cancelado">Cancelado</option>
+                        </select>
+                      </div>
+                      <div className="mt-2">
+                        <input
+                          type="color"
+                          name="cor"
+                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          value={novoEvento.cor}
+                          onChange={alterarNovoEvento}
+                        />
+                      </div>
+                      <div className="mt-5 sm:mt-6">
+                        <button
+                          type="submit"
+                          className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                        >
+                          Adicionar
+                        </button>
+                        <button
+                          type="button"
+                          className="ml-2 inline-flex justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                          onClick={fecharModal}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </form>
+                  </Dialog.Panel>
+                </div>
               </div>
-            ))}
-          </div>
+            </Dialog>
+          </Transition.Root>
         </main>
       </Layout>
     </>
   );
-};
-
-export default Eventos;
+}
