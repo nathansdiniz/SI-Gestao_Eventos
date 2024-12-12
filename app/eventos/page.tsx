@@ -1,15 +1,10 @@
 "use client";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin, {
-  Draggable,
-  DropArg,
-} from "@fullcalendar/interaction";
+import interactionPlugin, { Draggable } from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { CheckIcon, ExclamationTriangleIcon } from "@heroicons/react/20/solid";
-import { EventSourceInput } from "@fullcalendar/core/index.js";
 import Layout from "../_components/slide-bar";
 import { Button } from "../_components/ui/button";
 import { CalendarPlus, CalendarX2Icon } from "lucide-react";
@@ -27,8 +22,8 @@ interface Evento {
 export default function Home() {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
-  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null);
+  const [, setMostrarModalExcluir] = useState(false);
+  const [, setIdParaExcluir] = useState<number | null>(null);
   const [novoEvento, setNovoEvento] = useState<Evento>({
     titulo: "",
     inicio: "",
@@ -75,17 +70,6 @@ export default function Home() {
       cor: "#3788d8",
       id: 0,
     });
-  }
-
-  function abrirModalExcluir(eventoId: number) {
-    setMostrarModalExcluir(true);
-    setIdParaExcluir(eventoId);
-  }
-
-  function excluirEvento() {
-    setEventos(eventos.filter((evento) => evento.id !== idParaExcluir));
-    setMostrarModalExcluir(false);
-    setIdParaExcluir(null);
   }
 
   function fecharModal() {
@@ -140,7 +124,7 @@ export default function Home() {
     });
   }
 
-  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [, setDialogIsOpen] = useState(false);
   return (
     <>
       <Layout>

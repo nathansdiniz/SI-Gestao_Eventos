@@ -1,13 +1,10 @@
-import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
 import {
   PiggyBankIcon,
   TrendingDownIcon,
-  TrendingUpDownIcon,
   TrendingUpIcon,
   WalletIcon,
 } from "lucide-react";
 import CardResumido from "./card-resumido";
-import { db } from "@/app/_lib/prisma";
 
 interface CardResumo {
   mes: string;
@@ -18,7 +15,6 @@ interface CardResumo {
 }
 
 const CardResumo = async ({
-  mes,
   investidoTotal,
   depositoTotal,
   saldo,
