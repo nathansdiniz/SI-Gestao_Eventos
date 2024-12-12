@@ -23,7 +23,7 @@ import {
 const items = [
   {
     title: "Início",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
@@ -33,12 +33,12 @@ const items = [
   },
   {
     title: "Agenda",
-    url: "#",
+    url: "/agenda",
     icon: Calendar,
   },
   {
     title: "Eventos",
-    url: "#",
+    url: "/eventos",
     icon: CalendarCheck,
   },
   {

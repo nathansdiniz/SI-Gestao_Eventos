@@ -80,24 +80,22 @@ const GraficoPizza = ({
             />
           </PieChart>
         </ChartContainer>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <PorcentagemItem
-              icon={<TrendingUpIcon size={16} className="text-primary" />}
-              title="Receita"
-              value={tiposPorcentagem[TransactionType.DEPOSIT]}
-            />
-            <PorcentagemItem
-              icon={<TrendingDownIcon size={16} className="text-red-500" />}
-              title="Despesas"
-              value={tiposPorcentagem[TransactionType.EXPENSE]}
-            />
-            <PorcentagemItem
-              icon={<PiggyBankIcon size={16} />}
-              title="Investido"
-              value={tiposPorcentagem[TransactionType.INVESTMENT]}
-            />
-          </div>
+        <div className="space-y-3">
+          <PorcentagemItem
+            icon={<TrendingUpIcon size={16} className="text-primary" />}
+            title="Receita"
+            value={tiposPorcentagem[TransactionType.DEPOSIT]}
+          />
+          <PorcentagemItem
+            icon={<TrendingDownIcon size={16} className="text-red-500" />}
+            title="Despesas"
+            value={tiposPorcentagem[TransactionType.EXPENSE]}
+          />
+          <PorcentagemItem
+            icon={<PiggyBankIcon size={16} />}
+            title="Investido"
+            value={tiposPorcentagem[TransactionType.INVESTMENT]}
+          />
         </div>
       </CardContent>
     </Card>

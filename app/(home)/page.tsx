@@ -33,13 +33,12 @@ const Home = async ({ searchParams: { mes } }: HomeProps) => {
           <div className="grid h-full grid-cols-[2fr,1fr] gap-6 overflow-hidden">
             <div className="flex flex-col gap-6 overflow-hidden">
               <CardResumo mes={mes} {...dashboard} />
-            </div>
-
-            <div className="grid h-full grid-cols-3 grid-rows-1 gap-6 overflow-hidden">
-              <GraficoPizza {...dashboard} />
-              <GastosCategoria
-                gastosPorCategoria={dashboard.totalGastosPCategoria}
-              />
+              <div className="grid h-full grid-cols-3 grid-rows-1 gap-6 overflow-hidden">
+                <GraficoPizza {...dashboard} />
+                <GastosCategoria
+                  gastosPorCategoria={dashboard.totalGastosPCategoria}
+                />
+              </div>
             </div>
           </div>
         </div>
