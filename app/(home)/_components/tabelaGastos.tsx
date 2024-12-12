@@ -15,28 +15,26 @@ interface GastosCategoria {
 
 const GastosCategoria = ({ gastosPorCategoria }: GastosCategoria) => {
   return (
-    <ScrollArea className="col-span-2 h-full rounded-md p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Gastos por Categoria</CardTitle>
-        </CardHeader>
+    <ScrollArea className="col-span-2 h-full rounded-md border pb-6">
+      <CardHeader>
+        <CardTitle>Gastos por Categoria</CardTitle>
+      </CardHeader>
 
-        <CardContent>
-          {gastosPorCategoria.map((categoria) => (
-            <div key={categoria.category} className="space-y-2">
-              <div className="flex w-full justify-between">
-                <p className="text-sm font-bold">
-                  {TRANSACTION_CATEGORY_LABELS[categoria.category]}
-                </p>
-                <p className="text-sm font-bold">
-                  {categoria.percentageOfTotal}%
-                </p>
-              </div>
-              <Progress value={categoria.percentageOfTotal} />
+      <CardContent>
+        {gastosPorCategoria.map((categoria) => (
+          <div key={categoria.category} className="space-y-6">
+            <div className="flex w-full justify-between">
+              <p className="text-sm font-bold">
+                {TRANSACTION_CATEGORY_LABELS[categoria.category]}
+              </p>
+              <p className="text-sm font-bold">
+                {categoria.percentageOfTotal}%
+              </p>
             </div>
-          ))}
-        </CardContent>
-      </Card>
+            <Progress value={categoria.percentageOfTotal} />
+          </div>
+        ))}
+      </CardContent>
     </ScrollArea>
   );
 };

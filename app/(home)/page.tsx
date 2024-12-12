@@ -7,6 +7,7 @@ import { isMatch } from "date-fns";
 import GraficoPizza from "./_components/grafico-pizza";
 import { obterDashboard } from "../_data/obter-dados-dashboard";
 import GastosCategoria from "./_components/tabelaGastos";
+import UltimasTransacoes from "./_components/ultimas-transacoes";
 
 interface HomeProps {
   searchParams: {
@@ -20,7 +21,7 @@ const Home = async ({ searchParams: { mes } }: HomeProps) => {
     redirect("/login");
   }
   const mesInvalido = !mes || !isMatch(mes, "MM");
-  if (mesInvalido) redirect("?mes=01");
+  if (mesInvalido) redirect(`?mes=${new Date().getMonth() + 1}`);
   const dashboard = await obterDashboard(mes);
   return (
     <>
@@ -40,6 +41,9 @@ const Home = async ({ searchParams: { mes } }: HomeProps) => {
                 />
               </div>
             </div>
+            <UltimasTransacoes
+              ultimasTransacoes={dashboard.ultimasTransacoes}
+            ></UltimasTransacoes>
           </div>
         </div>
       </Layout>
