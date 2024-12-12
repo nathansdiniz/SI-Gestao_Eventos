@@ -1,10 +1,14 @@
 "use client";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+<<<<<<< HEAD
 import interactionPlugin, {
   Draggable,
   EventResizeDoneArg,
 } from "@fullcalendar/interaction";
+=======
+import interactionPlugin, { Draggable } from "@fullcalendar/interaction";
+>>>>>>> f95ba52fe8c03ab8629510c9b2543e3f945f887c
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
