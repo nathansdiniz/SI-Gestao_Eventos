@@ -3,32 +3,32 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, {
   Draggable,
-  DropArg,
+  EventResizeDoneArg,
 } from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { CheckIcon, ExclamationTriangleIcon } from "@heroicons/react/20/solid";
-import { EventSourceInput } from "@fullcalendar/core/index.js";
 import Layout from "../_components/slide-bar";
 import { Button } from "../_components/ui/button";
 import { CalendarPlus, CalendarX2Icon } from "lucide-react";
+import { EventClickArg, EventDropArg } from "@fullcalendar/core";
 
 interface Evento {
   titulo: string;
-  inicio: Date | string;
+  inicio: Date | string | null;
   diaTodo: boolean;
   descricao: string;
   status: string;
   cor: string;
   id: number;
+  fim: Date | string;
 }
 
 export default function Home() {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
-  const [idParaExcluir, setIdParaExcluir] = useState<number | null>(null);
+  const [, setMostrarModalExcluir] = useState(false);
+  const [, setIdParaExcluir] = useState<number | null>(null);
   const [novoEvento, setNovoEvento] = useState<Evento>({
     titulo: "",
     inicio: "",
@@ -37,6 +37,7 @@ export default function Home() {
     status: "Pendente",
     cor: "#3788d8",
     id: 0,
+    fim: "",
   });
 
   useEffect(() => {
@@ -74,18 +75,8 @@ export default function Home() {
       status: "Pendente",
       cor: "#3788d8",
       id: 0,
+      fim: "",
     });
-  }
-
-  function abrirModalExcluir(eventoId: number) {
-    setMostrarModalExcluir(true);
-    setIdParaExcluir(eventoId);
-  }
-
-  function excluirEvento() {
-    setEventos(eventos.filter((evento) => evento.id !== idParaExcluir));
-    setMostrarModalExcluir(false);
-    setIdParaExcluir(null);
   }
 
   function fecharModal() {
@@ -93,7 +84,8 @@ export default function Home() {
     setMostrarModalExcluir(false);
     setIdParaExcluir(null);
   }
-  function aoClicarEvento(info: any) {
+
+  function aoClicarEvento(info: EventClickArg) {
     const eventoClicado = eventos.find(
       (evento) => evento.titulo === info.event.title,
     );
@@ -102,20 +94,20 @@ export default function Home() {
       setMostrarModal(true);
     }
   }
-  function aoRedimensionarEvento(info: any) {
+  function aoRedimensionarEvento(info: EventResizeDoneArg) {
     const eventoAtualizado = eventos.map((evento) => {
-      if (evento.titulo === info.event.title) {
+      if (evento.id.toString() === info.event.id) {
+        // Usando 'id' ao invés de 'titulo'
         return {
           ...evento,
-          inicio: info.event.start, // Atualiza data de início
-          fim: info.event.end, // Atualiza data de fim (se aplicável)
+          start: info.event.start,
         };
       }
       return evento;
     });
     setEventos(eventoAtualizado);
   }
-  function aoArrastarEvento(info: any) {
+  function aoArrastarEvento(info: EventDropArg) {
     const eventoAtualizado = eventos.map((evento) => {
       if (evento.titulo === info.event.title) {
         return {
@@ -140,7 +132,7 @@ export default function Home() {
     });
   }
 
-  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [, setDialogIsOpen] = useState(false);
   return (
     <>
       <Layout>
@@ -175,10 +167,11 @@ export default function Home() {
               }}
               locale="pt-br"
               events={eventos.map((e) => ({
-                title: e.titulo,
-                start: e.inicio,
-                color: e.cor,
-                description: e.descricao,
+                titulo: e.titulo,
+                inicio: e.inicio,
+                cor: e.cor,
+                descricao: e.descricao,
+                fim: e.fim,
               }))}
               dateClick={aoClicarData}
               eventClick={aoClicarEvento}
@@ -225,7 +218,7 @@ export default function Home() {
                           type="datetime-local"
                           name="inicio"
                           className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={novoEvento.inicio.toString()}
+                          value={`${novoEvento.inicio}`}
                           onChange={alterarNovoEvento}
                           required
                         />

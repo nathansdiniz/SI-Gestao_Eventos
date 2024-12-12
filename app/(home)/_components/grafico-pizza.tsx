@@ -1,21 +1,9 @@
 "use client";
 
-import {
-  PiggyBankIcon,
-  TrendingDownIcon,
-  TrendingUp,
-  TrendingUpIcon,
-} from "lucide-react";
+import { PiggyBankIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/app/_components/ui/card";
+import { Card, CardContent } from "@/app/_components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -52,7 +40,6 @@ interface CardResumo {
 const GraficoPizza = ({
   investidoTotal,
   depositoTotal,
-  saldo,
   gastosTotal,
   tiposPorcentagem,
 }: CardResumo) => {

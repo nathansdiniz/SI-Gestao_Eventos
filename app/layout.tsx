@@ -18,14 +18,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Obtendo a variável de ambiente CLERK_FRONTEND_API
-  const clerkFrontendApi = process.env.CLERK_FRONTEND_API;
-
   return (
     <html lang="ptBR">
       <body className={`${mulish.className} dark antialiased`}>
         <ClerkProvider
-          frontendApi={clerkFrontendApi} // Passando a chave de produção
           appearance={{
             baseTheme: dark,
           }}
