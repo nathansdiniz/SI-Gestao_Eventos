@@ -78,11 +78,6 @@ export const obterDashboard = async (mes: string) => {
       (Number(category._sum.amount) / Number(gastosTotal)) * 100,
     ),
   }));
-  const lastTransactions = await db.transaction.findMany({
-    where,
-    orderBy: { date: "desc" },
-    take: 15,
-  });
   const ultimasTransacoes = await db.transaction.findMany({
     where,
     orderBy: { date: "desc" },
