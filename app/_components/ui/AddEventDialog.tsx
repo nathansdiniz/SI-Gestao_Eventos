@@ -10,11 +10,28 @@ import {
 } from "@/app/_components/ui/dialog";
 import { Button } from "./button";
 
+interface EventData {
+  id: string;
+  title: string;
+  description: string;
+  backgroundColor: string;
+  status: string;
+  start: Date;
+  end: Date;
+  allDay: boolean;
+}
+
+interface SelectedDate {
+  start: Date;
+  end: Date;
+  allDay: boolean;
+}
+
 interface AddEventDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddEvent: (eventData: any) => void;
-  selectedDate: any;
+  onAddEvent: (eventData: EventData) => void;
+  selectedDate: SelectedDate;
 }
 
 const AddEventDialog: React.FC<AddEventDialogProps> = ({
@@ -34,14 +51,18 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newEvent = {
+    const newEvent: EventData = {
       id: `${selectedDate.start.toISOString()}-${newEventTitle}`,
       title: newEventTitle,
       description: newEventDescription,
       backgroundColor: newEventColor,
       status: newEventStatus,
-      start: newEventStartDate || selectedDate.start,
-      end: newEventEndDate || selectedDate.end,
+      start: newEventStartDate
+        ? new Date(newEventStartDate)
+        : selectedDate.start, // Garante tipo Date
+      end: newEventEndDate
+        ? new Date(newEventEndDate)
+        : selectedDate.end || undefined, // Garante tipo Date ou undefined
       allDay: newEventAllDay,
     };
 
@@ -76,13 +97,14 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
             className="mb-3 w-full rounded-md border bg-black p-3 text-white"
           />
 
-          <label>Data Início</label>
+          <label>Data Início:</label>
           <input
             type="datetime-local"
             value={newEventStartDate}
             onChange={(e) => setNewEventStartDate(e.target.value)}
             className="mb-3 w-full rounded-md border bg-black p-3 text-white"
           />
+
           <label>Data Fim:</label>
           <input
             type="datetime-local"

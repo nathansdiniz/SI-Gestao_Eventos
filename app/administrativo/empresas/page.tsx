@@ -10,8 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/_components/ui/table";
-import { Diff } from "lucide-react";
 
+// Dados fictícios
 const invoices = [
   {
     Nome: "Elaine e Henrique Pizzaria Delivery Ltda",
@@ -31,7 +31,7 @@ const invoices = [
   },
 ];
 
-export function TableDemo() {
+export function TableDemo(): JSX.Element {
   return (
     <Table>
       <TableCaption>Lista das empresas mais recentes.</TableCaption>
@@ -56,7 +56,7 @@ export function TableDemo() {
             <TableCell>{invoice.CNPJ}</TableCell>
             <TableCell>{invoice["Data de Abertura"]}</TableCell>
             <TableCell>{invoice["Inscrição Estadual"]}</TableCell>
-            <TableCell className="text-right">{invoice.Site}</TableCell>
+            <TableCell>{invoice.Site}</TableCell>
             <TableCell>{invoice["E-Mail"]}</TableCell>
             <TableCell>{invoice.Endereço}</TableCell>
             <TableCell>{invoice.Cidade}</TableCell>
@@ -75,24 +75,19 @@ export function TableDemo() {
   );
 }
 
-const Funcionarios = () => {
+const Funcionarios: React.FC = () => {
   return (
-    <>
-      <Layout>
-        <div className="space-y-6 p-6">
-          <div className="flex justify-between">
-            <h1 className="text-4xl font-bold">Empresas</h1>
-            <Button className="font-bold text-white">
-              <Diff></Diff>
-              Adicionar Empresa
-            </Button>
-          </div>
-          <div className="flex justify-center">
-            <TableDemo></TableDemo>
-          </div>
+    <Layout>
+      <div className="space-y-6 p-6">
+        <div className="flex justify-between">
+          <h1 className="text-4xl font-bold">Empresas</h1>
+          <Button className="font-bold text-white">Adicionar Empresa</Button>
         </div>
-      </Layout>
-    </>
+        <div className="flex justify-center">
+          <TableDemo />
+        </div>
+      </div>
+    </Layout>
   );
 };
 

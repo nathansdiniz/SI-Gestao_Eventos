@@ -36,10 +36,9 @@ interface Dadosfinanceiros {
 
 interface DataProps {
   mes: string;
-  ano: string;
 }
 
-export const Financeiro = async ({ mes, ano }: DataProps) => {
+export const Financeiro = async ({ mes }: DataProps) => {
   const { userId } = await auth();
   if (!userId) {
     redirect("/login");
@@ -63,7 +62,6 @@ export const Financeiro = async ({ mes, ano }: DataProps) => {
     return dateB.getTime() - dateA.getTime(); // Ordem decrescente
   });
 
-  let dashboard;
   let investidoTotal = 0;
   let depositoTotal = 0;
   let gastosTotal = 0;
@@ -75,7 +73,7 @@ export const Financeiro = async ({ mes, ano }: DataProps) => {
       depositoTotal += Number(item.valor);
     else gastosTotal += Number(item.valor);
   });
-  dashboard = {
+  const dashboard = {
     investidoTotal: investidoTotal,
     depositoTotal: depositoTotal,
     saldo: depositoTotal - gastosTotal - investidoTotal,

@@ -1,10 +1,6 @@
 import { Badge } from "@/app/_components/ui/badge";
 import { CircleIcon } from "lucide-react";
 
-interface dadosfinanceirosProps {
-  tipocobranca: string;
-}
-
 interface TiposCobrancaBadgeProps {
   tipocobranca: string;
 }

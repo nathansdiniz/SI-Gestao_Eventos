@@ -71,10 +71,8 @@ const Financeiro = async ({ searchParams: { mes, ano } }: FinanceiroProps) => {
     return dateB.getTime() - dateA.getTime(); // Ordem decrescente
   });
 
-  let dashboard;
   let investidoTotal = 0;
   let depositoTotal = 0;
-  let saldo = 0;
   let gastosTotal = 0;
 
   dadosfinanceiros.data.map((item) => {
@@ -84,7 +82,7 @@ const Financeiro = async ({ searchParams: { mes, ano } }: FinanceiroProps) => {
       depositoTotal += Number(item.valor);
     else gastosTotal += Number(item.valor);
   });
-  dashboard = {
+  const dashboard = {
     investidoTotal: investidoTotal,
     depositoTotal: depositoTotal,
     saldo: depositoTotal - gastosTotal - investidoTotal,

@@ -85,7 +85,7 @@ export const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
   {
     accessorKey: "actions",
     header: "Ações",
-    cell: ({ row }) => (
+    cell: ({}) => (
       <div className="flex flex-row space-x-2">
         <Button
           variant="ghost"

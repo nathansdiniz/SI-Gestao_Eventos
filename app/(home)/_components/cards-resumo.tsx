@@ -1,9 +1,4 @@
-import {
-  PiggyBankIcon,
-  TrendingDownIcon,
-  TrendingUpIcon,
-  WalletIcon,
-} from "lucide-react";
+import { TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
 import CardResumido from "./card-resumido";
 
 interface CardResumo {
@@ -15,7 +10,6 @@ interface CardResumo {
 }
 
 const CardResumo = async ({
-  investidoTotal,
   depositoTotal,
   saldo,
   gastosTotal,
