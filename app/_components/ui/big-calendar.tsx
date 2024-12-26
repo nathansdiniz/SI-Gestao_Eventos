@@ -1,91 +1,157 @@
 "use client";
+import React, { useState, useEffect } from "react";
+import {
+  formatDate,
+  DateSelectArg,
+  EventClickArg,
+  EventApi,
+} from "@fullcalendar/core";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/app/_components/ui/dialog";
+import { Button } from "./button";
+import AddEventDialog from "./AddEventDialog";
+import EventDetailsDialog from "./EditEventDialog";
+import { PlusIcon } from "lucide-react";
 
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import { format } from "date-fns/format";
-import { parse } from "date-fns/parse";
-import { startOfWeek } from "date-fns/startOfWeek";
-import { getDay } from "date-fns/getDay";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useState } from "react";
-import Modal from "@/app/_components/Modal";
-import { ptBR } from "date-fns/locale";
+const Calendar: React.FC = () => {
+  const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<
+    EventClickArg["event"] | null
+  >(null);
 
-const locales = {
-  "pt-BR": ptBR,
-};
+  // Novos estados para os campos do evento
+  const [newEventTitle, setNewEventTitle] = useState<string>("");
+  const [newEventDescription, setNewEventDescription] = useState<string>("");
+  const [newEventColor, setNewEventColor] = useState<string>("#000000");
+  const [newEventStatus, setNewEventStatus] = useState<string>("Pendente");
+  const [newEventEndDate, setNewEventEndDate] = useState<string>("");
+  const [newEventAllDay, setNewEventAllDay] = useState<boolean>(true);
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
+  useEffect(() => {
+    const savedEvents = localStorage.getItem("events");
+    if (savedEvents) setCurrentEvents(JSON.parse(savedEvents));
+  }, []);
 
-interface Event {
-  id: number;
-  title: string;
-  start: Date;
-  end: Date;
-  allDay?: boolean;
-}
+  useEffect(() => {
+    localStorage.setItem("events", JSON.stringify(currentEvents));
+  }, [currentEvents]);
 
-const CalendarComponent = () => {
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: 1,
-      title: "Reunião com Cliente",
-      start: new Date(2024, 10, 26, 10, 0),
-      end: new Date(2024, 10, 26, 12, 0),
-    },
-  ]);
-
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
-    const newEvent = {
-      id: events.length + 1,
-      title: "Novo Evento",
-      start: slotInfo.start,
-      end: slotInfo.end,
-    };
-    setEvents([...events, newEvent]);
+  const handleDateClick = (selected: DateSelectArg) => {
+    setSelectedDate(selected);
+    setIsAddDialogOpen(true);
   };
 
-  const handleSelectEvent = (event: Event) => {
-    setSelectedEvent(event);
-    setModalOpen(true);
+  const handleEventClick = (event: EventClickArg) => {
+    console.log("Evento selecionado:", event.event); // Verifique a estrutura do evento aqui
+    setSelectedEvent(event.event); // Acesse o evento via `event.event`
+    setIsDialogOpen(true);
   };
 
-  const handleDeleteEvent = (eventId: number) => {
-    setEvents(events.filter((event) => event.id !== eventId));
-    setModalOpen(false);
+  const handleCloseDialog = () => {
+    setIsAddDialogOpen(false);
+    setIsEditDialogOpen(false);
+    setNewEventTitle("");
+    setNewEventDescription("");
+    setNewEventColor("#000000");
+    setNewEventStatus("Pendente");
+    setNewEventEndDate("");
+    setNewEventAllDay(true);
+  };
+
+  const handleAddEvent = (newEvent: any) => {
+    const calendarApi = selectedDate!.view.calendar;
+    calendarApi.addEvent(newEvent);
+  };
+
+  const handleEditEvent = () => {
+    if (selectedEvent) {
+      selectedEvent.setProp("title", newEventTitle || selectedEvent.title);
+      selectedEvent.setProp("backgroundColor", newEventColor);
+      selectedEvent.setExtendedProp("description", newEventDescription);
+      selectedEvent.setExtendedProp("status", newEventStatus);
+      handleCloseDialog();
+    }
+  };
+
+  const handleUpdateEvent = (updatedEvent: any) => {
+    // Lógica para atualizar o evento
+    console.log("Evento atualizado:", updatedEvent);
+    setIsDialogOpen(false); // Fechar o diálogo
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    // Lógica para excluir o evento
+    console.log("Evento excluído:", eventId);
+    setIsDialogOpen(false); // Fechar o diálogo
   };
 
   return (
     <div>
-      <div style={{ height: "80vh" }}>
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          selectable
-          onSelectSlot={handleSelectSlot} // Adicionar novos eventos
-          onSelectEvent={handleSelectEvent} // Ver detalhes do evento
-          style={{ height: "100%" }}
+      <div className="flex items-center justify-between px-10">
+        <h1 className="text-2xl font-bold">Calendário de Eventos</h1>
+        <Button onClick={() => setIsAddDialogOpen(true)} className="bg-primary">
+          <PlusIcon></PlusIcon>
+          Adicionar Evento
+        </Button>
+      </div>
+
+      <div className="mt-8 px-10">
+        <FullCalendar
+          height="80vh"
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          initialView="dayGridMonth"
+          locale="pt-br"
+          editable={true}
+          selectable={true}
+          dayMaxEvents={true}
+          select={handleDateClick}
+          eventClick={handleEventClick}
+          eventsSet={(events) => setCurrentEvents(events)}
+          initialEvents={
+            typeof window !== "undefined"
+              ? JSON.parse(localStorage.getItem("events") || "[]")
+              : []
+          }
         />
       </div>
-      {isModalOpen && selectedEvent && (
-        <Modal
-          event={selectedEvent}
-          onClose={() => setModalOpen(false)}
-          onDelete={() => handleDeleteEvent(selectedEvent.id)}
-        />
-      )}
+
+      {/* Diálogo para Adicionar Novo Evento */}
+      <AddEventDialog
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onAddEvent={handleAddEvent}
+        selectedDate={selectedDate}
+      />
+
+      {/* Diálogo para Editar/Excluir Evento */}
+      {/* Dialog de Adição/Edição/Visualização */}
+      <EventDetailsDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onUpdateEvent={handleUpdateEvent}
+        onDeleteEvent={handleDeleteEvent}
+        selectedEvent={selectedEvent}
+      />
     </div>
   );
 };
 
-export default CalendarComponent;
+export default Calendar;

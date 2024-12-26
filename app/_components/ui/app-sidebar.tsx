@@ -42,6 +42,11 @@ const items = [
     icon: CalendarCheck,
   },
   {
+    title: "Financeiro",
+    url: "/administrativo/financeiro",
+    icon: CalendarCheck,
+  },
+  {
     title: "Relatórios",
     url: "#",
     icon: FileText,

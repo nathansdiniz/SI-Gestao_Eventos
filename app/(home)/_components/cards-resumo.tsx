@@ -30,21 +30,15 @@ const CardResumo = async ({
         size="large"
       />
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 gap-6">
         <CardResumido
-          icon={<PiggyBankIcon size={16} className="text-" />}
-          title="Investido"
-          amount={investidoTotal}
-        />
-
-        <CardResumido
-          icon={<TrendingUpIcon size={16} className="text-primary" />}
-          title="Receita"
+          icon={<TrendingUpIcon size={16} className="text-green-500" />}
+          title="Entradas"
           amount={depositoTotal}
         />
         <CardResumido
           icon={<TrendingDownIcon size={16} className="text-red-500" />}
-          title="Despesa"
+          title="Saídas"
           amount={gastosTotal}
         />
       </div>
