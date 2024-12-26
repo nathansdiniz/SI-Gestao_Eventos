@@ -10,9 +10,25 @@ import { Button } from "./button";
 interface EventDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdateEvent: (updatedEvent: any) => void;
+  onUpdateEvent: (updatedEvent: {
+    id: string;
+    title: string;
+    description: string;
+    backgroundColor: string;
+    status: string;
+    start: string;
+    end: string;
+  }) => void;
   onDeleteEvent: (eventId: string) => void;
-  selectedEvent: any; // Evento selecionado
+  selectedEvent: {
+    id: string;
+    title: string;
+    description: string;
+    backgroundColor: string;
+    status: string;
+    start: string;
+    end: string;
+  }; // Pode ser null se nenhum evento for selecionado
 }
 
 const EventDetailsDialog: React.FC<EventDetailsDialogProps> = ({

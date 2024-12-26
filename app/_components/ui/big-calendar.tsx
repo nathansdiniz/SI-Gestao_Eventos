@@ -48,8 +48,15 @@ const Calendar: React.FC = () => {
   };
 
   const handleUpdateEvent = (updatedEvent: EventApi) => {
-    console.log("Evento atualizado:", updatedEvent);
-    setIsDialogOpen(false);
+    const formattedEvent = {
+      id: updatedEvent.id.toString(), // Garantindo que o ID seja uma string
+      title: updatedEvent.title,
+      description: updatedEvent.extendedProps.description || "", // Supondo que `description` esteja em `extendedProps`
+      backgroundColor: updatedEvent.backgroundColor || "#000000",
+      status: updatedEvent.extendedProps.status || "Pendente", // Usando `extendedProps` ou outra propriedade relevante
+      start: updatedEvent.startStr, // Ou a propriedade correta de data
+      end: updatedEvent.endStr, // Ou a propriedade correta de data
+    };
   };
 
   const handleDeleteEvent = (eventId: string) => {
