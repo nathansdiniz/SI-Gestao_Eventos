@@ -5,6 +5,9 @@ import {
   BadgeDollarSign,
   CalendarCheck,
   FileText,
+  Users,
+  Building2,
+  Landmark,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -44,12 +47,22 @@ const items = [
   {
     title: "Financeiro",
     url: "/administrativo/financeiro",
-    icon: CalendarCheck,
+    icon: Landmark,
   },
   {
     title: "Relatórios",
     url: "#",
     icon: FileText,
+  },
+  {
+    title: "Funcionarios",
+    url: "/administrativo/funcionarios",
+    icon: Users,
+  },
+  {
+    title: "Empresas",
+    url: "/administrativo/empresas",
+    icon: Building2,
   },
   {
     title: "Configurações",
