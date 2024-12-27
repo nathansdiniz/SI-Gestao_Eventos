@@ -1,6 +1,6 @@
 "use client";
 
-import { PiggyBankIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 
 import { Card, CardContent } from "@/app/_components/ui/card";
@@ -20,11 +20,11 @@ const chartConfig = {
     color: "#FFFFFF",
   },
   [TransactionType.DEPOSIT]: {
-    label: "Receita",
+    label: "Entradas",
     color: "#55B02E",
   },
   [TransactionType.EXPENSE]: {
-    label: "Despesas",
+    label: "Saídas",
     color: "#E93030",
   },
 } satisfies ChartConfig;
@@ -61,11 +61,11 @@ const GraficoPizza = ({
     },
   ];
   return (
-    <Card className="flex flex-col">
+    <Card className="mx-auto flex w-full max-w-md flex-col sm:max-w-sm">
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="xs:max-w-[150px] mx-auto aspect-square w-full max-w-[250px] sm:max-w-[200px]"
         >
           <PieChart>
             <ChartTooltip
@@ -76,14 +76,14 @@ const GraficoPizza = ({
               data={chartData}
               dataKey="amount"
               nameKey="type"
-              innerRadius={60}
+              innerRadius={40}
             />
           </PieChart>
         </ChartContainer>
         <div className="space-y-3">
           <PorcentagemItem
             icon={<TrendingUpIcon size={16} className="text-green-500" />}
-            title="Entrdas"
+            title="Entradas"
             value={tiposPorcentagem[TransactionType.DEPOSIT]}
           />
           <PorcentagemItem
