@@ -42,16 +42,18 @@ const Financeiro = async ({ searchParams: { mes } }: FinanceiroProps) => {
 
   // Chamada da API para obter os dados
 
-  const sortedData = dadosfinanceiros.data.sort(
-    (
-      a: { datacompetencia: string | number | Date },
-      b: { datacompetencia: string | number | Date },
-    ) => {
-      const dateA = new Date(a.datacompetencia);
-      const dateB = new Date(b.datacompetencia);
-      return dateB.getTime() - dateA.getTime(); // Ordem decrescente
-    },
-  );
+  const sortedData = Array.isArray(dadosfinanceiros.data)
+    ? dadosfinanceiros.data.sort(
+        (
+          a: { datacompetencia: string | number | Date },
+          b: { datacompetencia: string | number | Date },
+        ) => {
+          const dateA = new Date(a.datacompetencia);
+          const dateB = new Date(b.datacompetencia);
+          return dateB.getTime() - dateA.getTime();
+        },
+      )
+    : [];
 
   let investidoTotal = 0;
   let depositoTotal = 0;
