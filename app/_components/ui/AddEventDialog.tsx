@@ -102,7 +102,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
             type="datetime-local"
             value={newEventStartDate}
             onChange={(e) => setNewEventStartDate(e.target.value)}
-            className="mb-3 w-full rounded-md border bg-black p-3 text-white"
+            className="mb-3 w-full rounded-md border bg-white p-3 text-black"
           />
 
           <label>Data Fim:</label>
@@ -110,7 +110,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
             type="datetime-local"
             value={newEventEndDate}
             onChange={(e) => setNewEventEndDate(e.target.value)}
-            className="mb-3 w-full rounded-md border bg-black p-3 text-white"
+            className="mb-3 w-full rounded-md border bg-white p-3 text-black"
           />
 
           <label>Status:</label>
