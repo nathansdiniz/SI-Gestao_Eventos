@@ -39,15 +39,11 @@ export const TRANSACTION_PAYMENT_METHOD_LABELS = {
 export const TRANSACTION_TYPE_OPTIONS = [
   {
     value: TransactionType.EXPENSE,
-    label: "Despesa",
+    label: "Saídas",
   },
   {
     value: TransactionType.DEPOSIT,
-    label: "Depósito",
-  },
-  {
-    value: TransactionType.INVESTMENT,
-    label: "Investimento",
+    label: "Entradas",
   },
 ];
 

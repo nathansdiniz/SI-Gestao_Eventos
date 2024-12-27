@@ -12,7 +12,7 @@ const GastosCategoria = ({ gastosPorCategoria }: GastosCategoria) => {
   return (
     <ScrollArea className="col-span-2 h-full rounded-md border pb-6">
       <CardHeader>
-        <CardTitle>Gastos por Categoria</CardTitle>
+        <CardTitle>Saídas por Categoria</CardTitle>
       </CardHeader>
 
       <CardContent>

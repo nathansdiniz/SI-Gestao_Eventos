@@ -82,19 +82,14 @@ const GraficoPizza = ({
         </ChartContainer>
         <div className="space-y-3">
           <PorcentagemItem
-            icon={<TrendingUpIcon size={16} className="text-primary" />}
-            title="Receita"
+            icon={<TrendingUpIcon size={16} className="text-green-500" />}
+            title="Entrdas"
             value={tiposPorcentagem[TransactionType.DEPOSIT]}
           />
           <PorcentagemItem
             icon={<TrendingDownIcon size={16} className="text-red-500" />}
-            title="Despesas"
+            title="Saídas"
             value={tiposPorcentagem[TransactionType.EXPENSE]}
-          />
-          <PorcentagemItem
-            icon={<PiggyBankIcon size={16} />}
-            title="Investido"
-            value={tiposPorcentagem[TransactionType.INVESTMENT]}
           />
         </div>
       </CardContent>

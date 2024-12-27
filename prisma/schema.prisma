@@ -53,3 +53,380 @@ enum TransactionPaymentMethod {
   PIX
   OTHER
 }
+
+
+model PagtoConfig {
+  id                Int       @id @default(autoincrement())
+  tipo_saida      String?
+  tabela_cms        String?
+  periodiciade_pgto String?
+  data_created      DateTime?
+  data_updated      DateTime?
+  text_informacoes  String?
+}
+
+model UserType {
+  id           Int          @id @default(autoincrement())
+  name          String?
+  descricao     String?
+  data_created  DateTime?
+  data_updated  DateTime?
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  cpf            String?
+  usuario        String?
+  senha          String?
+  email          String?
+  id_user_type   Int?
+  data_created   DateTime?
+  data_updated   DateTime?
+}
+
+model Funcionarios {
+  id                Int              @id @default(autoincrement())
+  cpf               String?
+  nome              String?
+  funcao            String?
+  status            Boolean?
+  id_celula         Int?
+  endereco          String?
+  telefone          String?
+  email             String?
+  data_nascimento   DateTime?
+  data_start_funcao DateTime?
+  data_end_funcao   DateTime?
+  data_updated_funcao DateTime?
+  data_created      DateTime?
+  data_updated      DateTime?
+  Pagamentos_id  Int
+  User_id        Int
+}
+
+model Empresas {
+  id                Int        @id @default(autoincrement())
+  empresa            String?
+  cnpj               String     @unique
+  ramo_empresa       String?
+  localizacao_empresa String?
+  data_created       DateTime?
+  data_updated       DateTime?
+  gestor_responsavel String?
+}
+
+model EntradasEventos {
+  id                    Int            @id @default(autoincrement())
+  operacao                String?
+  data_principal          DateTime?
+  tipo_receita            String?
+  parcelas                Int?
+  valor                   Decimal?
+  troco                   Decimal?
+  custo_convenio          Int?
+  segment_convenio        Int?
+  taxa_juros              Decimal?
+  agencia                 String?
+  status                  String?
+  id_empresa              Int?
+  tipo                    Int?
+  banco                   String?
+  seq_operador            Int?
+  cod_transacao           String?
+  data_contratada         DateTime?
+  data_cancelada          DateTime?
+  data_proposta           DateTime?
+  data_movimentacao       DateTime?
+  cod_situacao            String?
+  cod_processamento       String?
+  valor_liquido           Decimal?
+  agente_responsavel      String?
+  cpf_cliente             String?
+  nome_cliente            String?
+  validacao               String?
+  ultima_alteracao_validacao String?
+}
+
+model Producao {
+  id                  Int               @id @default(autoincrement())
+  produto             String?
+  operacao            String?
+  chavej_operador     String?
+  cpf_cnpj_operador   String?
+  data_created        DateTime?
+  data_updated        DateTime?
+  text_informacoes    String?
+  Funcionarios_id Int
+}
+
+model EntradasAgenda {
+  id               Int               @id @default(autoincrement())
+  operacao          String?
+  situacao_operacao String?
+  valor             Decimal?
+  data_venda        DateTime?
+  vendedor          String?
+  cpf_cnpj_vendedor String?
+  comprador_cliente String?
+  cpf_cnpj_comprador String?
+  data_nasc_comprador DateTime?
+  data_cancelada    DateTime?
+  data_reativada    DateTime?
+  usuario_portal    String?
+  agencia           String?
+  data_contemplacao DateTime?
+  cep               String?
+  uf                String?
+  municipio         String?
+  data_created      DateTime?
+  data_updated      DateTime?
+  id_empresa        Int?
+}
+
+model CustomersContacts {
+  id          Int    @id @default(autoincrement())
+  cpf_cnpj    String?
+  ddd1        Int?
+  telefone1   Int?
+  ddd2        Int?
+  telefone2   Int?
+  ddd3        Int?
+  telefone3   Int?
+  ddd4        Int?
+  telefone4   Int?
+  ddd5        Int?
+  telefone5   Int?
+  ddd6        Int?
+  telefone6   Int?
+}
+
+model Leads {
+  id                   Int      @id @default(autoincrement())
+  num_campanha         String?
+  campanha             String?
+  origem               String?
+  produto              String?
+  cpf_cnpj_cliente     String?
+  telefone_cliente     String?
+  email_cliente        String?
+  data_primeiro_contato DateTime?
+  sg_uf                String?  @db.VarChar(2)
+  data_created         DateTime?
+  data_updated         DateTime?
+  return_cod_resultado String?
+  return_data_contato  DateTime?
+  send_data_contact_center DateTime?
+}
+
+model Customers {
+  id                  Int      @id @default(autoincrement())
+  cpf_cnpj            String?
+  nome_razao_social   String?
+  data_nasc           DateTime?
+  uf                  String?  @db.VarChar(2)
+  municipio_endereco  String?
+  nao_pertube         Boolean?
+  sexo                String?  @db.VarChar(1)
+  data_updated        DateTime?
+  data_created        DateTime?
+  ContactCustomer_id Int
+  Leads_id          Int
+}
+
+model MetasProducaoConfig {
+  id                  Int      @id
+  id_celula           Int?
+  produto             String?
+  valor_meta          Decimal?
+  mes                 String?
+  ano                 Int?
+  data_created        DateTime?
+  data_updated        DateTime?
+  Production_id   Int
+}
+
+
+
+model Eventos {
+  id                   Int      @id @default(autoincrement())
+  id_empresa           Int?
+  nome_evento          String?
+  contrato             Int?
+  valor_liquido        Decimal?
+  cliente_evento       String?
+  data_contratacao     DateTime?
+  max_participantes    Int?
+  informacoes_montagem Float?
+  nome_produto         String?
+  descricao_produto    String?
+  status_evento        String?
+  responsavel_montagem String?
+  local                String?  @db.VarChar(45)
+  diaTodo              Boolean?
+  datahora_inicio      DateTime?
+  datahora_fim         DateTime?
+  date_created         DateTime?
+  date_uploated        DateTime?
+  userId               String?  @db.VarChar(45)
+}
+
+model EventsType {
+  id          Int      @id @default(autoincrement())
+  tipo_evento Int?
+  id_empresa  Int?
+  segmento    String?
+}
+
+model HistoricoLogs {
+  idHistoricoLogs Int      @id
+  Descricao          String? @db.VarChar(45)
+  UserId             String? @db.VarChar(45)
+  datahora_alteracao DateTime?
+  HistoricoLogscol String? @db.VarChar(45)
+}
+
+model Orcamentos {
+  id                     Int      @id
+  nome_orcamento         String?
+  cliente_orcamento      String?
+  tipo_orcamento         String? @db.VarChar(45)
+  data_orcamento         DateTime?
+  valor_orcamento        Decimal?
+  forma_pagamento        String? @db.VarChar(45)
+  parcelas_orcamento     Int?
+  max_participantes      Int?
+  valor_negociado        Decimal?
+  forma_pagamento_negociado String? @db.VarChar(45)
+  parcelas_negociadas    Int?
+  data_negociacao        DateTime?
+  data_principal_evento  DateTime?
+  idVendedor_orcamento   String? @db.VarChar(45)
+  idVendedor_negociacao  String? @db.VarChar(45)
+  status_orcamento       String? @db.VarChar(45)
+  data_criacao           DateTime?
+  data_atualizacao       DateTime?
+}
+
+
+model PropostaSituacao {
+  id            Int       @id @default(autoincrement())
+  descricao     String    @db.VarChar(255)
+  status        String    @db.VarChar(50)
+  dt_criacao    DateTime  @default(now())
+  dt_alteracao  DateTime? @updatedAt
+  ativo         Boolean   @default(true)
+
+}
+
+model ClienteContato {
+  id            Int       @id @default(autoincrement())
+  clienteId     Int
+  tipo_contato  String    @db.VarChar(50)
+  valor_contato String    @db.VarChar(255)
+  dt_criacao    DateTime  @default(now())
+  dt_alteracao  DateTime? @updatedAt
+  ativo         Boolean   @default(true)
+}
+
+model Saidas {
+  id                      Int       @id @default(autoincrement())
+  descricao               String    // Descrição da saida
+  categoria               String?   // Categoria da saida (e.g., Alimentação, Transporte, Local, etc.)
+  valor                   Decimal   // Valor da saida
+  data_pagamento          DateTime? // Data de pagamento
+  data_emissao            DateTime? // Data de emissão da saida
+  forma_pagamento         String?   // Forma de pagamento (e.g., Dinheiro, Cartão, Transferência)
+  status_pagamento        String?   // Status de pagamento (e.g., Pago, Pendente)
+  fornecedor_id           Int?      // Referência ao fornecedor
+  fornecedor_nome         String?   // Nome do fornecedor (se não for uma referência)
+  evento_id               Int?      // Referência ao evento relacionado
+  evento_nome             String?   // Nome do evento (se não for uma referência)
+  data_criacao            DateTime  @default(now()) // Data de criação do registro
+  data_atualizacao        DateTime  @updatedAt          // Data da última atualização
+}
+
+model Fornecedores {
+  idfornecedores           Int       @id
+  nome_fornecedor          String?   
+  cnpj_fornecedor          String    @unique
+  tipo_fornecedor          String?   
+  representante_responsavel String?   
+  localizacao_fornecedor  String?   
+  telefone_fornecedor     String?   
+  email_fornecedor        String?   
+  data_contratada          DateTime? 
+  data_termino            DateTime? 
+  data_criacao            DateTime? 
+  data_atualizacao        DateTime? 
+  userID                  String?   
+}
+
+model Clientes {
+  idclientes               Int       @id
+  cliente                  String?   
+  cpf_cnpj_cliente        String    @unique
+  data_nascimento_cliente DateTime? 
+  endereco_cliente        String?   
+  estado_cliente          String?   
+  telefone_cliente        String?   
+  celular_cliente         String?   
+  email_cliente           String?   
+  sexo_cliente            String?   
+  data_criacao            DateTime? 
+  data_atualizacao        DateTime? 
+}
+
+model ModelosRelatorios {
+  idModelosRelatorios  Int       @id
+  nome_relatorio          String?   
+  ModelosRelatorioscol String?   
+}
+
+model Estoque {
+  id                      Int       @id
+  idProduto               Int?      
+  qtde_total              Int?      
+  qtde_disponivel         Int?      
+  qtde_em_uso             Int?      
+  localizacao_produto     String?   
+  data_status             DateTime? 
+  data_entrada            DateTime? 
+  data_saida             DateTime? 
+}
+
+model Produtos {
+  idProdutos              Int       @id
+  nome_produto            String?   
+  tipo_produto            String?   
+  qtde_total_produto      Int?      
+  valor_unitario_produto  Decimal?  
+  valor_total_produto     Decimal?  
+  data_status             DateTime? 
+  responsavel_cadastro    String?   
+  data_cadastro           DateTime? 
+  responsavel_atualizacao String?   
+  data_atualizacao        DateTime? 
+}
+
+model AgendaGeral {
+  idAgendaGeral           Int       @id
+  titulo_agenda           String?   
+  tipo_agenda             Int?      
+  responsavel_agenda      String?   
+  datahora_inicial        DateTime? 
+  datahora_final          DateTime? 
+  localizacao             String?   
+  informacoes_extras      String?   
+  userID                  String?   
+  data_criacao            DateTime? 
+  data_atualizacao        DateTime? 
+  status_compromisso      String?   
+  id_empresa              Int?      
+}
+
+model TiposAgenda {
+  idTiposAgenda           Int       @id
+  tipo_agenda             String?   
+  responsavel_agenda      String?   
+}
+
