@@ -28,32 +28,22 @@ const Financeiro = async ({ searchParams: { mes } }: FinanceiroProps) => {
 
   const baseURL = "https://app1.meeventos.com.br/inmidialed";
   const apiKey = process.env.TOKEN_ME_EVENTOS;
-  const res = await fetch(`${baseURL}/api/v1/financial`, {
-    method: "GET", // ou POST, PUT, DELETE, etc.
-    headers: {
-      Authorization: `${apiKey}`, // Inclua o token no cabeçalho
-      "Content-Type": "application/json", // Se você estiver enviando JSON
-      // outros headers, se necessário
+  const res = await fetch(
+    `${baseURL}/api/v1/financial?field_sort=datacompetencia&sort=desc`,
+    {
+      method: "GET", // ou POST, PUT, DELETE, etc.
+      headers: {
+        Authorization: `${apiKey}`, // Inclua o token no cabeçalho
+        "Content-Type": "application/json", // Se você estiver enviando JSON
+        // outros headers, se necessário
+      },
+      // body: JSON.stringify(dados), // Se for uma requisição POST com dados
     },
-    // body: JSON.stringify(dados), // Se for uma requisição POST com dados
-  });
+  );
 
   const dadosfinanceiros = await res.json(); // o
 
   // Chamada da API para obter os dados
-
-  const sortedData = Array.isArray(dadosfinanceiros.data)
-    ? dadosfinanceiros.data.sort(
-        (
-          a: { datacompetencia: string | number | Date },
-          b: { datacompetencia: string | number | Date },
-        ) => {
-          const dateA = new Date(a.datacompetencia);
-          const dateB = new Date(b.datacompetencia);
-          return dateB.getTime() - dateA.getTime();
-        },
-      )
-    : [];
 
   let investidoTotal = 0;
   let depositoTotal = 0;
@@ -88,7 +78,7 @@ const Financeiro = async ({ searchParams: { mes } }: FinanceiroProps) => {
           <ScrollArea className="space-y-6">
             <DataTable
               columns={financeiroColumns} // Usando as colunas corretamente
-              data={sortedData} // Passando os dados corretamente
+              data={dadosfinanceiros.data} // Passando os dados corretamente
             />
           </ScrollArea>
         </div>
