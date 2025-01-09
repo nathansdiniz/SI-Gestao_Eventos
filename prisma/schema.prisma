@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_AWS")
 }
 
 model Transaction {
@@ -247,28 +247,63 @@ model MetasProducaoConfig {
 
 
 
-model Eventos {
-  id                   Int      @id @default(autoincrement())
-  id_empresa           Int?
-  nome_evento          String?
-  contrato             Int?
-  valor_liquido        Decimal?
-  cliente_evento       String?
-  data_contratacao     DateTime?
-  max_participantes    Int?
-  informacoes_montagem Float?
-  nome_produto         String?
-  descricao_produto    String?
-  status_evento        String?
-  responsavel_montagem String?
-  local                String?  @db.VarChar(45)
-  diaTodo              Boolean?
-  datahora_inicio      DateTime?
-  datahora_fim         DateTime?
-  date_created         DateTime?
-  date_uploated        DateTime?
-  userId               String?  @db.VarChar(45)
+model Evento {
+  id          Int       @id @default(autoincrement())
+  tipoEvento  String
+  dataDeCadastro DateTime
+  idOrcamento Int? // Tornar o campo opcional
+  idCliente   Int?
+  nomeCliente String
+  dataEvento  DateTime?
+  horaEvento  String
+  localEvento String?
+  nomeEvento  String?
+  idLocalEvento Int?
+  endereco    String?
+  numero      Int?
+  complemento String?
+  cep         String?
+  bairro      String?
+  cidade      String?
+  estado      String?
+  informacoes String?
+  observacao  String?
+  codigoInterno String?
+  convidados  Int
+  datasAdicionais String
+  status      String
+  id_empresa  Int
 }
+
+model Eventosme {
+  id          Int       @id @default(autoincrement())
+  tipoEvento  String
+  dataDeCadastro DateTime
+  idOrcamento Int? // Tornar o campo opcional
+  idCliente   Int?
+  nomeCliente String
+  dataEvento  DateTime?
+  horaEvento  String
+  localEvento String?
+  nomeEvento  String?
+  idLocalEvento Int?
+  endereco    String?
+  numero      Int?
+  complemento String?
+  cep         String?
+  bairro      String?
+  cidade      String?
+  estado      String?
+  informacoes String?
+  observacao  String?
+  codigoInterno String?
+  convidados  Int
+  datasAdicionais String
+  status      String
+  id_empresa  Int
+}
+
+
 
 model EventsType {
   id          Int      @id @default(autoincrement())
@@ -286,9 +321,10 @@ model HistoricoLogs {
 }
 
 model Orcamentos {
-  id                     Int      @id
+  id                     Int      @id @default(autoincrement())
   nome_orcamento         String?
   cliente_orcamento      String?
+  email_cliente            String?   // Email do cliente
   tipo_orcamento         String? @db.VarChar(45)
   data_orcamento         DateTime?
   valor_orcamento        Decimal?
@@ -305,6 +341,21 @@ model Orcamentos {
   status_orcamento       String? @db.VarChar(45)
   data_criacao           DateTime?
   data_atualizacao       DateTime?
+   observacao       String?   // Observação (campo livre de texto)
+  codigoInterno    String?   // Código interno
+  numeroConvidados Int?      // Número de convidados do evento
+   valorInicial     Decimal?  // Valor inicial negociável
+  whatsapp         String?   // Cliente possui WhatsApp
+  ddiTelefone      String?   // DDI do telefone (com o "+")
+  telefone         String?   // Telefone com ou sem máscara
+  ddiCelular       String?   // DDI do celular (com o "+")
+  celular          String?   // Celular com ou sem máscara
+  idLocalEvento    Int?      // ID do local do evento
+  nomeResponsavel  String?   // Nome do responsável
+  obs2             String?   // Observação adicional 2
+  obs3             String?   // Observação adicional 3
+  obs4             String?   // Observação adicional 4
+  nomeDoEvento     String?   // Nome do evento (campo livre de texto)
 }
 
 
@@ -364,6 +415,7 @@ model Fornecedores {
 model Clientes {
   idclientes               Int       @id
   cliente                  String?   
+   tipoCadastro        Boolean?  @default(false) // 0 = Pessoa Física, 1 = Pessoa Jurídica
   cpf_cnpj_cliente        String    @unique
   data_nascimento_cliente DateTime? 
   endereco_cliente        String?   
@@ -375,6 +427,57 @@ model Clientes {
   data_criacao            DateTime? 
   data_atualizacao        DateTime? 
 }
+model Cliente {
+  id                Int      @id @default(autoincrement())
+  tipoCadastro      Boolean  // false = PF, true = PJ
+  nome              String
+  email             String?
+  telefone          String?
+  endereco          String?
+  cep               String?
+  complemento       String?
+  cidade            String?
+  estado            String?
+  pais              String?
+  pontoReferencia   String?
+  anotacoes         String?
+  dataCadastro      DateTime @default(now())
+  ddiTelefone         String?   // DDI do telefone (ex: (31))
+  ddiTelefone2        String?   // DDI do telefone secundário (ex: (31))
+  telefone2           String?   // Telefone secundário
+  ddiCelular          String?   // DDI do celular (ex: (31))
+  celular             String?   // Celular
+  redeSocial          String?   // URL da rede social
+
+  pessoaFisica      PessoaFisica?
+  pessoaJuridica    PessoaJuridica?
+   id_empresa                Int?     
+}
+model PessoaFisica {
+  id                Int      @id @default(autoincrement())
+  clienteId         Int      @unique
+  cliente           Cliente  @relation(fields: [clienteId], references: [id])
+  cpf               String?  @unique
+  rg                String?
+  orgaoExpeditor    String?
+  dataDeNascimento  DateTime?
+  estadoCivil       String?
+  profissao         String?
+  nacionalidade     String?
+}
+model PessoaJuridica {
+  id                Int      @id @default(autoincrement())
+  clienteId         Int      @unique
+  cliente           Cliente  @relation(fields: [clienteId], references: [id])
+  cnpj              String?  @unique
+  razaoSocial       String?
+  nomeFantasia      String?
+  inscricaoMunicipal String?
+  inscricaoEstadual String?
+}
+
+
+
 
 model ModelosRelatorios {
   idModelosRelatorios  Int       @id

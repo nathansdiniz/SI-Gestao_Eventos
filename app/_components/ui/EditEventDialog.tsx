@@ -43,6 +43,7 @@ const EventDetailsDialog: React.FC<EventDetailsDialogProps> = ({
   const [eventEndDate, setEventEndDate] = useState<string>(
     selectedEvent?.end || "",
   );
+  console.log(selectedEvent);
 
   // Atualiza o estado do evento quando selectedEvent mudar
   useEffect(() => {
@@ -75,6 +76,7 @@ const EventDetailsDialog: React.FC<EventDetailsDialogProps> = ({
     onDeleteEvent(selectedEvent.id);
     onClose();
   };
+  console.log(selectedEvent);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

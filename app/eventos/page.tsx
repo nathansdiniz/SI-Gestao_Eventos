@@ -16,12 +16,34 @@ import { EventClickArg, EventDropArg } from "@fullcalendar/core";
 interface Evento {
   titulo: string;
   inicio: Date | string | null;
+  fim: Date | string;
   diaTodo: boolean;
   descricao: string;
   status: string;
   cor: string;
   id: number;
-  fim: Date | string;
+  tipoEvento: string;
+  dataDeCadastro: string;
+  idOrcamento: number;
+  idCliente: number;
+  nomeCliente: string;
+  dataEvento: string;
+  horaEvento: string;
+  localEvento: string;
+  nomeEvento: string;
+  idLocalEvento: number;
+  endereco: string;
+  numero: string;
+  complemento: string;
+  cep: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  informacoes: string;
+  observacao: string;
+  codigoInterno: string;
+  convidados: number;
+  datasAdicionais: string[];
 }
 
 export default function Home() {
@@ -32,12 +54,34 @@ export default function Home() {
   const [novoEvento, setNovoEvento] = useState<Evento>({
     titulo: "",
     inicio: "",
+    fim: "",
     diaTodo: false,
     descricao: "",
     status: "Pendente",
     cor: "#3788d8",
     id: 0,
-    fim: "",
+    tipoEvento: "",
+    dataDeCadastro: "",
+    idOrcamento: 0,
+    idCliente: 0,
+    nomeCliente: "",
+    dataEvento: "",
+    horaEvento: "",
+    localEvento: "",
+    nomeEvento: "",
+    idLocalEvento: 0,
+    endereco: "",
+    numero: "",
+    complemento: "",
+    cep: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    informacoes: "",
+    observacao: "",
+    codigoInterno: "",
+    convidados: 0,
+    datasAdicionais: [],
   });
 
   useEffect(() => {
@@ -65,17 +109,54 @@ export default function Home() {
 
   function adicionarEvento(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setEventos([...eventos, novoEvento]);
+    setEventos([
+      ...eventos,
+      {
+        ...novoEvento,
+        inicio: novoEvento.inicio
+          ? new Date(novoEvento.inicio).toISOString()
+          : new Date().toISOString(),
+        fim: novoEvento.fim
+          ? new Date(novoEvento.fim).toISOString()
+          : new Date().toISOString(),
+      },
+    ]);
     setMostrarModal(false);
+    resetNovoEvento();
+  }
+
+  function resetNovoEvento() {
     setNovoEvento({
       titulo: "",
       inicio: "",
+      fim: "",
       diaTodo: false,
       descricao: "",
       status: "Pendente",
       cor: "#3788d8",
       id: 0,
-      fim: "",
+      tipoEvento: "",
+      dataDeCadastro: "",
+      idOrcamento: 0,
+      idCliente: 0,
+      nomeCliente: "",
+      dataEvento: "",
+      horaEvento: "",
+      localEvento: "",
+      nomeEvento: "",
+      idLocalEvento: 0,
+      endereco: "",
+      numero: "",
+      complemento: "",
+      cep: "",
+      bairro: "",
+      cidade: "",
+      estado: "",
+      informacoes: "",
+      observacao: "",
+      codigoInterno: "",
+      convidados: 0,
+      datasAdicionais: [],
     });
   }
 
@@ -87,13 +168,14 @@ export default function Home() {
 
   function aoClicarEvento(info: EventClickArg) {
     const eventoClicado = eventos.find(
-      (evento) => evento.titulo === info.event.title,
+      (evento) => evento.id.toString() === info.event.id,
     );
     if (eventoClicado) {
       setNovoEvento(eventoClicado);
       setMostrarModal(true);
     }
   }
+
   function aoRedimensionarEvento(info: EventResizeDoneArg) {
     const eventoAtualizado = eventos.map((evento) => {
       if (evento.id.toString() === info.event.id) {
@@ -163,16 +245,27 @@ export default function Home() {
               headerToolbar={{
                 left: "prev,next today",
                 center: "title",
-                right: "dayGridMonth,timeGridWeek",
+                right: "dayGridMonth,timeGridWeek, timeGridDay",
               }}
               locale="pt-br"
-              events={eventos.map((e) => ({
-                titulo: e.titulo,
-                inicio: e.inicio,
-                cor: e.cor,
-                descricao: e.descricao,
-                fim: e.fim,
-              }))}
+              events={eventos
+                .filter((e) => e.inicio && e.fim) // Filtra eventos com datas válidas
+                .map((e) => ({
+                  id: e.id.toString(), // Converte o ID para string
+                  title: e.titulo,
+                  start: e.inicio
+                    ? new Date(e.inicio).toISOString()
+                    : undefined, // Garante o formato ISO
+                  end: e.fim ? new Date(e.fim).toISOString() : undefined, // Garante o formato ISO
+                  backgroundColor: e.cor,
+                  extendedProps: {
+                    descricao: e.descricao,
+                    tipoEvento: e.tipoEvento,
+                    nomeCliente: e.nomeCliente,
+                    convidados: e.convidados,
+                    localEvento: e.localEvento,
+                  },
+                }))}
               dateClick={aoClicarData}
               eventClick={aoClicarEvento}
               editable={true} // Permite arrastar eventos

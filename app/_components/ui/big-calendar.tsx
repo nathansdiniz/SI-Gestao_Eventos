@@ -20,12 +20,18 @@ const Calendar: React.FC = () => {
   >(null);
 
   useEffect(() => {
-    const savedEvents = localStorage.getItem("events");
-    if (savedEvents) setCurrentEvents(JSON.parse(savedEvents));
+    if (typeof window !== "undefined") {
+      const savedEvents = localStorage.getItem("events");
+      if (savedEvents) {
+        setCurrentEvents(JSON.parse(savedEvents));
+      }
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("events", JSON.stringify(currentEvents));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("events", JSON.stringify(currentEvents));
+    }
   }, [currentEvents]);
 
   const handleDateClick = (selected: DateSelectArg) => {
@@ -84,7 +90,7 @@ const Calendar: React.FC = () => {
           select={handleDateClick}
           eventClick={handleEventClick}
           eventsSet={(events) => setCurrentEvents(events)}
-          initialEvents={JSON.parse(localStorage.getItem("events") || "[]")}
+          initialEvents={[]} // Remove o acesso direto ao localStorage
         />
       </div>
 

@@ -8,7 +8,9 @@ const CalendarPage: React.FC = () => {
       <Layout>
         {" "}
         <main>
-          <h1 style={{ textAlign: "center", margin: "20px 0" }}>Agenda</h1>
+          <h1 style={{ textAlign: "center", margin: "20px 0" }}>
+            Calendário de Eventos
+          </h1>
 
           <CustomCalendar />
         </main>

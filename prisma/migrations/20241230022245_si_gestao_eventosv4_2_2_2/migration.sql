@@ -1,0 +1,30 @@
+-- CreateTable
+CREATE TABLE "Eventosme" (
+    "id" SERIAL NOT NULL,
+    "tipoEvento" TEXT NOT NULL,
+    "dataDeCadastro" TIMESTAMP(3) NOT NULL,
+    "idOrcamento" INTEGER,
+    "idCliente" INTEGER,
+    "nomeCliente" TEXT NOT NULL,
+    "dataEvento" TIMESTAMP(3),
+    "horaEvento" TEXT NOT NULL,
+    "localEvento" TEXT,
+    "nomeEvento" TEXT,
+    "idLocalEvento" INTEGER,
+    "endereco" TEXT,
+    "numero" INTEGER,
+    "complemento" TEXT,
+    "cep" TEXT,
+    "bairro" TEXT,
+    "cidade" TEXT,
+    "estado" TEXT,
+    "informacoes" TEXT,
+    "observacao" TEXT,
+    "codigoInterno" TEXT,
+    "convidados" INTEGER NOT NULL,
+    "datasAdicionais" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "id_empresa" INTEGER NOT NULL,
+
+    CONSTRAINT "Eventosme_pkey" PRIMARY KEY ("id")
+);
