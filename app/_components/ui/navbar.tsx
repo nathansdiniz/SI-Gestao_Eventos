@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SidebarTrigger } from "./sidebar";
 import { usePathname } from "next/navigation";
+import { Button } from "./button";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -17,6 +18,16 @@ const Navbar = () => {
           width={70}
           height={20}
         />
+        <Link
+          href="/menu"
+          className={
+            pathname === "/menu"
+              ? "font-bold text-primary"
+              : "text-muted-foreground"
+          }
+        >
+          Menu
+        </Link>
         <Link
           href="/"
           className={
@@ -37,16 +48,7 @@ const Navbar = () => {
         >
           Eventos
         </Link>
-        <Link
-          href="/transactions"
-          className={
-            pathname === "/transactions"
-              ? "font-bold text-primary"
-              : "text-muted-foreground"
-          }
-        >
-          Transações
-        </Link>
+
         <Link
           href="/relatorios"
           className={
@@ -57,9 +59,20 @@ const Navbar = () => {
         >
           Relatórios
         </Link>
+        <Link
+          href="/transactions"
+          className={
+            pathname === "/transactions"
+              ? "font-bold text-primary"
+              : "text-muted-foreground"
+          }
+        >
+          Transações
+        </Link>
       </div>
 
       <div className="flex h-full items-center justify-center">
+        <Button variant={"ghost"}>Trocar Empresa</Button>
         <UserButton showName />
       </div>
     </nav>

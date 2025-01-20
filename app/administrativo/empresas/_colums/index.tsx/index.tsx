@@ -1,7 +1,18 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/app/_components/ui/button";
-import { PencilIcon, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
+import AtualizarEmpresasButton from "../../_components/botao-update";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@radix-ui/react-dialog";
+import { DialogFooter, DialogHeader } from "@/app/_components/ui/dialog";
+import ExcluirEmpresasButton from "../../_components/botao-exclusaoEmpresa";
 
 interface EmpresasProps {
   id: string;
@@ -17,10 +28,9 @@ interface EmpresasProps {
   estado: string;
   telefone: string;
   celular: string;
-  dataAbertura: string;
+  dataAbertura: Date;
   inscricaoEstadual: string;
 }
-
 export const empresasColumns: ColumnDef<EmpresasProps>[] = [
   {
     accessorKey: "dataAbertura",
@@ -42,7 +52,7 @@ export const empresasColumns: ColumnDef<EmpresasProps>[] = [
     header: "CNPJ",
   },
   {
-    accessorKey: "inscricaoEStadual",
+    accessorKey: "inscricaoEstadual",
     header: "Inscrição Estadual",
   },
   {
@@ -68,22 +78,10 @@ export const empresasColumns: ColumnDef<EmpresasProps>[] = [
   {
     accessorKey: "actions",
     header: "Ações",
-    cell: ({}) => (
+    cell: ({ row }) => (
       <div className="flex flex-row space-x-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-yellow-600 text-white"
-        >
-          <PencilIcon />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-red-800 text-white"
-        >
-          <TrashIcon />
-        </Button>
+        <AtualizarEmpresasButton dados={row.original}></AtualizarEmpresasButton>
+        <ExcluirEmpresasButton dados={row.original} />
       </div>
     ),
   },

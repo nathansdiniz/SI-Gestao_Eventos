@@ -276,7 +276,7 @@ model Evento {
 }
 
 model Eventosme {
-  id          Int       @id @default(autoincrement())
+  id          Int        @unique
   tipoEvento  String
   dataDeCadastro DateTime
   idOrcamento Int? // Tornar o campo opcional
@@ -321,7 +321,7 @@ model HistoricoLogs {
 }
 
 model Orcamentos {
-  id                     Int      @id @default(autoincrement())
+  id                     Int       @unique
   nome_orcamento         String?
   cliente_orcamento      String?
   email_cliente            String?   // Email do cliente
@@ -356,6 +356,7 @@ model Orcamentos {
   obs3             String?   // Observação adicional 3
   obs4             String?   // Observação adicional 4
   nomeDoEvento     String?   // Nome do evento (campo livre de texto)
+  id_empresa      Int?
 }
 
 

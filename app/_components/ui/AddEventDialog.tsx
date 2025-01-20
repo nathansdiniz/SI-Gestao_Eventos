@@ -19,6 +19,27 @@ interface EventData {
   start: Date;
   end: Date;
   allDay: boolean;
+  tipoEvento: string;
+  datadecadastro: Date;
+  idorcamento: number;
+  idcliente: number;
+  nomeCliente: string;
+  dataevento: Date;
+  localevento: string;
+  nomeevento: string;
+  idlocalevento: number;
+  endereco: string;
+  numero: string;
+  complemento: string;
+  cep: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  informacoes: string;
+  observacao: string;
+  codigointerno: string;
+  convidados: number;
+  datasAdicionais: {};
 }
 
 interface SelectedDate {
@@ -40,33 +61,48 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
   onAddEvent,
   selectedDate,
 }) => {
-  const [newEventTitle, setNewEventTitle] = useState<string>("");
-  const [newEventDescription, setNewEventDescription] = useState<string>("");
-  const [newEventColor, setNewEventColor] = useState<string>("#000000");
-  const [newEventStatus, setNewEventStatus] = useState<string>("Pendente");
-  const [newEventStartDate, setNewEventStartDate] = useState<string>("");
-  const [newEventEndDate, setNewEventEndDate] = useState<string>("");
-  const [newEventAllDay, setNewEventAllDay] = useState<boolean>(true);
+  const [formData, setFormData] = useState<EventData>({
+    id: "",
+    title: "",
+    description: "",
+    backgroundColor: "#000000",
+    status: "Pendente",
+    start: selectedDate.start,
+    end: selectedDate.end,
+    allDay: selectedDate.allDay,
+    tipoEvento: "",
+    datadecadastro: new Date(),
+    idorcamento: 0,
+    idcliente: 0,
+    nomeCliente: "",
+    dataevento: selectedDate.start,
+    localevento: "",
+    nomeevento: "",
+    idlocalevento: 0,
+    endereco: "",
+    numero: "",
+    complemento: "",
+    cep: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    informacoes: "",
+    observacao: "",
+    codigointerno: "",
+    convidados: 0,
+    datasAdicionais: {},
+  });
+
+  const handleChange = (field: keyof EventData, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const newEvent: EventData = {
-      id: `${selectedDate.start.toISOString()}-${newEventTitle}`,
-      title: newEventTitle,
-      description: newEventDescription,
-      backgroundColor: newEventColor,
-      status: newEventStatus,
-      start: newEventStartDate
-        ? new Date(newEventStartDate)
-        : selectedDate.start, // Garante tipo Date
-      end: newEventEndDate
-        ? new Date(newEventEndDate)
-        : selectedDate.end || undefined, // Garante tipo Date ou undefined
-      allDay: newEventAllDay,
-    };
-
-    onAddEvent(newEvent);
+    onAddEvent({ ...formData, id: `${formData.start}-${formData.title}` });
     onClose();
   };
 
@@ -79,44 +115,52 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="p-7">
+          {/* Campos Básicos */}
           <label>Título:</label>
           <input
             type="text"
-            placeholder="Título do Evento"
-            value={newEventTitle}
-            onChange={(e) => setNewEventTitle(e.target.value)}
+            value={formData.title}
+            onChange={(e) => handleChange("title", e.target.value)}
             required
             className="mb-3 w-full rounded-md border bg-black p-3 text-white"
           />
 
           <label>Descrição:</label>
           <textarea
-            placeholder="Descrição"
-            value={newEventDescription}
-            onChange={(e) => setNewEventDescription(e.target.value)}
+            value={formData.description}
+            onChange={(e) => handleChange("description", e.target.value)}
             className="mb-3 w-full rounded-md border bg-black p-3 text-white"
           />
 
+          <label>Cor:</label>
+          <input
+            type="color"
+            value={formData.backgroundColor}
+            onChange={(e) => handleChange("backgroundColor", e.target.value)}
+            className="mb-3"
+          />
+
+          {/* Datas e Status */}
           <label>Data Início:</label>
           <input
             type="datetime-local"
-            value={newEventStartDate}
-            onChange={(e) => setNewEventStartDate(e.target.value)}
+            value={formData.start.toISOString().slice(0, 16)}
+            onChange={(e) => handleChange("start", new Date(e.target.value))}
             className="mb-3 w-full rounded-md border bg-white p-3 text-black"
           />
 
           <label>Data Fim:</label>
           <input
             type="datetime-local"
-            value={newEventEndDate}
-            onChange={(e) => setNewEventEndDate(e.target.value)}
+            value={formData.end.toISOString().slice(0, 16)}
+            onChange={(e) => handleChange("end", new Date(e.target.value))}
             className="mb-3 w-full rounded-md border bg-white p-3 text-black"
           />
 
           <label>Status:</label>
           <select
-            value={newEventStatus}
-            onChange={(e) => setNewEventStatus(e.target.value)}
+            value={formData.status}
+            onChange={(e) => handleChange("status", e.target.value)}
             className="mb-3 w-full rounded-md border bg-black p-3 text-white"
           >
             <option value="Pendente">Pendente</option>
@@ -124,25 +168,33 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
             <option value="Cancelado">Cancelado</option>
           </select>
 
-          <label>Cor:</label>
+          <label>Nome do Cliente:</label>
           <input
-            type="color"
-            value={newEventColor}
-            onChange={(e) => setNewEventColor(e.target.value)}
-            className="mb-3"
+            type="text"
+            value={formData.nomeCliente}
+            onChange={(e) => handleChange("nomeCliente", e.target.value)}
+            className="mb-3 w-full rounded-md border bg-black p-3 text-white"
           />
 
-          <div className="mb-3">
-            <label>
-              <input
-                type="checkbox"
-                checked={newEventAllDay}
-                onChange={() => setNewEventAllDay(!newEventAllDay)}
-              />
-              Dia Todo
-            </label>
-          </div>
+          {/* Outros Campos */}
+          <label>Local do Evento:</label>
+          <input
+            type="text"
+            value={formData.localevento}
+            onChange={(e) => handleChange("localevento", e.target.value)}
+            className="mb-3 w-full rounded-md border bg-black p-3 text-white"
+          />
 
+          {/* Adicione outros campos conforme necessário */}
+          <label>Convidados:</label>
+          <input
+            type="number"
+            value={formData.convidados}
+            onChange={(e) => handleChange("convidados", Number(e.target.value))}
+            className="mb-3 w-full rounded-md border bg-black p-3 text-white"
+          />
+
+          {/* Botões */}
           <div className="flex justify-between">
             <Button type="submit" className="bg-green-500">
               Adicionar

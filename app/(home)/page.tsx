@@ -8,6 +8,7 @@ import GraficoPizza from "./_components/grafico-pizza";
 import { obterDashboard } from "../_data/obter-dados-dashboard";
 import GastosCategoria from "./_components/tabelaGastos";
 import UltimasTransacoes from "./_components/ultimas-transacoes";
+import BotaoVoltar from "../_components/botao-voltar";
 
 interface HomeProps {
   searchParams: {
@@ -27,6 +28,7 @@ const Home = async ({ searchParams: { mes } }: HomeProps) => {
     <>
       <Layout>
         <div className="space-y-6 p-6">
+          <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
           <div className="flex justify-between">
             <h1 className="text-4xl font-bold">Dashboard</h1>
             <SelecionarMes />

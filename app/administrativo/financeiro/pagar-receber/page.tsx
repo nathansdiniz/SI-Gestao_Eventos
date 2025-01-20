@@ -5,8 +5,8 @@ import SelecionarAno from "@/app/(home)/_components/selecionar-ano";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { isMatch } from "date-fns";
-import TabelaFinanceira from "./_components/tabelaFinanceiro";
-import { Button } from "@/app/_components/ui/button";
+import TabelaFinanceira from "../_components/tabelaFinanceiro";
+import TabelaContas from "../_components/tabelaContas";
 
 interface FinanceiroProps {
   searchParams: {
@@ -48,13 +48,16 @@ const Financeiro = async ({ searchParams: { mes } }: FinanceiroProps) => {
   let depositoTotal = 0;
   let gastosTotal = 0;
 
-  dadosfinanceiros.data.map((item: { tipocobranca: string; valor: any }) => {
-    if (item.tipocobranca === "Investimento")
-      investidoTotal += Number(item.valor);
-    else if (item.tipocobranca === "Receita")
-      depositoTotal += Number(item.valor);
-    else gastosTotal += Number(item.valor);
-  });
+  dadosfinanceiros.data.map(
+    (item: { tipocobranca: string; valor: any; pago: string }) => {
+      if (item.tipocobranca === "Investimento")
+        investidoTotal += Number(item.valor);
+      else if (item.tipocobranca === "Receita")
+        depositoTotal += Number(item.valor);
+      else gastosTotal += Number(item.valor);
+      return item.pago == "nao" || item.pago == "não";
+    },
+  );
   const dashboard = {
     investidoTotal: investidoTotal,
     depositoTotal: depositoTotal,
@@ -64,22 +67,38 @@ const Financeiro = async ({ searchParams: { mes } }: FinanceiroProps) => {
   return (
     <>
       <Layout>
-        <div className="flex">
+        <div>
           <h1
             style={{ textAlign: "center", margin: "20px 0" }}
             className="text-xl font-bold"
           >
-            Movimentações Financeiras
+            Contas A Pagar e A Receber
           </h1>
-          <div className="justify-items-end">
-            <SelecionarMes></SelecionarMes>
-            <SelecionarAno mes={mes}></SelecionarAno>
-          </div>
+          <SelecionarMes></SelecionarMes>
+          <SelecionarAno mes={mes}></SelecionarAno>
           <CardResumo mes="12" {...dashboard} />
-          <Button className="justify-end bg-green-900"> A Pagar/Receber</Button>
-          <TabelaFinanceira
-            dadosfinanceiros={dadosfinanceiros.data}
-          ></TabelaFinanceira>
+          <div className="flex space-x-6">
+            <TabelaContas
+              titulo="A Receber"
+              dadosfinanceiros={dadosfinanceiros.data.filter(
+                (item: { tipocobranca: string }) => {
+                  return item.tipocobranca === "Receita";
+                },
+              )}
+              key={"A Receber"}
+              cor={"green"}
+            ></TabelaContas>
+            <TabelaContas
+              titulo="A Pagar"
+              dadosfinanceiros={dadosfinanceiros.data.filter(
+                (item: { tipocobranca: string }) => {
+                  return item.tipocobranca === "Despesa";
+                },
+              )}
+              key={"A Pagar"}
+              cor={"yellow"}
+            ></TabelaContas>
+          </div>
         </div>
       </Layout>
     </>

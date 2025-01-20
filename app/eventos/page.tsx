@@ -225,14 +225,14 @@ export default function Home() {
             {/* Aplique o justify-end para alinhar os botões à direita */}
             <Button
               className="mr-2 w-40 rounded-xl bg-lime-800 font-bold text-white" // Adicionei "mr-2" para dar um espaçamento entre os botões
-              onClick={() => aoClicarData}
+              onClick={() => setMostrarModal(true)}
             >
               <CalendarPlus />
               Adicionar Eventos
             </Button>
             <Button
               className="w-40 rounded-xl bg-red-900 font-bold text-white"
-              onClick={() => setDialogIsOpen(true)}
+              onClick={() => setMostrarModalExcluir(true)}
             >
               <CalendarX2Icon />
               Excluir Eventos
@@ -245,7 +245,7 @@ export default function Home() {
               headerToolbar={{
                 left: "prev,next today",
                 center: "title",
-                right: "dayGridMonth,timeGridWeek, timeGridDay",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
               }}
               locale="pt-br"
               events={eventos
@@ -289,13 +289,14 @@ export default function Home() {
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
               </Transition.Child>
               <div className="fixed inset-0 z-10 overflow-y-auto">
-                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg sm:p-6">
+                <div className="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-6">
+                  <Dialog.Panel className="relative w-full max-w-4xl transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:p-8">
                     <form onSubmit={adicionarEvento}>
                       <h3 className="text-lg font-medium text-gray-900">
                         Novo Evento
                       </h3>
                       <div className="mt-2">
+                        <label>Título</label>
                         <input
                           type="text"
                           name="titulo"
@@ -306,15 +307,33 @@ export default function Home() {
                           required
                         />
                       </div>
-                      <div className="mt-2">
-                        <input
-                          type="datetime-local"
-                          name="inicio"
-                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={`${novoEvento.inicio}`}
-                          onChange={alterarNovoEvento}
-                          required
-                        />
+                      <div className="mt-2 grid grid-cols-2 gap-4">
+                        <div>
+                          <input
+                            type="datetime-local"
+                            name="inicio"
+                            className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            value={
+                              novoEvento.inicio
+                                ? novoEvento.inicio.toString()
+                                : ""
+                            }
+                            onChange={alterarNovoEvento}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="datetime-local"
+                            name="fim"
+                            className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            value={
+                              novoEvento.fim ? novoEvento.fim.toString() : ""
+                            }
+                            onChange={alterarNovoEvento}
+                            required
+                          />
+                        </div>
                       </div>
                       <div className="mt-2">
                         <textarea
@@ -325,40 +344,70 @@ export default function Home() {
                           onChange={alterarNovoEvento}
                         />
                       </div>
-                      <div className="mt-2">
-                        <select
-                          name="status"
-                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={novoEvento.status}
-                          onChange={alterarNovoEvento}
-                        >
-                          <option value="Pendente">Pendente</option>
-                          <option value="Confirmado">Confirmado</option>
-                          <option value="Cancelado">Cancelado</option>
-                        </select>
+                      <div className="mt-2 grid grid-cols-2 gap-4">
+                        <div>
+                          <input
+                            type="text"
+                            name="nomeCliente"
+                            className="block w-full rounded-md border-gray-300 text-black shadow-sm sm:text-sm"
+                            placeholder="Nome do Cliente"
+                            value={novoEvento.nomeCliente}
+                            onChange={alterarNovoEvento}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="localEvento"
+                            className="block w-full rounded-md border-gray-300 text-black shadow-sm sm:text-sm"
+                            placeholder="Local do Evento"
+                            value={novoEvento.localEvento}
+                            onChange={alterarNovoEvento}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="cidade"
+                            className="block w-full rounded-md border-gray-300 text-black shadow-sm sm:text-sm"
+                            placeholder="Cidade"
+                            value={novoEvento.cidade}
+                            onChange={alterarNovoEvento}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="estado"
+                            className="block w-full rounded-md border-gray-300 text-black shadow-sm sm:text-sm"
+                            placeholder="Estado"
+                            value={novoEvento.estado}
+                            onChange={alterarNovoEvento}
+                          />
+                        </div>
                       </div>
                       <div className="mt-2">
-                        <input
-                          type="color"
-                          name="cor"
-                          className="block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={novoEvento.cor}
+                        <textarea
+                          name="observacao"
+                          className="block w-full rounded-md border-gray-300 text-black shadow-sm sm:text-sm"
+                          placeholder="Observação"
+                          value={novoEvento.observacao}
                           onChange={alterarNovoEvento}
                         />
                       </div>
-                      <div className="mt-5 sm:mt-6">
-                        <button
-                          type="submit"
-                          className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
-                        >
-                          Adicionar
-                        </button>
+                      <div className="mt-4 flex justify-end">
                         <button
                           type="button"
-                          className="ml-2 inline-flex justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                          className="mr-2 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
                           onClick={fecharModal}
                         >
                           Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                        >
+                          Salvar
                         </button>
                       </div>
                     </form>

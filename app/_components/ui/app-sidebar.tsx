@@ -8,6 +8,7 @@ import {
   Users,
   Building2,
   Landmark,
+  SquareMenuIcon,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -30,14 +31,20 @@ const items = [
     icon: Home,
   },
   {
-    title: "Transações",
-    url: "/transactions",
-    icon: BadgeDollarSign,
+    title: "Menu Principal",
+    url: "/menu",
+    icon: SquareMenuIcon,
   },
+
   {
     title: "Agenda",
     url: "/agenda",
     icon: Calendar,
+  },
+  {
+    title: "Empresas",
+    url: "/administrativo/empresas",
+    icon: Building2,
   },
   {
     title: "Eventos",
@@ -50,19 +57,19 @@ const items = [
     icon: Landmark,
   },
   {
-    title: "Relatórios",
-    url: "#",
-    icon: FileText,
-  },
-  {
     title: "Funcionarios",
     url: "/administrativo/funcionarios",
     icon: Users,
   },
   {
-    title: "Empresas",
-    url: "/administrativo/empresas",
-    icon: Building2,
+    title: "Relatórios",
+    url: "#",
+    icon: FileText,
+  },
+  {
+    title: "Transações",
+    url: "/transactions",
+    icon: BadgeDollarSign,
   },
   {
     title: "Configurações",

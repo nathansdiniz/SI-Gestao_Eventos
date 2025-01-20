@@ -2,13 +2,15 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/app/_components/ui/button";
 import { PencilIcon, TrashIcon } from "lucide-react";
+import BotaoEditarFuncionario from "../_components/botao-update";
+import ExcluirFuncionarioButton from "../_components/botao-exclusaoEmpresa";
 
 interface FuncionariosProps {
   nome: string;
   cpf: string;
   idade: number;
   rg: string;
-  data_nasc: string;
+  data_nasc: Date;
   sexo: string;
   signo: string;
   bairro: string;
@@ -74,22 +76,12 @@ export const funcionariosColumns: ColumnDef<FuncionariosProps>[] = [
   {
     accessorKey: "actions",
     header: "Ações",
-    cell: ({}) => (
+    cell: ({ row }) => (
       <div className="flex flex-row space-x-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-yellow-600 text-white"
-        >
-          <PencilIcon />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-red-800 text-white"
-        >
-          <TrashIcon />
-        </Button>
+        <BotaoEditarFuncionario dados={row.original}></BotaoEditarFuncionario>
+        <ExcluirFuncionarioButton
+          dados={row.original}
+        ></ExcluirFuncionarioButton>
       </div>
     ),
   },

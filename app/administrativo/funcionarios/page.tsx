@@ -3,6 +3,7 @@ import { Button } from "@/app/_components/ui/button";
 import { DataTable } from "@/app/_components/ui/data-table";
 import { Diff } from "lucide-react";
 import { funcionariosColumns } from "./_columns";
+import AdicionarFuncionarioButton from "./_components/add-funcionario";
 
 const invoices = [
   {
@@ -10,7 +11,7 @@ const invoices = [
     idade: 60,
     cpf: "927.691.605-91",
     rg: "41.034.485-0",
-    data_nasc: "14/08/1964",
+    data_nasc: new Date("14/08/1964"),
     sexo: "Masculino",
     signo: "Leão",
     mae: "Analu Nina Aurora",
@@ -35,7 +36,7 @@ const invoices = [
     idade: 56,
     cpf: "994.911.036-01",
     rg: "17.969.368-2",
-    data_nasc: "25/02/1968",
+    data_nasc: new Date("25/02/1968"),
     sexo: "Masculino",
     signo: "Peixes",
     mae: "Daiane Alice Liz",
@@ -60,7 +61,7 @@ const invoices = [
     idade: 52,
     cpf: "799.591.103-38",
     rg: "50.961.080-8",
-    data_nasc: "19/04/1972",
+    data_nasc: new Date("19/04/1972"),
     sexo: "Feminino",
     signo: "Áries",
     mae: "Rosângela Sara Tânia",
@@ -85,7 +86,7 @@ const invoices = [
     idade: 73,
     cpf: "951.408.896-41",
     rg: "11.948.801-2",
-    data_nasc: "09/06/1951",
+    data_nasc: new Date("09/06/1951"),
     sexo: "Feminino",
     signo: "Gêmeos",
     mae: "Clarice Eloá",
@@ -110,7 +111,7 @@ const invoices = [
     idade: 29,
     cpf: "038.713.893-58",
     rg: "10.444.513-0",
-    data_nasc: "10/03/1995",
+    data_nasc: new Date("10/03/1995"),
     sexo: "Masculino",
     signo: "Peixes",
     mae: "Julia Betina",
@@ -135,7 +136,7 @@ const invoices = [
     idade: 37,
     cpf: "308.082.251-03",
     rg: "44.223.582-3",
-    data_nasc: "12/01/1987",
+    data_nasc: new Date("12/01/1987"),
     sexo: "Masculino",
     signo: "Capricórnio",
     mae: "Gabriela Luana",
@@ -160,7 +161,7 @@ const invoices = [
     idade: 78,
     cpf: "640.393.924-69",
     rg: "13.612.257-7",
-    data_nasc: "24/07/1946",
+    data_nasc: new Date("24/07/1946"),
     sexo: "Feminino",
     signo: "Leão",
     mae: "Maitê Tereza",
@@ -185,7 +186,7 @@ const invoices = [
     idade: 43,
     cpf: "078.338.367-37",
     rg: "45.742.436-9",
-    data_nasc: "26/11/1981",
+    data_nasc: new Date("26/11/1981"),
     sexo: "Masculino",
     signo: "Sagitário",
     mae: "Fátima Carolina",
@@ -210,7 +211,7 @@ const invoices = [
     idade: 34,
     cpf: "994.108.423-87",
     rg: "27.498.732-6",
-    data_nasc: "22/03/1990",
+    data_nasc: new Date("22/03/1990"),
     sexo: "Masculino",
     signo: "Áries",
     mae: "Nicole Isabela",
@@ -235,7 +236,7 @@ const invoices = [
     idade: 51,
     cpf: "000.884.406-21",
     rg: "32.052.068-7",
-    data_nasc: "05/08/1973",
+    data_nasc: new Date("05/08/1973"),
     sexo: "Masculino",
     signo: "Leão",
     mae: "Carla Natália",
@@ -260,7 +261,7 @@ const invoices = [
     idade: 18,
     cpf: "047.990.805-20",
     rg: "17.226.323-2",
-    data_nasc: "11/11/2006",
+    data_nasc: new Date("11/11/2006"),
     sexo: "Feminino",
     signo: "Escorpião",
     mae: "Bárbara Jaqueline",
@@ -285,7 +286,7 @@ const invoices = [
     idade: 40,
     cpf: "071.880.048-62",
     rg: "37.843.613-2",
-    data_nasc: "02/09/1984",
+    data_nasc: new Date("02/09/1984"),
     sexo: "Feminino",
     signo: "Virgem",
     mae: "Daniela Débora",
@@ -310,7 +311,7 @@ const invoices = [
     idade: 61,
     cpf: "345.864.840-20",
     rg: "43.191.430-8",
-    data_nasc: "16/08/1963",
+    data_nasc: new Date("16/08/1963"),
     sexo: "Masculino",
     signo: "Leão",
     mae: "Andrea Daiane Stefany",
@@ -335,7 +336,7 @@ const invoices = [
     idade: 50,
     cpf: "399.636.429-69",
     rg: "25.159.416-6",
-    data_nasc: "01/03/1974",
+    data_nasc: new Date("01/03/1974"),
     sexo: "Feminino",
     signo: "Peixes",
     mae: "Louise Aline Fernanda",
@@ -364,10 +365,7 @@ const Funcionarios = () => {
         <div className="space-y-6 p-6">
           <div className="flex justify-between">
             <h1 className="text-4xl font-bold">Funcionários</h1>
-            <Button className="font-bold text-white">
-              <Diff></Diff>
-              Adicionar Funcionario
-            </Button>
+            <AdicionarFuncionarioButton></AdicionarFuncionarioButton>
           </div>
           <DataTable columns={funcionariosColumns} data={invoices}></DataTable>
         </div>

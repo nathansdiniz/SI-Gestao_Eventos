@@ -11,8 +11,8 @@ export const obterDashboard = async (mes: string) => {
   const where = {
     userId,
     date: {
-      gte: new Date(`2024-${mes}/01`),
-      lt: new Date(`2024-${mes}/31`),
+      gte: new Date(`2025-${mes}/01`),
+      lt: new Date(`2025-${mes}/31`),
     },
   };
 

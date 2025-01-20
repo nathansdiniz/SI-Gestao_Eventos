@@ -2,6 +2,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { isMatch } from "date-fns";
+import { Prisma } from "@prisma/client";
+import { db } from "@/app/_lib/prisma";
 
 interface DataProps {
   mes: string;
@@ -62,4 +64,14 @@ export const Financeiro = async ({ mes }: DataProps) => {
   };
 
   return dashboard;
+};
+
+export const AddFinanceiro = async (params: Prisma.SaidasCreateInput) => {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("Ação não autorizada.");
+  }
+  db.saidas.create({
+    data: params,
+  });
 };
