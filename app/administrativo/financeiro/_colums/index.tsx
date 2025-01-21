@@ -19,14 +19,14 @@ interface FinanceiroPropos {
   multa: string;
   desconto: string;
   pago: string;
-  idconta: string;
-  conta: string;
+  idconta: string | null;
+  conta: string | null;
   idcategoria: string | number;
   categoria: string | null;
-  idcentrodecusto: string;
-  centrodecusto: string;
+  idcentrodecusto: string | null;
+  centrodecusto: string | null;
   mododepagamento: string;
-  parcelas: null;
+  parcelas: null | {};
   idevento: string;
 }
 

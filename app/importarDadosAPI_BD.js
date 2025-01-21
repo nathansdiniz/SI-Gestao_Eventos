@@ -9819,9 +9819,9 @@ async function InserirOrcamentos() {
             data_principal_evento: orcamento.data_principal_evento
               ? new Date(orcamento.data_principal_evento)
               : null,
-            idVendedor_orcamento: orcamento.idVendedor_orcamento || null,
+            idVendedor_orcamento: orcamento.vendedor || null,
             idVendedor_negociacao: orcamento.idVendedor_negociacao || null,
-            status_orcamento: orcamento.status_orcamento || null,
+            status_orcamento: orcamento.status || null,
             data_criacao: orcamento.data_criacao
               ? new Date(orcamento.data_criacao)
               : orcamentoExistente.data_criacao,
@@ -9839,11 +9839,11 @@ async function InserirOrcamentos() {
             ddiCelular: orcamento.ddiCelular || null,
             celular: orcamento.celular || "", // Preenche com string vazia, caso não tenha
             idLocalEvento: orcamento.idLocalEvento || null,
-            nomeResponsavel: orcamento.nomeResponsavel || null,
+            nomeResponsavel: orcamento.nomeresponsavel || null,
             obs2: orcamento.obs2 || null,
             obs3: orcamento.obs3 || null,
             obs4: orcamento.obs4 || null,
-            nomeDoEvento: orcamento.nomeDoEvento || null,
+            nomeDoEvento: orcamento.nomedoevento || null,
             id_empresa: 1,
           },
         });
@@ -10019,5 +10019,21 @@ async function inserirOuAtualizarEventos() {
   }
 }
 
+/* const baseURL = "https://app1.meeventos.com.br/inmidialed";
+  const apiKey = process.env.TOKEN_ME_EVENTOS;
+  const res = await fetch(
+    `${baseURL}/api/v1/financial?field_sort=datacompetencia&sort=desc`,
+    {
+      method: "GET", // ou POST, PUT, DELETE, etc.
+      headers: {
+        Authorization: `${apiKey}`, // Inclua o token no cabeçalho
+        "Content-Type": "application/json", // Se você estiver enviando JSON
+        // outros headers, se necessário
+      },
+      // body: JSON.stringify(dados), // Se for uma requisição POST com dados
+    },
+  );
+
+  const dadosfinanceiros = await res.json(); // o*/
 // Chamada da função
 fetchAndInsertData();

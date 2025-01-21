@@ -413,25 +413,18 @@ model Fornecedores {
   userID                  String?   
 }
 
+
 model Clientes {
-  idclientes               Int       @id
-  cliente                  String?   
-   tipoCadastro        Boolean?  @default(false) // 0 = Pessoa Física, 1 = Pessoa Jurídica
-  cpf_cnpj_cliente        String    @unique
-  data_nascimento_cliente DateTime? 
-  endereco_cliente        String?   
-  estado_cliente          String?   
-  telefone_cliente        String?   
-  celular_cliente         String?   
-  email_cliente           String?   
-  sexo_cliente            String?   
-  data_criacao            DateTime? 
-  data_atualizacao        DateTime? 
-}
-model Cliente {
-  id                Int      @id @default(autoincrement())
-  tipoCadastro      Boolean  // false = PF, true = PJ
-  nome              String
+  id                Int      @unique
+  tipoCadastro      String?
+  cliente              String
+  cpf_cnpj_cliente  String?
+   razaoSocial       String?
+  nomeFantasia      String?
+  inscricaoMunicipal String?
+  inscricaoEstadual String?
+  data_nasc         DateTime?
+  estadoCivil       String?
   email             String?
   telefone          String?
   endereco          String?
@@ -449,32 +442,33 @@ model Cliente {
   ddiCelular          String?   // DDI do celular (ex: (31))
   celular             String?   // Celular
   redeSocial          String?   // URL da rede social
-
-  pessoaFisica      PessoaFisica?
-  pessoaJuridica    PessoaJuridica?
    id_empresa                Int?     
 }
-model PessoaFisica {
-  id                Int      @id @default(autoincrement())
-  clienteId         Int      @unique
-  cliente           Cliente  @relation(fields: [clienteId], references: [id])
-  cpf               String?  @unique
-  rg                String?
-  orgaoExpeditor    String?
-  dataDeNascimento  DateTime?
-  estadoCivil       String?
-  profissao         String?
-  nacionalidade     String?
-}
-model PessoaJuridica {
-  id                Int      @id @default(autoincrement())
-  clienteId         Int      @unique
-  cliente           Cliente  @relation(fields: [clienteId], references: [id])
-  cnpj              String?  @unique
-  razaoSocial       String?
-  nomeFantasia      String?
-  inscricaoMunicipal String?
-  inscricaoEstadual String?
+
+model FinanceiroME {
+  id    Int         @unique
+  evento    String?
+  datapagamento    String?
+  datacompetencia    String?
+  tipocobranca    String?
+  idrecebidode    String?
+  recebidode    String?
+  informede    String?
+  descricao    String?
+  valor    Decimal?
+  juros    Decimal?
+  multa    Decimal?
+  desconto    Decimal?
+  pago    String?
+  idconta    String?
+  conta    String?
+  idcategoria    String?
+  categoria    String?
+  idcentrodecusto    String?
+  centrodecusto    String?
+  mododepagamento    String?
+  parcelas    Json?
+  idevento    String?
 }
 
 
@@ -483,7 +477,7 @@ model PessoaJuridica {
 model ModelosRelatorios {
   idModelosRelatorios  Int       @id
   nome_relatorio          String?   
-  ModelosRelatorioscol String?   
+  ModelosRelatorioscol Json?   
 }
 
 model Estoque {

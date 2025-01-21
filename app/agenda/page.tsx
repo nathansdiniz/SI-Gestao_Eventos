@@ -1,6 +1,7 @@
 import React from "react";
 import CustomCalendar from "@/app/_components/ui/big-calendar";
 import Layout from "../_components/slide-bar";
+import BotaoVoltar from "../_components/botao-voltar";
 
 const CalendarPage: React.FC = () => {
   return (
@@ -8,6 +9,7 @@ const CalendarPage: React.FC = () => {
       <Layout>
         {" "}
         <main>
+          <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
           <h1 style={{ textAlign: "center", margin: "20px 0" }}>Agenda</h1>
 
           <CustomCalendar />

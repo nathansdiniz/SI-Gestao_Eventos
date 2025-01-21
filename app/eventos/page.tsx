@@ -12,6 +12,7 @@ import Layout from "../_components/slide-bar";
 import { Button } from "../_components/ui/button";
 import { CalendarPlus, CalendarX2Icon } from "lucide-react";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core";
+import BotaoVoltar from "../_components/botao-voltar";
 
 interface Evento {
   titulo: string;
@@ -219,6 +220,7 @@ export default function Home() {
     <>
       <Layout>
         <main className="flex min-h-screen flex-col items-center justify-center bg-gray-900 text-gray-100">
+          <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
           <h1 className="mb-4 text-3xl font-bold">Calendário de Eventos</h1>
           <div className="flex w-full justify-end px-40">
             {" "}

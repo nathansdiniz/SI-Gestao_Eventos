@@ -14,23 +14,28 @@ interface FinanceiroProps {
   datapagamento: string;
   datacompetencia: string;
   tipocobranca: string;
-  idrecebidode: string;
+  idrecebidode: string | null;
   recebidode: string;
   informede: string;
   descricao: string;
-  valor: number;
+  valor: string;
   juros: string;
   multa: string;
   desconto: string;
   pago: string;
-  idconta: string;
-  conta: string;
-  idcategoria: string;
-  categoria: string;
-  idcentrodecusto: string;
-  centrodecusto: string;
+  idconta: string | null;
+  conta: string | null;
+  idcategoria: string | null;
+  categoria: string | null;
+  idcentrodecusto: string | null;
+  centrodecusto: string | null;
   mododepagamento: string;
-  parcelas: string;
+  parcelas: null | {
+    id: number;
+    datapagamento: string;
+    descricao: string;
+    valor: number;
+  };
   idevento: string;
 }
 

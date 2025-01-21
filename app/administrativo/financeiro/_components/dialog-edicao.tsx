@@ -22,7 +22,7 @@ import {
 import { Input } from "@/app/_components/ui/input";
 import { MoneyInput } from "@/app/_components/money-input";
 import { DatePicker } from "@/app/_components/ui/date-picker";
-import { z } from "zod";
+import { string, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -43,10 +43,14 @@ const formSchema = z.object({
   }),
   datacompetencia: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
-  }),
-  idrecebidode: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
+  }), // Aceita null
+  idrecebidode: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "A descrição é obrigatória.",
+    })
+    .nullable(), // Aceita null
   recebidode: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
   }),
@@ -55,59 +59,84 @@ const formSchema = z.object({
   }),
   juros: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
-  }),
+  }), // Aceita null
   multa: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
-  }),
+  }), // Aceita null
   desconto: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
-  }),
+  }), // Aceita null
   pago: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
-  }),
-  idconta: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  conta: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  idcategoria: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  categoria: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  idcentrodecusto: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  centrodecusto: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
+  }), // Aceita null
+  idconta: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "A descrição é obrigatória.",
+    })
+    .nullable(),
+  conta: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "A descrição é obrigatória.",
+    })
+    .nullable(),
+  idcategoria: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "A descrição é obrigatória.",
+    })
+    .nullable(),
+  categoria: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "A descrição é obrigatória.",
+    })
+    .nullable(),
+  idcentrodecusto: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "A descrição é obrigatória.",
+    })
+    .nullable(),
+  centrodecusto: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "A descrição é obrigatória.",
+    })
+    .nullable(),
   mododepagamento: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
-  }),
-  parcelas: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
+  }), // Aceita null
+  parcelas: z
+    .object({
+      id: z.number(), // Aceita null
+      datapagamento: z.string(), // Aceita null
+      valor: z.number(), // Aceita null
+      descricao: z.string(), // Aceita null
+    })
+    .nullable(), // Permite que `parcelas` em si seja null
   idevento: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
   }),
   descricao: z.string().trim().min(1, {
     message: "A descrição é obrigatória.",
   }),
-  valor: z
-    .number({
-      required_error: "O valor é obrigatório.",
-    })
-    .positive({
-      message: "O valor deve ser positivo.",
-    }),
+  valor: z.string({
+    required_error: "O valor é obrigatório.",
+  }), // Aceita null
   tipocobranca: z.string().min(1, {
     message: "O tipo de cobrança é obrigatório.",
   }),
   datapagamento: z.string({
     required_error: "A data de pagamento é obrigatória.",
-  }),
+  }), // Aceita null
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -122,19 +151,19 @@ interface FinanceiroProps {
   recebidode: string;
   informede: string;
   descricao: string;
-  valor: number;
+  valor: string;
   juros: string;
   multa: string;
   desconto: string;
   pago: string;
-  idconta: string;
-  conta: string;
-  idcategoria: string;
-  categoria: string;
-  idcentrodecusto: string;
-  centrodecusto: string;
+  idconta: string | null;
+  conta: string | null;
+  idcategoria: string | number;
+  categoria: string | null;
+  idcentrodecusto: string | null;
+  centrodecusto: string | null;
   mododepagamento: string;
-  parcelas: string;
+  parcelas: null | {};
   idevento: string;
 }
 
@@ -221,19 +250,7 @@ const EditDialogFinancas = ({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="parcelas"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Parcela</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Digite a parcela..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <FormField
               control={form.control}
               name="valor"

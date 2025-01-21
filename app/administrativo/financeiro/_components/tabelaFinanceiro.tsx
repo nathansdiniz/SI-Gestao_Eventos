@@ -21,14 +21,14 @@ interface FinanceiroProps {
   multa: string;
   desconto: string;
   pago: string;
-  idconta: string;
-  conta: string;
+  idconta: string | null;
+  conta: string | null;
   idcategoria: string | number;
   categoria: string | null;
-  idcentrodecusto: string;
-  centrodecusto: string;
+  idcentrodecusto: string | null;
+  centrodecusto: string | null;
   mododepagamento: string;
-  parcelas: null;
+  parcelas: null | {};
   idevento: string;
 }
 
@@ -64,7 +64,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
 
   return (
     <>
-      <div className="flex items-center justify-center space-x-10 space-y-6">
+      <div className="flex items-center justify-center space-x-10 p-6">
         <Button
           className={`h-32 w-96 rounded-sm text-2xl font-bold ${
             botaoSelecionado === "todos"
