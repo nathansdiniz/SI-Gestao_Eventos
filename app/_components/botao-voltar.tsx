@@ -11,13 +11,15 @@ const BotaoVoltar = ({ redirecionar }: CardResumidProps) => {
   const router = useRouter();
 
   return (
-    <Button
-      onClick={() => router.push(redirecionar)}
-      variant={"outline"}
-      className="h-11 w-20"
-    >
-      <ArrowBigLeftDashIcon size={150} />
-    </Button>
+    <>
+      <Button
+        onClick={() => router.push(redirecionar)}
+        variant={"outline"}
+        className="h-11 w-20"
+      >
+        <ArrowBigLeftDashIcon size={150} />
+      </Button>
+    </>
   );
 };
 

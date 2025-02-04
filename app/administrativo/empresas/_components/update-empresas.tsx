@@ -1,6 +1,6 @@
 "use client";
+import { addUpdateEmpresas } from "@/app/_actions/criar-atualizarEmpresas";
 import { Button } from "@/app/_components/ui/button";
-import { DatePicker } from "@/app/_components/ui/date-picker";
 import {
   DialogHeader,
   DialogTitle,
@@ -20,13 +20,16 @@ import {
 } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
-  id: z.string(),
-  nome: z.string().trim().min(1, {
-    message: "Nome é obrigatório.",
+  id: z.number(),
+  userID: z.string(),
+  empresa: z.string().trim().min(1, {
+    message: "Empresa é obrigatório.",
   }),
   cnpj: z.string().trim().min(1, {
     message: "CNPJ é obrigatório.",
@@ -37,30 +40,22 @@ const formSchema = z.object({
   dataAbertura: z.date({
     required_error: "A data é obrigatório.",
   }),
+  data_created: z.date(),
+  data_updated: z.date(),
   site: z.string(),
   email: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
-  cep: z.string().trim().min(1, {
+  localizacao_empresa: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
-  endereco: z.string().trim().min(1, {
+  ramo_empresa: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
-  numero: z.number().positive(),
-  bairro: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  cidade: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  estado: z.string().trim().min(1, {
+  gestor_responsavel: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
   telefone: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  celular: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
 });
@@ -80,26 +75,57 @@ const UpdateEmpresasButton = ({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
-      id: "1561",
-      nome: "",
+      id: 0,
+      userID: "",
+      empresa: "",
       cnpj: "",
       inscricaoEstadual: "",
       dataAbertura: new Date(),
       site: "",
       email: "",
-      cep: "",
-      endereco: "",
-      numero: 50,
-      bairro: "",
-      cidade: "",
-      estado: "",
+      localizacao_empresa: "",
+      gestor_responsavel: "",
       telefone: "",
-      celular: "",
     },
   });
 
-  const onSubmit = (data: FormSchema) => {
+  const onSubmit = async (data: FormSchema) => {
     console.log(data);
+    try {
+      await addUpdateEmpresas(data);
+      console.log("Dados salvos com sucesso!");
+      toast("Empresa Salva com sucesso!", {
+        description: (
+          <div className="flex items-center">
+            <CircleCheckBigIcon className="mr-2 text-white" />
+            <span>{`${data.empresa} salva em ${new Date().toLocaleString()}`}</span>
+          </div>
+        ),
+        action: {
+          label: "X",
+          onClick: () => console.log("X"),
+        },
+        style: {
+          background: "#007300",
+          textDecorationColor: "#f1f4ff",
+        }, // Cor de fundo e texto
+      });
+      setIsOpen(false);
+      form.reset();
+    } catch (error) {
+      toast("Falha ao salvar os dados!", {
+        description: <AlertTriangleIcon />,
+        action: {
+          label: "X",
+          onClick: () => console.log("X"),
+        },
+        style: {
+          background: "#af080d",
+          textDecorationColor: "#f1f4ff",
+        }, // Cor de fundo e texto
+      });
+      console.error("Erro ao salvar dados:", error);
+    }
   };
 
   return (
@@ -126,7 +152,7 @@ const UpdateEmpresasButton = ({
           >
             <FormField
               control={form.control}
-              name="nome"
+              name="empresa"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Empresa</FormLabel>
@@ -167,14 +193,28 @@ const UpdateEmpresasButton = ({
                 <FormItem>
                   <FormLabel>Data de Abertura</FormLabel>
                   <FormControl>
-                    <DatePicker
-                      value={new Date(field.value)}
-                      onChange={field.onChange}
-                    />
+                    <div className="relative w-full">
+                      <input
+                        type="date"
+                        value={
+                          field.value
+                            ? new Date(field.value).toISOString().split("T")[0]
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const date = new Date(e.target.value); // Converter para Date
+                          field.onChange(
+                            isNaN(date.getTime()) ? undefined : date,
+                          ); // Validar se é uma data válida
+                        }}
+                        className="w-full rounded border bg-transparent p-2 pl-10 text-white"
+                      />
+                    </div>
                   </FormControl>
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="email"
@@ -189,7 +229,7 @@ const UpdateEmpresasButton = ({
             />
             <FormField
               control={form.control}
-              name="endereco"
+              name="localizacao_empresa"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Endereço</FormLabel>
@@ -201,10 +241,10 @@ const UpdateEmpresasButton = ({
             />
             <FormField
               control={form.control}
-              name="numero"
+              name="ramo_empresa"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Número</FormLabel>
+                  <FormLabel>Ramo Empresa</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -213,46 +253,10 @@ const UpdateEmpresasButton = ({
             />
             <FormField
               control={form.control}
-              name="bairro"
+              name="gestor_responsavel"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bairro</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cidade"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cidade</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="estado"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estado</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cep"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>CEP</FormLabel>
+                  <FormLabel>Gestor Responsavel</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -274,12 +278,17 @@ const UpdateEmpresasButton = ({
             />
 
             <DialogFooter className="mt-4 flex flex-wrap justify-center gap-4">
+              {" "}
+              {/* Footer DENTRO do form */}
               <DialogClose asChild>
-                <Button variant={"ghost"}>Cancelar</Button>
+                <Button type="button" variant={"ghost"}>
+                  Cancelar
+                </Button>
               </DialogClose>
-              <Button>Salvar</Button>
+              <Button type="submit">Salvar</Button>
             </DialogFooter>
-          </form>
+          </form>{" "}
+          {/* Formulário FECHADO aqui */}
         </Form>
       </DialogContent>
     </Dialog>

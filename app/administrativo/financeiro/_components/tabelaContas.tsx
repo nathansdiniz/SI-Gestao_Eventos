@@ -7,36 +7,42 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import TiposCobrancaBadge from "./tipoCobranca";
 import EditDialog from "./dialog-edicao";
 import { ColumnDef } from "@tanstack/react-table";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 
+// Configuração do pdfmake
+pdfMake.vfs = pdfFonts.vfs;
 interface FinanceiroProps {
-  id: string;
-  evento: string;
-  datapagamento: string;
-  datacompetencia: string;
-  tipocobranca: string;
+  id: number;
+  evento: string | null;
+  datapagamento: Date | null;
+  datacompetencia: Date | null;
+  tipocobranca: string | null;
   idrecebidode: string | null;
-  recebidode: string;
-  informede: string;
-  descricao: string;
-  valor: string;
-  juros: string;
-  multa: string;
-  desconto: string;
-  pago: string;
+  recebidode: string | null;
+  informede: string | null;
+  descricao: string | null;
+  valor: number | null;
+  juros: number | null;
+  multa: number | null;
+  desconto: number | null;
+  pago: string | null;
   idconta: string | null;
   conta: string | null;
   idcategoria: string | null;
   categoria: string | null;
   idcentrodecusto: string | null;
   centrodecusto: string | null;
-  mododepagamento: string;
+  mododepagamento: string | null;
   parcelas: null | {
-    id: number;
-    datapagamento: string;
-    descricao: string;
-    valor: number;
+    id: number | null;
+    datapagamento: string | null;
+    descricao: string | null;
+    valor: number | null;
   };
-  idevento: string;
+  data_criacao: Date;
+  data_update: Date;
+  idevento: string | null;
 }
 
 interface TabelaFinanceiraProps {
@@ -50,8 +56,7 @@ const TabelaContas = ({
   titulo,
   cor,
 }: TabelaFinanceiraProps) => {
-  const [dadosFiltrados, setDadosFiltrados] =
-    useState<FinanceiroProps[]>(dadosfinanceiros);
+  const [dadosFiltrados] = useState<FinanceiroProps[]>(dadosfinanceiros);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<FinanceiroProps>();
@@ -62,32 +67,30 @@ const TabelaContas = ({
     setIsDialogOpen(true);
   };
 
-  const handleSave = (updatedData: FinanceiroProps) => {
-    // Lógica para salvar os dados atualizados (ex: chamada de API)
-    console.log("Dados atualizados:", updatedData);
-    setIsDialogOpen(false);
-  };
-
   const columns: ColumnDef<FinanceiroProps>[] = [
     // Tipagem aqui!
     {
       accessorKey: "datacompetencia",
       header: "Data",
-      cell: (
-        { row }, // `row` agora é tipado como Row<FinanceiroProps>
-      ) =>
-        new Date(row.original.datacompetencia).toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        }),
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datacompetencia
+          ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })
+          : "",
     },
     { accessorKey: "descricao", header: "Descrição", enableColumnFilter: true },
     {
       accessorKey: "tipocobranca",
       header: "Tipo de Cobrança",
       cell: ({ row }) => (
-        <TiposCobrancaBadge tipocobranca={row.original.tipocobranca} />
+        <TiposCobrancaBadge
+          tipocobranca={
+            row.original.tipocobranca ? row.original.tipocobranca : ""
+          }
+        />
       ),
     },
     {
@@ -128,12 +131,16 @@ const TabelaContas = ({
       ),
     },
   ];
+
+  // Função para exportar para PDF
+
+  // Função para exportar para Excel
   return (
     <>
       <EditDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onSave={handleSave}
+        financeiroId={"0"}
         defaultValues={selectedRow}
         setIsOpen={(isOpen: boolean) => setIsDialogOpen(isOpen)}
       />

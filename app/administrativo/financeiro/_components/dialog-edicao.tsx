@@ -21,8 +21,7 @@ import {
 } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
 import { MoneyInput } from "@/app/_components/money-input";
-import { DatePicker } from "@/app/_components/ui/date-picker";
-import { string, z } from "zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -32,158 +31,97 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/_components/ui/select";
-import { TRANSACTION_TYPE_OPTIONS } from "@/app/_constants/transactions";
+import { toast } from "sonner";
+import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
+import { addUpdateFinanceiro } from "@/app/_actions/criar-atualizarFinanceiro";
 
+// Definição do schema do Zod
 const formSchema = z.object({
-  id: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  evento: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  datacompetencia: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }), // Aceita null
-  idrecebidode: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "A descrição é obrigatória.",
-    })
-    .nullable(), // Aceita null
-  recebidode: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  informede: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  juros: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }), // Aceita null
-  multa: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }), // Aceita null
-  desconto: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }), // Aceita null
-  pago: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }), // Aceita null
-  idconta: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "A descrição é obrigatória.",
-    })
-    .nullable(),
-  conta: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "A descrição é obrigatória.",
-    })
-    .nullable(),
-  idcategoria: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "A descrição é obrigatória.",
-    })
-    .nullable(),
-  categoria: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "A descrição é obrigatória.",
-    })
-    .nullable(),
-  idcentrodecusto: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "A descrição é obrigatória.",
-    })
-    .nullable(),
-  centrodecusto: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "A descrição é obrigatória.",
-    })
-    .nullable(),
-  mododepagamento: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }), // Aceita null
+  id: z.number().optional(),
+  evento: z.string().nullable(),
+  datacompetencia: z.date().nullable(),
+  idrecebidode: z.string().nullable(),
+  recebidode: z.string().nullable(),
+  informede: z.string().nullable(),
+  juros: z.number().nullable(),
+  multa: z.number().nullable(),
+  desconto: z.number().nullable(),
+  pago: z.string().nullable(),
+  idconta: z.string().nullable(),
+  conta: z.string().nullable(),
+  idcategoria: z.string().nullable(),
+  categoria: z.string().nullable(),
+  idcentrodecusto: z.string().nullable(),
+  centrodecusto: z.string().nullable(),
+  mododepagamento: z.string().nullable(),
   parcelas: z
     .object({
-      id: z.number(), // Aceita null
-      datapagamento: z.string(), // Aceita null
-      valor: z.number(), // Aceita null
-      descricao: z.string(), // Aceita null
+      id: z.number().nullable(),
+      datapagamento: z.string().nullable(),
+      valor: z.number().nullable(),
+      descricao: z.string().nullable(),
     })
-    .nullable(), // Permite que `parcelas` em si seja null
-  idevento: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  descricao: z.string().trim().min(1, {
-    message: "A descrição é obrigatória.",
-  }),
-  valor: z.string({
-    required_error: "O valor é obrigatório.",
-  }), // Aceita null
-  tipocobranca: z.string().min(1, {
-    message: "O tipo de cobrança é obrigatório.",
-  }),
-  datapagamento: z.string({
-    required_error: "A data de pagamento é obrigatória.",
-  }), // Aceita null
+    .nullable(),
+  idevento: z.string().nullable(),
+  descricao: z.string().nullable(),
+  valor: z.number().nullable(),
+  tipocobranca: z.string().nullable(),
+  datapagamento: z.date().nullable(),
+  userID: z.string().nullable(),
+  data_criacao: z.date(),
+  data_update: z.date(),
+  id_empresa: z.number().nullable(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
 
-interface FinanceiroProps {
-  id: string;
-  evento: string;
-  datapagamento: string;
-  datacompetencia: string;
-  tipocobranca: string;
-  idrecebidode: string;
-  recebidode: string;
-  informede: string;
-  descricao: string;
-  valor: string;
-  juros: string;
-  multa: string;
-  desconto: string;
-  pago: string;
-  idconta: string | null;
-  conta: string | null;
-  idcategoria: string | number;
-  categoria: string | null;
-  idcentrodecusto: string | null;
-  centrodecusto: string | null;
-  mododepagamento: string;
-  parcelas: null | {};
-  idevento: string;
-}
-
 interface EditDialogProps {
   isOpen: boolean;
   defaultValues?: Partial<FormSchema>;
-  onClose: () => void;
-  onSave: (data: FormSchema) => void;
+  financeiroId?: string;
+  onClose?: () => void;
+  onSave?: (data: FormSchema) => void;
   setIsOpen: (isOpen: boolean) => void;
 }
 
 const EditDialogFinancas = ({
   isOpen,
   defaultValues,
-  onSave,
   setIsOpen,
+  financeiroId,
 }: EditDialogProps) => {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
-    defaultValues, // Inicializa o formulário com os valores
+    defaultValues: {
+      id: undefined,
+      evento: "",
+      datacompetencia: null,
+      idrecebidode: null,
+      recebidode: "",
+      informede: "",
+      juros: null,
+      multa: null,
+      desconto: null,
+      pago: null,
+      idconta: null,
+      conta: "",
+      idcategoria: null,
+      categoria: "",
+      idcentrodecusto: null,
+      centrodecusto: "",
+      mododepagamento: null,
+      parcelas: null,
+      idevento: null,
+      descricao: "",
+      valor: null,
+      tipocobranca: null,
+      datapagamento: null,
+      userID: null,
+      data_criacao: new Date(),
+      data_update: new Date(),
+      id_empresa: null,
+      ...defaultValues,
+    },
   });
 
   // Atualiza os campos do formulário quando defaultValues mudar
@@ -193,11 +131,45 @@ const EditDialogFinancas = ({
     }
   }, [defaultValues, form]);
 
-  const onSubmit = (data: FormSchema) => {
-    onSave(data);
-    setIsOpen(false);
-    form.reset(); // Reseta o formulário após salvar
+  const onSubmit = async (data: FormSchema) => {
+    console.log(data);
+    try {
+      await addUpdateFinanceiro(data);
+      toast("Registro Financeiro salvo com sucesso!", {
+        description: (
+          <div className="flex items-center">
+            <CircleCheckBigIcon className="mr-2 text-white" />
+            <span>{`${data.descricao} salva em ${new Date().toLocaleString()}`}</span>
+          </div>
+        ),
+        action: {
+          label: "X",
+          onClick: () => console.log("X"),
+        },
+        style: {
+          background: "#007300",
+          textDecorationColor: "#f1f4ff",
+        },
+      });
+      setIsOpen(false);
+      form.reset();
+    } catch (error) {
+      toast("Falha ao salvar os dados!", {
+        description: <AlertTriangleIcon />,
+        action: {
+          label: "X",
+          onClick: () => console.log("X"),
+        },
+        style: {
+          background: "#af080d",
+          textDecorationColor: "#f1f4ff",
+        },
+      });
+      console.error("Erro ao salvar dados:", error);
+    }
   };
+
+  const isUpdate = Boolean(financeiroId);
 
   return (
     <Dialog
@@ -212,10 +184,10 @@ const EditDialogFinancas = ({
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-[200vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Editar Registro</DialogTitle>
-          <DialogDescription>
-            Atualize os campos necessários abaixo:
-          </DialogDescription>
+          <DialogTitle>
+            {isUpdate ? "Atualizar" : "Criar"} Registro Financeiro
+          </DialogTitle>
+          <DialogDescription>Insira as informações abaixo:</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -231,12 +203,17 @@ const EditDialogFinancas = ({
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Input placeholder="Digite a descrição..." {...field} />
+                    <Input
+                      placeholder="Digite a descrição..."
+                      {...field}
+                      value={field.value ?? ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="evento"
@@ -244,7 +221,11 @@ const EditDialogFinancas = ({
                 <FormItem>
                   <FormLabel>Evento</FormLabel>
                   <FormControl>
-                    <Input placeholder="Digite o evento..." {...field} />
+                    <Input
+                      placeholder="Digite o evento..."
+                      {...field}
+                      value={field.value ?? ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -272,6 +253,7 @@ const EditDialogFinancas = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="juros"
@@ -293,6 +275,7 @@ const EditDialogFinancas = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="multa"
@@ -314,6 +297,7 @@ const EditDialogFinancas = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="desconto"
@@ -344,11 +328,11 @@ const EditDialogFinancas = ({
                   <FormLabel>Tipo de Cobrança</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? undefined}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a verified email to display" />
+                        <SelectValue placeholder="Selecione o tipo de cobrança" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -364,6 +348,7 @@ const EditDialogFinancas = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="pago"
@@ -372,11 +357,11 @@ const EditDialogFinancas = ({
                   <FormLabel>Status</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? undefined}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a verified email to display" />
+                        <SelectValue placeholder="Selecione o status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -392,6 +377,7 @@ const EditDialogFinancas = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="mododepagamento"
@@ -400,14 +386,17 @@ const EditDialogFinancas = ({
                   <FormLabel>Modo de Pagamento</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? undefined}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a verified email to display" />
+                        <SelectValue placeholder="Selecione o modo de pagamento" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem key={"Dinheiro"} value={"Dinheiro"}>
+                        {"Dinheiro"}
+                      </SelectItem>
                       <SelectItem key={"PIX"} value={"PIX"}>
                         {"PIX"}
                       </SelectItem>
@@ -429,6 +418,9 @@ const EditDialogFinancas = ({
                       >
                         {"Boleto Bancário"}
                       </SelectItem>
+                      <SelectItem key={"Transfêrencia"} value={"Transfêrencia"}>
+                        {"Transfêrencia"}
+                      </SelectItem>
                       <SelectItem key={"Não Informado"} value={"Não Informado"}>
                         {"Não Informado"}
                       </SelectItem>
@@ -438,34 +430,67 @@ const EditDialogFinancas = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="datacompetencia"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Data Competência</FormLabel>
-                  <DatePicker
-                    value={new Date(field.value)}
-                    onChange={field.onChange}
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="date"
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().split("T")[0]
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const dateString = e.target.value;
+                        const date = dateString
+                          ? new Date(dateString)
+                          : undefined;
+                        field.onChange(date);
+                      }}
+                      className="w-full rounded border bg-transparent p-2 pl-10 text-white"
+                    />
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="datapagamento"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Data de Pagamento</FormLabel>
-                  <DatePicker
-                    value={new Date(field.value)}
-                    onChange={field.onChange}
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="date"
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().split("T")[0]
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const dateString = e.target.value;
+                        const date = dateString
+                          ? new Date(dateString)
+                          : undefined;
+                        field.onChange(date);
+                      }}
+                      className="w-full rounded border bg-transparent p-2 pl-10 text-white"
+                    />
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Outros campos aqui... */}
+
             <DialogFooter className="mt-4 flex flex-wrap justify-center gap-4">
               <DialogClose asChild>
                 <Button type="button" variant="outline" size={"lg"}>
@@ -473,7 +498,7 @@ const EditDialogFinancas = ({
                 </Button>
               </DialogClose>
               <Button type="submit" size={"lg"}>
-                Salvar
+                {isUpdate ? "Atualizar" : "Adicionar"}
               </Button>
             </DialogFooter>
           </form>

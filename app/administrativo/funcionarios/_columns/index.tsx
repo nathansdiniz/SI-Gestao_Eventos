@@ -1,44 +1,52 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/app/_components/ui/button";
-import { PencilIcon, TrashIcon } from "lucide-react";
+import { ArrowUpDownIcon } from "lucide-react";
 import BotaoEditarFuncionario from "../_components/botao-update";
 import ExcluirFuncionarioButton from "../_components/botao-exclusaoEmpresa";
 
 interface FuncionariosProps {
+  id: number;
   nome: string;
   cpf: string;
-  idade: number;
   rg: string;
-  data_nasc: Date;
+  data_nascimento: Date;
   sexo: string;
-  signo: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-  cep: string;
-  mae: string;
-  pai: string;
+  funcao: string;
+  id_empresa: number;
+  endereco: string;
+  status: boolean;
   email: string;
-  senha: string;
-  telefone_fixo: string;
+  telefone: string;
   celular: string;
-  altura: string;
-  peso: number;
-  tipo_sanguineo: string;
-  cor: string;
+  data_start_funcao: Date;
+  data_end_funcao: Date | null;
+  data_updated_funcao: Date;
+  data_created: Date;
+  data_updated: Date;
+  userID: string | null;
 }
 
 export const funcionariosColumns: ColumnDef<FuncionariosProps>[] = [
   {
     accessorKey: "nome",
-    header: "Nome",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Nome Completo
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "data_nasc",
     header: "Data Nascimento",
     cell: ({ row: { original: transaction } }) =>
-      new Date(transaction.data_nasc).toLocaleDateString("pt-BR", {
+      new Date(transaction.data_nascimento ?? "").toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "short",
         year: "numeric",
@@ -51,11 +59,31 @@ export const funcionariosColumns: ColumnDef<FuncionariosProps>[] = [
   },
   {
     accessorKey: "sexo",
-    header: "Sexo",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Sexo
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "email",
-    header: "E-mail",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "rg",
@@ -66,8 +94,26 @@ export const funcionariosColumns: ColumnDef<FuncionariosProps>[] = [
     header: "Endereco",
   },
   {
-    accessorKey: "cidade",
-    header: "Cidade",
+    accessorKey: "telefone",
+    header: "telefone",
+  },
+  {
+    accessorKey: "celular",
+    header: "celular",
+  },
+  {
+    accessorKey: "funcao",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Função
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "estado",

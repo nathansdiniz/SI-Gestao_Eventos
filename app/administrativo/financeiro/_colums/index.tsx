@@ -5,29 +5,29 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import TiposCobrancaBadge from "../_components/tipoCobranca";
 
 interface FinanceiroPropos {
-  id: string;
-  evento: string;
-  datapagamento: string;
-  datacompetencia: string;
-  tipocobranca: string;
-  idrecebidode: string;
-  recebidode: string;
-  informede: string;
-  descricao: string;
-  valor: string;
-  juros: string;
-  multa: string;
-  desconto: string;
-  pago: string;
+  id: number;
+  evento: string | null;
+  datapagamento: string | null;
+  datacompetencia: string | null;
+  tipocobranca: string | null;
+  idrecebidode: string | null;
+  recebidode: string | null;
+  informede: string | null;
+  descricao: string | null;
+  valor: number | null;
+  juros: number | null;
+  multa: number | null;
+  desconto: number | null;
+  pago: string | null;
   idconta: string | null;
   conta: string | null;
-  idcategoria: string | number;
+  idcategoria: string | null;
   categoria: string | null;
   idcentrodecusto: string | null;
   centrodecusto: string | null;
-  mododepagamento: string;
-  parcelas: null | {};
-  idevento: string;
+  mododepagamento: string | null;
+  parcelas: null | object;
+  idevento: string | null;
 }
 
 export const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
@@ -35,11 +35,13 @@ export const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
     accessorKey: "datacompetencia",
     header: "Data",
     cell: ({ row: { original: transaction } }) =>
-      new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }),
+      transaction.datacompetencia
+        ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })
+        : "",
   },
   {
     accessorKey: "descricao",
@@ -50,7 +52,11 @@ export const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
     accessorKey: "tipocobranca",
     header: "Tipo de Cobrança",
     cell: ({ row }) => (
-      <TiposCobrancaBadge tipocobranca={row.original.tipocobranca} />
+      <TiposCobrancaBadge
+        tipocobranca={
+          row.original.tipocobranca ? row.original.tipocobranca : ""
+        }
+      />
     ),
   },
   {
@@ -67,11 +73,13 @@ export const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
     accessorKey: "datapagamento",
     header: "Data Pagamento",
     cell: ({ row: { original: transaction } }) =>
-      new Date(transaction.datapagamento).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }),
+      transaction.datapagamento
+        ? new Date(transaction.datapagamento).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })
+        : "",
   },
   {
     accessorKey: "valor",
@@ -111,11 +119,13 @@ export const ContasColumns: ColumnDef<FinanceiroPropos>[] = [
     accessorKey: "datacompetencia",
     header: "Data",
     cell: ({ row: { original: transaction } }) =>
-      new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }),
+      transaction.datacompetencia
+        ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })
+        : "",
   },
   {
     accessorKey: "descricao",
@@ -127,7 +137,11 @@ export const ContasColumns: ColumnDef<FinanceiroPropos>[] = [
     accessorKey: "tipocobranca",
     header: "Tipo de Cobrança",
     cell: ({ row }) => (
-      <TiposCobrancaBadge tipocobranca={row.original.tipocobranca} />
+      <TiposCobrancaBadge
+        tipocobranca={
+          row.original.tipocobranca ? row.original.tipocobranca : ""
+        }
+      />
     ),
   },
   {

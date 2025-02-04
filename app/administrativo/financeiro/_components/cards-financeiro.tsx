@@ -1,10 +1,4 @@
-import {
-  MinusIcon,
-  Plus,
-  TrendingDownIcon,
-  TrendingUpIcon,
-  WalletIcon,
-} from "lucide-react";
+import { MinusIcon, Plus } from "lucide-react";
 import CardResumido from "@/app/(home)/_components/card-resumido";
 
 interface CardResumo {
@@ -15,10 +9,7 @@ interface CardResumo {
   gastosTotal: number;
 }
 
-const CardResumoFinanceiro = async ({
-  depositoTotal,
-  gastosTotal,
-}: CardResumo) => {
+const CardResumoFinanceiro = ({ depositoTotal, gastosTotal }: CardResumo) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-6">

@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/app/_components/ui/button";
-import { DatePicker } from "@/app/_components/ui/date-picker";
 import {
   DialogHeader,
   DialogTitle,
@@ -11,21 +10,13 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/app/_components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/app/_components/ui/form";
-import { Input } from "@/app/_components/ui/input";
+import { SelecionarEvento } from "@/app/_components/ui/select-pesquisa";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleAlert } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   nome: z.string().trim().min(1, {
     message: "Nome é obrigatório.",
   }),
@@ -35,35 +26,45 @@ const formSchema = z.object({
   rg: z.string().trim().min(1, {
     message: "Inscrição Estadual é obrigatório.",
   }),
-  data_nasc: z.date({
+  data_nascimento: z.date({
     required_error: "A data é obrigatório.",
   }),
   sexo: z.string(),
   email: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
-  cep: z.string().trim().min(1, {
+  funcao: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
   endereco: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
-  idade: z.number().positive(),
-  bairro: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
+  id_empresa: z.number().positive(),
+  data_start_funcao: z.date({
+    message: "A data é origatória.",
   }),
-  cidade: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
+  status: z.boolean(),
+  data_end_funcao: z
+    .date({
+      message: "A data é origatória.",
+    })
+    .nullable(),
+  data_updated_funcao: z.date({
+    message: "A data é origatória.",
   }),
-  estado: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
+  data_created: z.date({
+    message: "A data é origatória.",
   }),
-  telefone_fixo: z.string().trim().min(1, {
+  data_updated: z.date({
+    message: "A data é origatória.",
+  }),
+  telefone: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
   celular: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
+  userID: z.string().nullable(),
 });
 type FormSchema = z.infer<typeof formSchema>;
 
@@ -81,20 +82,23 @@ const ExcluirFuncionarioDialog = ({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
-      id: "1561",
+      id: 1561,
       nome: "",
       cpf: "",
       rg: "",
-      data_nasc: new Date(),
+      data_nascimento: new Date(),
       sexo: "",
       email: "",
-      cep: "",
+      funcao: "",
+      status: true,
       endereco: "",
-      idade: 50,
-      bairro: "",
-      cidade: "",
-      estado: "",
-      telefone_fixo: "",
+      id_empresa: 1,
+      userID: "",
+      data_created: new Date(),
+      data_start_funcao: new Date(),
+      data_updated: new Date(),
+      data_updated_funcao: new Date(),
+      telefone: "",
       celular: "",
     },
   });
@@ -122,6 +126,8 @@ const ExcluirFuncionarioDialog = ({
           </DialogDescription>
         </DialogHeader>
 
+        <SelecionarEvento></SelecionarEvento>
+
         <DialogFooter className="mt-4 flex items-center justify-center gap-4">
           <DialogClose asChild>
             <Button
@@ -131,7 +137,11 @@ const ExcluirFuncionarioDialog = ({
               Cancelar
             </Button>
           </DialogClose>
-          <Button variant={"secondary"} className="px-6 py-3 text-lg">
+          <Button
+            variant={"secondary"}
+            className="px-6 py-3 text-lg"
+            onClick={() => onSubmit}
+          >
             Excluir
           </Button>
         </DialogFooter>

@@ -5,27 +5,25 @@ import { useState } from "react";
 import ExcluirFuncionarioDialog from "./botao-exclusao";
 
 interface FuncionarioProps {
+  id: number;
   nome: string;
   cpf: string;
-  idade: number;
   rg: string;
-  data_nasc: Date;
+  data_nascimento: Date;
   sexo: string;
-  signo: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-  cep: string;
-  mae: string;
-  pai: string;
+  funcao: string;
+  id_empresa: number;
+  endereco: string;
+  status: boolean;
   email: string;
-  senha: string;
-  telefone_fixo: string;
+  telefone: string;
   celular: string;
-  altura: string;
-  peso: number;
-  tipo_sanguineo: string;
-  cor: string;
+  data_start_funcao: Date;
+  data_end_funcao: Date | null;
+  data_updated_funcao: Date;
+  data_created: Date;
+  data_updated: Date;
+  userID: string | null;
 }
 
 interface dadosFuncionario {

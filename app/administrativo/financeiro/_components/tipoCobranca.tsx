@@ -1,3 +1,4 @@
+"use client";
 import { Badge } from "@/app/_components/ui/badge";
 import { CircleIcon } from "lucide-react";
 
@@ -25,7 +26,7 @@ const TiposCobrancaBadge = ({ tipocobranca }: TiposCobrancaBadgeProps) => {
   return (
     <Badge className="font bold bg-white bg-opacity-10 text-white">
       <CircleIcon className="mr-2 fill-white" size={10} />
-      Investimento
+      Outros
     </Badge>
   );
 };

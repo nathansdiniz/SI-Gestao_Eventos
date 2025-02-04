@@ -2,7 +2,7 @@
 import { Button } from "@/app/_components/ui/button";
 import { PlusCircleIcon } from "lucide-react";
 import { useState } from "react";
-import UpdateFuncionarioButton from "./update-empresas";
+import UpdateFuncionarioButton from "./update-funcionario";
 
 const AdicionarFuncionarioButton = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);

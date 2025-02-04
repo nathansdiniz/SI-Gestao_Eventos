@@ -8,46 +8,49 @@ export const obterDashboard = async (mes: string) => {
   if (!userId) {
     throw new Error("Não autorizado.");
   }
+  const ano =
+    Number(mes) === new Date().getMonth() + 1
+      ? new Date().getFullYear()
+      : new Date().getFullYear() - 1;
   const where = {
-    userId,
-    date: {
-      gte: new Date(`2025-${mes}/01`),
-      lt: new Date(`2025-${mes}/31`),
+    datacompetencia: {
+      gte: new Date(`${ano}-${mes}/01`),
+      lt: new Date(`${ano}-${mes}/31`),
     },
   };
 
   const investidoTotal = Number(
     (
-      await db.transaction.aggregate({
-        where: { ...where, type: "INVESTMENT" },
-        _sum: { amount: true },
+      await db.financeiroME.aggregate({
+        where: { ...where, tipocobranca: "INVESTMENT" },
+        _sum: { valor: true },
       })
-    )?._sum?.amount,
+    )?._sum?.valor,
   );
   const depositoTotal = Number(
     (
-      await db.transaction.aggregate({
-        where: { ...where, type: "DEPOSIT" },
-        _sum: { amount: true },
+      await db.financeiroME.aggregate({
+        where: { ...where, tipocobranca: "Receita" },
+        _sum: { valor: true },
       })
-    )?._sum?.amount,
+    )?._sum?.valor,
   );
   const gastosTotal = Number(
     (
-      await db.transaction.aggregate({
-        where: { ...where, type: "EXPENSE" },
-        _sum: { amount: true },
+      await db.financeiroME.aggregate({
+        where: { ...where, tipocobranca: "Despesa" },
+        _sum: { valor: true },
       })
-    )?._sum?.amount,
+    )?._sum?.valor,
   );
   const saldo = depositoTotal - investidoTotal - gastosTotal;
   const transactionsTotal = Number(
     (
-      await db.transaction.aggregate({
+      await db.financeiroME.aggregate({
         where,
-        _sum: { amount: true },
+        _sum: { valor: true },
       })
-    )._sum.amount,
+    )._sum.valor,
   );
   const tiposPorcentagem: TransacaoPorcentagemPorTipo = {
     [TransactionType.DEPOSIT]: Math.round(
@@ -61,27 +64,28 @@ export const obterDashboard = async (mes: string) => {
     ),
   };
   const totalGastosPCategoria: TotalGastosPorCategoria[] = (
-    await db.transaction.groupBy({
-      by: ["category"],
+    await db.financeiroME.groupBy({
+      by: ["categoria"],
       where: {
         ...where,
-        type: TransactionType.EXPENSE,
+        tipocobranca: "Despesa",
       },
       _sum: {
-        amount: true,
+        valor: true,
       },
     })
   ).map((category) => ({
-    category: category.category,
-    totalAmount: Number(category._sum.amount),
+    category: category.categoria, // Ajustado para corresponder ao tipo esperado
+    totalAmount: Number(category._sum.valor), // Ajustado para corresponder ao tipo esperado
     percentageOfTotal: Math.round(
-      (Number(category._sum.amount) / Number(gastosTotal)) * 100,
+      (Number(category._sum.valor) / Number(gastosTotal)) * 100,
     ),
   }));
-  const ultimasTransacoes = await db.transaction.findMany({
+
+  const ultimasTransacoes = await db.financeiroME.findMany({
     where,
-    orderBy: { date: "desc" },
-    take: 30,
+    orderBy: { datacompetencia: "desc" },
+    take: 15,
   });
   return {
     investidoTotal,

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import {
   Table,
@@ -13,32 +14,23 @@ import { Input } from "@/app/_components/ui/input";
 import { CalendarIcon, SearchIcon } from "lucide-react";
 import { Label } from "@/app/_components/ui/label";
 
-const HistoricoLogsPage: React.FC = () => {
-  const [logs, setLogs] = useState([
-    {
-      id: 1,
-      usuario: "admin",
-      acao: "Login no sistema",
-      data: "2025-01-20 08:30:00",
-      status: "Sucesso",
-    },
-    {
-      id: 2,
-      usuario: "johndoe",
-      acao: "Criação de novo relatório",
-      data: "2025-01-19 14:15:00",
-      status: "Sucesso",
-    },
-    {
-      id: 3,
-      usuario: "janedoe",
-      acao: "Tentativa de login inválida",
-      data: "2025-01-19 13:45:00",
-      status: "Falha",
-    },
-    // Adicione mais logs para exemplo
-  ]);
+interface HistoricoLogsProps {
+  idHistoricoLogs?: number; // Opcional para diferenciar criação/atualização
+  descricao: string;
+  status: string;
+  acao_realizada: string;
+  dados_acao: any;
+  datahora_alteracao: string; // Alterado para string para facilitar manipulação
+  HistoricoLogscol: string;
+  userID?: string; // Será preenchido com o ID do usuário autenticado
+}
 
+interface HistoricoLogsPageProps {
+  data: HistoricoLogsProps[];
+}
+
+const HistoricoLogsPage: React.FC<HistoricoLogsPageProps> = ({ data }) => {
+  const [logs, setLogs] = useState(data);
   const [filter, setFilter] = useState({
     startDate: "",
     endDate: "",
@@ -46,8 +38,22 @@ const HistoricoLogsPage: React.FC = () => {
   });
 
   const handleSearch = () => {
-    // Lógica para filtrar os logs
-    console.log("Filtrando logs com os critérios:", filter);
+    const { startDate, endDate, usuario } = filter;
+
+    const filteredLogs = data.filter((log) => {
+      const logDate = new Date(log.datahora_alteracao);
+      const isAfterStartDate = startDate
+        ? logDate >= new Date(startDate)
+        : true;
+      const isBeforeEndDate = endDate ? logDate <= new Date(endDate) : true;
+      const matchesUsuario = usuario
+        ? log.userID?.toLowerCase().includes(usuario.toLowerCase())
+        : true;
+
+      return isAfterStartDate && isBeforeEndDate && matchesUsuario;
+    });
+
+    setLogs(filteredLogs);
   };
 
   return (
@@ -65,7 +71,7 @@ const HistoricoLogsPage: React.FC = () => {
                 type="date"
                 id="startDate"
                 value={filter.startDate}
-                onChange={(e: { target: { value: any } }) =>
+                onChange={(e) =>
                   setFilter({ ...filter, startDate: e.target.value })
                 }
               />
@@ -79,7 +85,7 @@ const HistoricoLogsPage: React.FC = () => {
                 type="date"
                 id="endDate"
                 value={filter.endDate}
-                onChange={(e: { target: { value: any } }) =>
+                onChange={(e) =>
                   setFilter({ ...filter, endDate: e.target.value })
                 }
               />
@@ -93,7 +99,7 @@ const HistoricoLogsPage: React.FC = () => {
               id="usuario"
               placeholder="Buscar por usuário"
               value={filter.usuario}
-              onChange={(e: { target: { value: any } }) =>
+              onChange={(e) =>
                 setFilter({ ...filter, usuario: e.target.value })
               }
             />
@@ -112,20 +118,24 @@ const HistoricoLogsPage: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>Usuário</TableHead>
+                <TableHead>Descrição</TableHead>
                 <TableHead>Ação</TableHead>
                 <TableHead>Data e Hora</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Usuário</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {logs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell>{log.id}</TableCell>
-                  <TableCell>{log.usuario}</TableCell>
-                  <TableCell>{log.acao}</TableCell>
-                  <TableCell>{log.data}</TableCell>
+                <TableRow key={log.idHistoricoLogs}>
+                  <TableCell>{log.idHistoricoLogs}</TableCell>
+                  <TableCell>{log.descricao}</TableCell>
+                  <TableCell>{log.acao_realizada}</TableCell>
+                  <TableCell>
+                    {new Date(log.datahora_alteracao).toLocaleString()}
+                  </TableCell>
                   <TableCell>{log.status}</TableCell>
+                  <TableCell>{log.userID}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

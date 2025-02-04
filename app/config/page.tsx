@@ -1,11 +1,5 @@
 import Layout from "@/app/_components/slide-bar";
-import {
-  BellRingIcon,
-  Building2Icon,
-  HistoryIcon,
-  Receipt,
-  Users,
-} from "lucide-react";
+import { BellRingIcon, HistoryIcon, Users } from "lucide-react";
 import CardMenu from "@/app/_components/cards-menu";
 import BotaoVoltar from "../_components/botao-voltar";
 

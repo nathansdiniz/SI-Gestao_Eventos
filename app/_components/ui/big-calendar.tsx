@@ -66,7 +66,7 @@ const Calendar: React.FC = () => {
   return (
     <div>
       <div className="flex items-center justify-between px-10">
-        <h1 className="text-2xl font-bold">Calendário de Eventos</h1>
+        <h1 className="text-2xl font-bold">Calendário de Agendamentos</h1>
         <Button onClick={() => setIsAddDialogOpen(true)} className="bg-primary">
           <PlusIcon />
           Adicionar Evento

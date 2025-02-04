@@ -21,31 +21,44 @@ const Home = async ({ searchParams: { mes } }: HomeProps) => {
   if (!userId) {
     redirect("/login");
   }
+
   const mesInvalido = !mes || !isMatch(mes, "MM");
   if (mesInvalido) redirect(`?mes=${new Date().getMonth() + 1}`);
+
   const dashboard = await obterDashboard(mes);
+
   return (
     <>
       <Layout>
         <div className="space-y-6 p-6">
-          <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
+          <BotaoVoltar redirecionar="/menu" />
           <div className="flex justify-between">
             <h1 className="text-4xl font-bold">Dashboard</h1>
             <SelecionarMes />
           </div>
-          <div className="grid h-full grid-cols-[2fr,1fr] gap-6 overflow-hidden">
-            <div className="flex flex-col gap-6 overflow-hidden">
+
+          {/* Gráfico de Pizza ao lado dos Cards */}
+          <div className="grid grid-cols-3 gap-6">
+            <div className="col-span-2 flex flex-col gap-6">
               <CardResumo mes={mes} {...dashboard} />
-              <div className="grid h-full grid-cols-3 grid-rows-1 gap-6 overflow-hidden">
-                <GraficoPizza {...dashboard} />
-                <GastosCategoria
-                  gastosPorCategoria={dashboard.totalGastosPCategoria}
-                />
-              </div>
             </div>
-            <UltimasTransacoes
-              ultimasTransacoes={dashboard.ultimasTransacoes}
-            ></UltimasTransacoes>
+            <GraficoPizza {...dashboard} />
+          </div>
+
+          {/* Tabelas ocupando duas colunas de forma igual */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="h-full p-4">
+              <GastosCategoria
+                gastosPorCategoria={dashboard.totalGastosPCategoria.filter(
+                  (item) => item.percentageOfTotal > 0,
+                )}
+              />
+            </div>
+            <div className="h-full p-4">
+              <UltimasTransacoes
+                ultimasTransacoes={dashboard.ultimasTransacoes}
+              />
+            </div>
           </div>
         </div>
       </Layout>

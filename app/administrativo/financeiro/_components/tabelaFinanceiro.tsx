@@ -1,45 +1,220 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/app/_components/ui/button";
 import { DataTable } from "@/app/_components/ui/data-table";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { ArrowDownCircleIcon, CircleArrowUpIcon } from "lucide-react";
-import { financeiroColumns } from "../_colums";
+import {
+  ArrowDownCircleIcon,
+  CircleArrowUpIcon,
+  DownloadIcon,
+  FileTextIcon,
+  PencilIcon,
+  SheetIcon,
+  TrashIcon,
+} from "lucide-react";
+import Pop_upFiltros from "./popup-filtros";
+import TiposCobrancaBadge from "./tipoCobranca";
+import { ColumnDef } from "@tanstack/react-table";
+import EditDialogFinancas from "./dialog-edicao";
+import CardResumo from "@/app/(home)/_components/cards-resumo";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
+
+// Configuração do pdfmake
+pdfMake.vfs = pdfFonts.vfs;
+
+interface ParcelasProps {
+  id: number | null;
+  datapagamento: string | null;
+  descricao: string | null;
+  valor: number | null;
+}
 
 interface FinanceiroProps {
-  id: string;
-  evento: string;
-  datapagamento: string;
-  datacompetencia: string;
-  tipocobranca: string;
-  idrecebidode: string;
-  recebidode: string;
-  informede: string;
-  descricao: string;
-  valor: string;
-  juros: string;
-  multa: string;
-  desconto: string;
-  pago: string;
+  id: number;
+  evento: string | null;
+  datapagamento: Date | null;
+  datacompetencia: Date | null;
+  tipocobranca: string | null;
+  idrecebidode: string | null;
+  recebidode: string | null;
+  informede: string | null;
+  descricao: string | null;
+  valor: number | null;
+  juros: number | null;
+  multa: number | null;
+  desconto: number | null;
+  pago: string | null;
   idconta: string | null;
   conta: string | null;
-  idcategoria: string | number;
+  idcategoria: string | null;
   categoria: string | null;
   idcentrodecusto: string | null;
   centrodecusto: string | null;
-  mododepagamento: string;
-  parcelas: null | {};
-  idevento: string;
+  mododepagamento: string | null;
+  parcelas: ParcelasProps | null;
+  idevento: string | null;
+  userID: string | null;
+  data_criacao: Date;
+  data_update: Date;
+  id_empresa: number | null;
 }
 
 interface TabelaFinanceiraProps {
   dadosfinanceiros: FinanceiroProps[];
 }
 
+interface FilterState {
+  tipo: string | null;
+  status: string | null;
+  dataInicio: Date;
+  dataFim: Date;
+}
+
 const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
   const [dadosFiltrados, setDadosFiltrados] =
     useState<FinanceiroProps[]>(dadosfinanceiros);
   const [botaoSelecionado, setBotaoSelecionado] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FilterState>({
+    tipo: null,
+    status: null,
+    dataInicio: new Date("2024-01-01"),
+    dataFim: new Date(),
+  });
+
+  const [dashboard, setDashboard] = useState({
+    investidoTotal: 0,
+    depositoTotal: 0,
+    saldo: 0,
+    gastosTotal: 0,
+  });
+
+  useEffect(() => {
+    calcularTotais(dadosFiltrados);
+  }, [dadosFiltrados]);
+
+  const calcularTotais = (dados: FinanceiroProps[]) => {
+    let investidoTotal = 0;
+    let depositoTotal = 0;
+    let gastosTotal = 0;
+
+    dados.forEach((item) => {
+      const valor = Number(item.valor || 0);
+      if (item.tipocobranca === "Investimento") {
+        investidoTotal += valor;
+      } else if (item.tipocobranca === "Receita") {
+        depositoTotal += valor;
+      } else {
+        gastosTotal += valor;
+      }
+    });
+
+    setDashboard({
+      investidoTotal,
+      depositoTotal,
+      saldo: depositoTotal - gastosTotal - investidoTotal,
+      gastosTotal,
+    });
+  };
+
+  const financeiroColumns: ColumnDef<FinanceiroProps>[] = [
+    {
+      accessorKey: "datacompetencia",
+      header: "Data",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datacompetencia
+          ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })
+          : "",
+    },
+    {
+      accessorKey: "descricao",
+      header: "Descrição",
+    },
+    {
+      accessorKey: "tipocobranca",
+      header: "Tipo de Cobrança",
+      cell: ({ row }) => (
+        <TiposCobrancaBadge
+          tipocobranca={
+            row.original.tipocobranca ? row.original.tipocobranca : ""
+          }
+        />
+      ),
+    },
+    {
+      accessorKey: "evento",
+      header: "Responsável",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.evento || "Não informado.",
+    },
+    {
+      accessorKey: "pago",
+      header: "Pago",
+    },
+    {
+      accessorKey: "datapagamento",
+      header: "Data Pagamento",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datapagamento
+          ? new Date(transaction.datapagamento).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })
+          : "",
+    },
+    {
+      accessorKey: "valor",
+      header: "Valor",
+      cell: ({ row: { original: transaction } }) =>
+        new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(Number(transaction.valor)),
+    },
+    {
+      accessorKey: "actions",
+      header: "Ações",
+      cell: ({ row }) => (
+        <div className="flex flex-row space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-yellow-600 text-white"
+            onClick={() => handleEditClick(row.original)}
+          >
+            <PencilIcon />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-red-800 text-white"
+          >
+            <TrashIcon />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    aplicarFiltros(filters);
+  }, [dadosfinanceiros, filters]);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<FinanceiroProps>();
+
+  const handleEditClick = (row: FinanceiroProps) => {
+    console.log(row);
+    setSelectedRow(row);
+    setIsDialogOpen(true);
+  };
 
   const filtrarReceitas = () => {
     const receitas = dadosfinanceiros.filter(
@@ -47,6 +222,12 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     );
     setDadosFiltrados(receitas);
     setBotaoSelecionado("receitas");
+    setFilters({
+      tipo: "Receita",
+      status: null,
+      dataInicio: new Date("2024-01-01"),
+      dataFim: new Date(),
+    });
   };
 
   const filtrarDespesas = () => {
@@ -55,15 +236,259 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     );
     setDadosFiltrados(despesas);
     setBotaoSelecionado("despesas");
+    setFilters({
+      tipo: "Despesa",
+      status: null,
+      dataInicio: new Date("2024-01-01"),
+      dataFim: new Date(),
+    });
   };
 
   const mostrarTodos = () => {
     setDadosFiltrados(dadosfinanceiros);
     setBotaoSelecionado("todos");
+    setFilters({
+      tipo: null,
+      status: null,
+      dataInicio: new Date("2024-01-01"),
+      dataFim: new Date(),
+    });
+  };
+
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
+  const aplicarFiltros = (filtros: FilterState) => {
+    let dadosFiltradosTemporarios = [...dadosfinanceiros];
+
+    if (filtros.tipo) {
+      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter(
+        (item) => item.tipocobranca === filtros.tipo,
+      );
+    }
+
+    if (filtros.status) {
+      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter(
+        (item) => item.pago === filtros.status,
+      );
+    }
+
+    if (filtros.dataInicio) {
+      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter((item) => {
+        const dataCompetencia = item.datacompetencia
+          ? new Date(item.datacompetencia)
+          : null;
+        return dataCompetencia && dataCompetencia >= filtros.dataInicio;
+      });
+    }
+
+    if (filtros.dataFim) {
+      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter((item) => {
+        const dataCompetencia = item.datacompetencia
+          ? new Date(item.datacompetencia)
+          : null;
+        return dataCompetencia && dataCompetencia <= filtros.dataFim;
+      });
+    }
+
+    setDadosFiltrados(dadosFiltradosTemporarios);
+  };
+
+  // Função para exportar para PDF
+  const exportToPDF = () => {
+    // 📌 Obtendo data e hora da emissão
+    const filtro = filters;
+    const dataEmissao = new Date();
+    const dataFormatada = dataEmissao.toLocaleDateString("pt-BR");
+    const horaFormatada = dataEmissao.toLocaleTimeString("pt-BR");
+    filtro.dataInicio.setHours(25);
+    filtro.dataFim.setHours(25);
+
+    // 📌 Calculando o total
+    const total = dadosFiltrados.reduce((acc, item) => {
+      const valor = Number(item.valor) || 0;
+      return item.tipocobranca === "Receita" ? acc + valor : acc - valor;
+    }, 0);
+
+    const docDefinition = {
+      content: [
+        { text: "Relatório Financeiro", style: "header" },
+        {
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", "auto", "auto", "auto", "auto", "auto"],
+            body: [
+              [
+                { text: "Data", style: "tableHeader" },
+                { text: "Descrição", style: "tableHeader" },
+                { text: "Tipo de Cobrança", style: "tableHeader" },
+                { text: "Responsável", style: "tableHeader" },
+                { text: "Pago", style: "tableHeader" },
+                { text: "Data Pagamento", style: "tableHeader" },
+                { text: "Valor", style: "tableHeader" },
+              ],
+              ...dadosFiltrados.map((item) => [
+                {
+                  text: item.datacompetencia
+                    ? new Date(item.datacompetencia).toLocaleDateString("pt-BR")
+                    : "",
+                  style: "tableBody",
+                },
+                { text: item.descricao || "", style: "tableBody" },
+                { text: item.tipocobranca || "", style: "tableBody" },
+                { text: item.evento || "", style: "tableBody" },
+                { text: item.pago || "", style: "tableBody" },
+                {
+                  text: item.datapagamento
+                    ? new Date(item.datapagamento).toLocaleDateString("pt-BR")
+                    : "",
+                  style: "tableBody",
+                },
+                {
+                  text: new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(Number(item.valor)),
+                  style: "tableBody",
+                },
+              ]),
+            ],
+          },
+          layout: "lightHorizontalLines", // Adiciona linhas horizontais leves
+        },
+        { text: "\n" }, // Espaço antes do total
+        {
+          text: `Total: ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(total)}`,
+          style: "total",
+        },
+        {
+          text: `Emitido em: ${dataFormatada} às ${horaFormatada}`,
+          style: "footer",
+        },
+      ],
+      styles: {
+        header: {
+          fontSize: 14,
+          bold: true,
+          marginLeft: 5,
+          marginTop: 2,
+          marginRight: 10,
+          marginBottom: 2,
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 10,
+          fillColor: "#eeeeee", // Cor de fundo cinza claro para cabeçalho
+        },
+        tableBody: {
+          fontSize: 8, // Fonte menor para os dados da tabela
+        },
+        total: {
+          fontSize: 12,
+          bold: true,
+          marginLeft: 5,
+          marginTop: 2,
+          marginRight: 10,
+          marginBottom: 2,
+        },
+        footer: {
+          fontSize: 10,
+          marginLeft: 5,
+          marginTop: 2,
+          marginRight: 10,
+          marginBottom: 2,
+          color: "#555",
+        },
+      },
+    };
+
+    pdfMake
+      .createPdf(docDefinition)
+      .download(
+        `relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()}.pdf`,
+      );
+
+    toast("Baixando Relátorio!", {
+      description: (
+        <div className="flex items-center">
+          <DownloadIcon className="mr-2 text-white" />
+          <span>{`relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()} emitido em ${new Date().toLocaleString()}`}</span>
+        </div>
+      ),
+      action: {
+        label: "X",
+        onClick: () => console.log("X"),
+      },
+      style: {
+        background: "#007300",
+        textDecorationColor: "#f1f4ff",
+      },
+    });
+  };
+
+  // Função para exportar para Excel
+  const exportToExcel = () => {
+    const filtro = filters;
+    filtro.dataInicio.setHours(25);
+    filtro.dataFim.setHours(25);
+    const worksheet = XLSX.utils.json_to_sheet(
+      dadosFiltrados.map((item) => ({
+        Data: item.datacompetencia
+          ? new Date(item.datacompetencia).toLocaleDateString("pt-BR")
+          : "",
+        Descrição: item.descricao || "",
+        "Tipo de Cobrança": item.tipocobranca || "",
+        Responsável: item.evento || "",
+        Pago: item.pago || "",
+        "Data Pagamento": item.datapagamento
+          ? new Date(item.datapagamento).toLocaleDateString("pt-BR")
+          : "",
+        Valor: new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(Number(item.valor)),
+      })),
+    );
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      `relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()}.xlsx`,
+    );
+    XLSX.writeFile(workbook, "relatorio_financeiro.xlsx");
+    toast("Baixando Relátorio Excel.", {
+      description: (
+        <div className="flex items-center">
+          <DownloadIcon className="mr-2 text-white" />
+          <span>{`Relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()} emitido em ${new Date().toLocaleString()}`}</span>
+        </div>
+      ),
+      action: {
+        label: "X",
+        onClick: () => console.log("X"),
+      },
+      style: {
+        background: "#007300",
+        textDecorationColor: "#f1f4ff",
+      },
+    });
   };
 
   return (
     <>
+      <EditDialogFinancas
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        financeiroId="0"
+        defaultValues={selectedRow}
+        setIsOpen={(isOpen: boolean) => setIsDialogOpen(isOpen)}
+      />
+      <Pop_upFiltros onFilterChange={handleFilterChange} />
+      <div>
+        <CardResumo mes="12" {...dashboard} />
+      </div>
+
       <div className="flex items-center justify-center space-x-10 p-6">
         <Button
           className={`h-32 w-96 rounded-sm text-2xl font-bold ${
@@ -98,11 +523,25 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           Saídas
         </Button>
       </div>
+      <div className="flex justify-end space-x-4 p-4">
+        <Button
+          onClick={exportToPDF}
+          className="text-white"
+          variant={"outline"}
+        >
+          <FileTextIcon size={40}></FileTextIcon>
+          Exportar para PDF
+        </Button>
+        <Button onClick={exportToExcel} className="bg-green-500 text-white">
+          <SheetIcon size={40}></SheetIcon>
+          Exportar para Excel
+        </Button>
+      </div>
       <ScrollArea className="space-y-6">
         <DataTable
           key={"tabelaFinanceira"}
-          columns={financeiroColumns} // Colunas
-          data={dadosFiltrados} // Dados filtrados
+          columns={financeiroColumns}
+          data={dadosFiltrados}
         />
       </ScrollArea>
     </>

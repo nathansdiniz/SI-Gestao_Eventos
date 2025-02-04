@@ -39,7 +39,7 @@ interface EventData {
   observacao: string;
   codigointerno: string;
   convidados: number;
-  datasAdicionais: {};
+  datasAdicionais: object;
 }
 
 interface SelectedDate {

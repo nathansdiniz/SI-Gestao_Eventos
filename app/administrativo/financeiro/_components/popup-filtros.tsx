@@ -6,6 +6,7 @@ import {
 } from "@/app/_components/ui/popover";
 import { Button } from "@/app/_components/ui/button";
 import { useState } from "react";
+import { FilterIcon } from "lucide-react";
 
 interface FilterProps {
   onFilterChange: (filters: FilterState) => void;
@@ -14,16 +15,16 @@ interface FilterProps {
 interface FilterState {
   tipo: string | null;
   status: string | null;
-  dataInicio?: Date | null;
-  dataFim?: Date | null;
+  dataInicio: Date;
+  dataFim: Date;
 }
 
 const Pop_upFiltros = ({ onFilterChange }: FilterProps) => {
   const [filters, setFilters] = useState<FilterState>({
     tipo: null,
     status: null,
-    dataInicio: null,
-    dataFim: null,
+    dataInicio: new Date("2024-01-01"),
+    dataFim: new Date(),
   });
 
   const handleFilterChange = (
@@ -38,19 +39,26 @@ const Pop_upFiltros = ({ onFilterChange }: FilterProps) => {
   };
 
   const clearFilters = () => {
-    setFilters({ tipo: null, status: null, dataInicio: null, dataFim: null });
+    setFilters({
+      tipo: null,
+      status: null,
+      dataInicio: new Date("2024-01-01"),
+      dataFim: new Date(),
+    });
     onFilterChange({
       tipo: null,
       status: null,
-      dataInicio: null,
-      dataFim: null,
+      dataInicio: new Date("2024-01-01"),
+      dataFim: new Date(),
     });
   };
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button>Filtros</Button>
+        <Button className="w-72" variant={"outline"}>
+          <FilterIcon size={64}></FilterIcon>Filtros
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-2">
@@ -62,8 +70,9 @@ const Pop_upFiltros = ({ onFilterChange }: FilterProps) => {
             onChange={(e) => handleFilterChange("tipo", e.target.value)}
           >
             <option value="">Todos</option>
-            <option value="Receita">Receita</option>
-            <option value="Despesa">Despesa</option>
+            <option value="Receita">Entradas</option>
+            <option value="Despesa">Saídas</option>
+            <option value="null">Outros</option>
           </select>
 
           <label htmlFor="status">Status:</label>
@@ -74,8 +83,8 @@ const Pop_upFiltros = ({ onFilterChange }: FilterProps) => {
             onChange={(e) => handleFilterChange("status", e.target.value)}
           >
             <option value="">Todos</option>
-            <option value="Pago">Pago</option>
-            <option value="Pendente">Pendente</option>
+            <option value="sim">Pago</option>
+            <option value="nao">Pendente</option>
           </select>
           <label htmlFor="dataInicio">Data Início:</label>
           <input

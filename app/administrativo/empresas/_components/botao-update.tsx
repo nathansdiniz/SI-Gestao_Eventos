@@ -5,21 +5,20 @@ import { useState } from "react";
 import UpdateEmpresasButton from "./update-empresas";
 
 interface EmpresasProps {
-  id: string;
-  nome: string;
+  id: number;
+  empresa: string;
   cnpj: string;
   site: string;
-  cep: string;
+  ramo_empresa: string;
   email: string;
-  endereco: string;
-  numero: number;
-  bairro: string;
-  cidade: string;
-  estado: string;
+  localizacao_empresa: string;
   telefone: string;
-  celular: string;
   dataAbertura: Date;
+  data_created: Date;
+  data_updated: Date;
   inscricaoEstadual: string;
+  gestor_responsavel: string;
+  userID: string;
 }
 
 interface dadosEmpresa {

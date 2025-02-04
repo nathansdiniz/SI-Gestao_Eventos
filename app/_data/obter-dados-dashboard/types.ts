@@ -1,10 +1,10 @@
-import { TransactionCategory, TransactionType } from "@prisma/client";
+import { TransactionType } from "@prisma/client";
 
 export type TransacaoPorcentagemPorTipo = {
   [key in TransactionType]: number;
 };
 export interface TotalGastosPorCategoria {
-  category: TransactionCategory;
+  category: string | null;
   totalAmount: number;
   percentageOfTotal: number;
 }

@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/app/_components/ui/button";
-import { DatePicker } from "@/app/_components/ui/date-picker";
 import {
   DialogHeader,
   DialogTitle,
@@ -11,21 +10,13 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/app/_components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/app/_components/ui/form";
-import { Input } from "@/app/_components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleAlert } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  id: z.string(),
+  id: z.number(),
+  userID: z.string(),
   nome: z.string().trim().min(1, {
     message: "Nome é obrigatório.",
   }),
@@ -81,7 +72,7 @@ const ExcluirEmpresaDialog = ({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
-      id: "1561",
+      id: 1561,
       nome: "",
       cnpj: "",
       inscricaoEstadual: "",
@@ -96,6 +87,7 @@ const ExcluirEmpresaDialog = ({
       estado: "",
       telefone: "",
       celular: "",
+      userID: "",
     },
   });
 
@@ -131,7 +123,11 @@ const ExcluirEmpresaDialog = ({
               Cancelar
             </Button>
           </DialogClose>
-          <Button variant={"secondary"} className="px-6 py-3 text-lg">
+          <Button
+            variant={"secondary"}
+            className="px-6 py-3 text-lg"
+            onClick={() => onSubmit}
+          >
             Excluir
           </Button>
         </DialogFooter>

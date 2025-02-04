@@ -1,4 +1,5 @@
-import AddTransactionButton from "@/app/_components/add-transaction-button copy";
+"use client";
+import BotaoAdicionarFinancas from "@/app/_components/add-Financeiro";
 import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
 import { ReactNode } from "react";
 
@@ -35,7 +36,7 @@ const CardResumido = ({
           }).format(amount)}
         </p>
 
-        {size === "large" && <AddTransactionButton />}
+        {size === "large" && <BotaoAdicionarFinancas />}
       </CardContent>
     </Card>
   );
