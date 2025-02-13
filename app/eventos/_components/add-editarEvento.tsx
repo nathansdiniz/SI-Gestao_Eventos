@@ -22,45 +22,23 @@ import { Input } from "@/app/_components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/_components/ui/select";
 import { toast } from "sonner";
 import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
 
-// Schema atualizado para corresponder ao Prisma
+// Schema atualizado para a nova interface
 const formSchema = z.object({
-  id: z.number().optional(),
-  tipoEvento: z.string().min(1, "Tipo do evento é obrigatório"),
-  dataDeCadastro: z.string().min(1, "Data de cadastro é obrigatória"),
-  idOrcamento: z.number().optional(),
-  idCliente: z.number().optional(),
+  titulo: z.string().min(1, "Título é obrigatório"),
+  inicio: z.string().min(1, "Data de início é obrigatória"),
+  fim: z.string().min(1, "Data de fim é obrigatória"),
+  descricao: z.string().optional(),
   nomeCliente: z.string().min(1, "Nome do cliente é obrigatório"),
-  dataEvento: z.string().optional(),
-  horaEvento: z.string().min(1, "Hora do evento é obrigatória"),
-  localEvento: z.string().optional(),
-  nomeEvento: z.string().optional(),
-  idLocalEvento: z.number().optional(),
-  endereco: z.string().optional(),
-  numero: z.string().optional(), // Prisma define como Int, mas no form pode ser string para input flexível
-  complemento: z.string().optional(),
-  cep: z.string().optional(),
-  bairro: z.string().optional(),
-  cidade: z.string().optional(),
-  estado: z.string().optional(),
-  informacoes: z.string().optional(),
+  localEvento: z.string().min(1, "Local da Agenda é obrigatório"),
+  cidade: z.string().min(1, "Cidade é obrigatória"),
+  estado: z
+    .string()
+    .min(1, "Estado é obrigatório")
+    .max(2, "Use a sigla do estado"),
   observacao: z.string().optional(),
-  codigoInterno: z.string().optional(),
-  convidados: z.number().min(0, "Número de convidados deve ser positivo"),
-  datasAdicionais: z.string().optional(), // Mantido como string para refletir Prisma
-  status: z.string().min(1, "Status é obrigatório"),
-  id_empresa: z.number().min(1, "Empresa é obrigatória"),
-  userID: z.string().optional(),
-  diaTodo: z.boolean().default(false),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -81,14 +59,15 @@ export function AddEventDialog({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      tipoEvento: "",
-      dataDeCadastro: new Date().toISOString(),
+      titulo: "",
+      inicio: "",
+      fim: "",
+      descricao: "",
       nomeCliente: "",
-      horaEvento: "",
-      status: "Pendente",
-      id_empresa: 1, // Defina um valor padrão válido
-      convidados: 0,
-      diaTodo: false,
+      localEvento: "",
+      cidade: "",
+      estado: "",
+      observacao: "",
       ...defaultValues,
     },
   });
@@ -96,11 +75,11 @@ export function AddEventDialog({
   const handleSubmit = async (data: FormSchema) => {
     try {
       onSubmit(data);
-      toast("Evento salvo com sucesso!", {
+      toast("agenda salvo com sucesso!", {
         description: (
           <div className="flex items-center">
             <CircleCheckBigIcon className="mr-2 text-white" />
-            <span>{`${data.tipoEvento} salvo em ${new Date().toLocaleString()}`}</span>
+            <span>{`${data.titulo} salvo em ${new Date().toLocaleString()}`}</span>
           </div>
         ),
         style: {
@@ -110,14 +89,14 @@ export function AddEventDialog({
       });
       onClose();
     } catch (error) {
-      toast("Falha ao salvar o evento!", {
+      toast("Falha ao salvar o agenda!", {
         description: <AlertTriangleIcon />,
         style: {
           background: "#af080d",
           color: "#fff",
         },
       });
-      console.error("Erro ao salvar evento:", error);
+      console.error("Erro ao salvar agenda:", error);
     }
   };
 
@@ -125,7 +104,7 @@ export function AddEventDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] max-w-[200vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Adicionar Evento</DialogTitle>
+          <DialogTitle>Adicionar Compromisso</DialogTitle>
           <DialogDescription>Preencha os campos abaixo:</DialogDescription>
         </DialogHeader>
 
@@ -134,18 +113,15 @@ export function AddEventDialog({
             onSubmit={form.handleSubmit(handleSubmit)}
             className="grid grid-cols-1 gap-4 md:grid-cols-2"
           >
-            {/* Campos do formulário */}
+            {/* Campos do formulário atualizados */}
             <FormField
               control={form.control}
-              name="tipoEvento"
+              name="titulo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Evento</FormLabel>
+                  <FormLabel>Título</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Ex: Casamento, Aniversário..."
-                      {...field}
-                    />
+                    <Input placeholder="Título da agenda" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,10 +130,10 @@ export function AddEventDialog({
 
             <FormField
               control={form.control}
-              name="dataDeCadastro"
+              name="inicio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Data de Cadastro</FormLabel>
+                  <FormLabel>Data e Hora de Início</FormLabel>
                   <FormControl>
                     <Input type="datetime-local" {...field} />
                   </FormControl>
@@ -168,12 +144,12 @@ export function AddEventDialog({
 
             <FormField
               control={form.control}
-              name="horaEvento"
+              name="fim"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hora do Evento</FormLabel>
+                  <FormLabel>Data e Hora de Término</FormLabel>
                   <FormControl>
-                    <Input type="time" {...field} />
+                    <Input type="datetime-local" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -182,22 +158,90 @@ export function AddEventDialog({
 
             <FormField
               control={form.control}
-              name="status"
+              name="nomeCliente"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Pendente">Pendente</SelectItem>
-                      <SelectItem value="Confirmado">Confirmado</SelectItem>
-                      <SelectItem value="Cancelado">Cancelado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Cliente</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome do cliente" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="localEvento"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Local da agenda</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Local onde será realizado" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="cidade"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cidade</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Cidade da agenda" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="estado"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Estado (UF)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Sigla do estado (ex: SP)"
+                      maxLength={2}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="descricao"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Descrição detalhada da agenda"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="observacao"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Observações</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Observações adicionais" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
