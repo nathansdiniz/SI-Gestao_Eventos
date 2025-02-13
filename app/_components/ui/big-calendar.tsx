@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DateSelectArg, EventClickArg, EventApi } from "@fullcalendar/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -55,6 +55,13 @@ const Calendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<
     EventClickArg["event"] | null
   >(null);
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    new Date().getMonth() + 1,
+  );
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear(),
+  );
+  const calendarRef = useRef<any>(null);
 
   // Carrega os eventos do banco de dados
   useEffect(() => {
@@ -157,6 +164,14 @@ const Calendar: React.FC = () => {
     }
   };
 
+  // Função para navegar para o mês e ano selecionados
+  const navigateToMonthYear = () => {
+    if (calendarRef.current) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.gotoDate(new Date(selectedYear, selectedMonth - 1, 1));
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between px-10">
@@ -167,8 +182,45 @@ const Calendar: React.FC = () => {
         </Button>
       </div>
 
+      {/* Componente de seleção de mês e ano */}
+      <div className="mt-4 flex items-center gap-4 px-10">
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          className="rounded-md border p-2 dark:bg-gray-950"
+        >
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+            <option key={month} value={month}>
+              {new Date(0, month - 1).toLocaleString("pt-BR", {
+                month: "long",
+              })}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+          className="rounded-md border p-2 dark:bg-gray-950"
+        >
+          {Array.from(
+            { length: 10 },
+            (_, i) => new Date().getFullYear() + i,
+          ).map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+
+        <Button onClick={navigateToMonthYear} className="bg-blue-500">
+          Ir para
+        </Button>
+      </div>
+
       <div className="mt-8 px-10">
         <FullCalendar
+          ref={calendarRef}
           height="80vh"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={{
@@ -190,6 +242,13 @@ const Calendar: React.FC = () => {
             setIsDialogOpen(true);
           }}
           events={currentEvents}
+          buttonText={{
+            today: "Hoje",
+            month: "Mês",
+            week: "Semana",
+            day: "Dia",
+            list: "Lista",
+          }}
         />
       </div>
 
@@ -207,7 +266,7 @@ const Calendar: React.FC = () => {
       <EventDetailsDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onUpdateEvent={handleUpdateEvent}
+        onEditEvent={() => setIsAddDialogOpen(true)}
         onDeleteEvent={handleDeleteEvent}
         selectedEvent={selectedEvent}
       />

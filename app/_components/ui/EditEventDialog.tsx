@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+"use client";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,211 +7,201 @@ import {
   DialogTitle,
 } from "@/app/_components/ui/dialog";
 import { Button } from "./button";
+import AddEventDialog from "./AddEventDialog";
 
 interface EventDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdateEvent: (updatedEvent: any) => void;
   onDeleteEvent: (eventId: string) => void;
+  onEditEvent: (eventData: Evento) => void; // Passa os dados do evento para edição
   selectedEvent: any; // Evento selecionado
+}
+
+interface Evento {
+  id: number;
+  tipoEvento: string;
+  dataDeCadastro: Date;
+  idOrcamento?: number | null;
+  idCliente?: number | null;
+  nomeCliente: string;
+  dataEvento?: Date | null;
+  horaEvento: string;
+  localEvento?: string | null;
+  nomeEvento?: string | null | undefined;
+  idLocalEvento?: number | null;
+  endereco?: string | null;
+  numero?: number | null;
+  complemento?: string | null;
+  cep?: string | null;
+  bairro?: string | null;
+  cidade?: string | null;
+  estado?: string | null;
+  informacoes?: string | null;
+  observacao?: string | null;
+  codigoInterno?: string | null;
+  convidados: number;
+  datasAdicionais: string | null;
+  status: string | null;
+  id_empresa: number;
+  userID?: string | null;
+  diaTodo: boolean;
 }
 
 const EventDetailsDialog: React.FC<EventDetailsDialogProps> = ({
   isOpen,
   onClose,
-  onUpdateEvent,
   onDeleteEvent,
+  onEditEvent,
   selectedEvent,
 }) => {
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
 
-  // Estado local para edição do evento
-  const [eventTitle, setEventTitle] = useState<string>(
-    selectedEvent?.title || "",
-  );
-  const [eventDescription, setEventDescription] = useState<string>(
-    selectedEvent?.description || "",
-  );
-  const [eventColor, setEventColor] = useState<string>(
-    selectedEvent?.backgroundColor || "#000000",
-  );
-  const [eventStatus, setEventStatus] = useState<string>(
-    selectedEvent?.status || "Pendente",
-  );
-  const [eventStartDate, setEventStartDate] = useState<string>(
-    selectedEvent?.start || "",
-  );
-  const [eventEndDate, setEventEndDate] = useState<string>(
-    selectedEvent?.end || "",
-  );
-  console.log(selectedEvent);
+  const handleEditEvent = () => {
+    setIsAddDialogOpen(true);
+  };
 
-  // Atualiza o estado do evento quando selectedEvent mudar
-  useEffect(() => {
-    if (selectedEvent) {
-      setEventTitle(selectedEvent.title || "");
-      setEventDescription(selectedEvent.description || "");
-      setEventColor(selectedEvent.backgroundColor || "#000000");
-      setEventStatus(selectedEvent.status || "Pendente");
-      setEventStartDate(selectedEvent.start || "");
-      setEventEndDate(selectedEvent.end || "");
+  const formatSelectedEvent = (event: any): Evento => {
+    if (!event) {
+      return {
+        id: 0,
+        tipoEvento: "",
+        dataDeCadastro: new Date(),
+        idOrcamento: null,
+        idCliente: null,
+        nomeCliente: "",
+        dataEvento: null,
+        horaEvento: "",
+        localEvento: "",
+        nomeEvento: "",
+        idLocalEvento: null,
+        endereco: "",
+        numero: null,
+        complemento: "",
+        cep: "",
+        bairro: "",
+        cidade: "",
+        estado: "",
+        informacoes: "",
+        observacao: "",
+        codigoInterno: "",
+        convidados: 0,
+        datasAdicionais: "",
+        status: "",
+        id_empresa: 1,
+        userID: null,
+        diaTodo: false,
+      };
     }
-  }, [selectedEvent]);
 
-  const handleUpdate = () => {
-    const updatedEvent = {
-      ...selectedEvent,
-      title: eventTitle,
-      description: eventDescription,
-      backgroundColor: eventColor,
-      status: eventStatus,
-      start: eventStartDate,
-      end: eventEndDate,
+    return {
+      id: Number(event.id),
+      tipoEvento: event.extendedProps.tipoEvento,
+      dataDeCadastro: new Date(),
+      idOrcamento: event.extendedProps.idOrcamento || null,
+      idCliente: event.extendedProps.idCliente || null,
+      nomeCliente: event.extendedProps.nomeCliente,
+      dataEvento: event.start ? new Date(event.start) : null,
+      horaEvento: event.start ? new Date(event.start).toTimeString() : "",
+      localEvento: event.extendedProps.localEvento,
+      nomeEvento: event.title,
+      idLocalEvento: event.extendedProps.idLocalEvento || null,
+      endereco: event.extendedProps.endereco || "",
+      numero: event.extendedProps.numero || null,
+      complemento: event.extendedProps.complemento || "",
+      cep: event.extendedProps.cep || "",
+      bairro: event.extendedProps.bairro || "",
+      cidade: event.extendedProps.cidade || "",
+      estado: event.extendedProps.estado || "",
+      informacoes: event.extendedProps.informacoes,
+      observacao: event.extendedProps.observacao,
+      codigoInterno: "",
+      convidados: event.extendedProps.convidados || 0,
+      datasAdicionais: event.extendedProps.datasAdicionais || "",
+      status: event.extendedProps.status,
+      id_empresa: 1, // Defina o ID da empresa conforme necessário
+      userID: null,
+      diaTodo: event.allDay || false,
     };
-    onUpdateEvent(updatedEvent);
-    setIsEditing(false);
-    onClose();
   };
-
-  const handleDelete = () => {
-    onDeleteEvent(selectedEvent.id);
-    onClose();
-  };
-  console.log(selectedEvent);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-center">
-            {isEditing ? "Editar Evento" : "Detalhes do Evento"}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <AddEventDialog
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        defaultValues={formatSelectedEvent(selectedEvent)}
+        selectedDate={
+          selectedEvent || { start: new Date(), end: new Date(), allDay: true }
+        }
+        onSave={(eventData: Evento) => {
+          onEditEvent(eventData);
+          setIsAddDialogOpen(false);
+        }}
+      />
 
-        {!isEditing ? (
-          // Visualização do Evento
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              Detalhes do Evento
+            </DialogTitle>
+          </DialogHeader>
+
+          {/* Visualização do Evento */}
           <div className="p-5">
             <p>
               <strong>Título:</strong> {selectedEvent?.title}
             </p>
             <p>
               <strong>Descrição:</strong>{" "}
-              {selectedEvent?.description || "Sem descrição"}
+              {selectedEvent?.extendedProps?.informacoes || "Sem descrição"}
             </p>
             <p>
-              <strong>Status:</strong> {selectedEvent?.status}
+              <strong>Status:</strong> {selectedEvent?.extendedProps?.status}
             </p>
             <p>
-              <strong>Data Início:</strong>{" "}
-              {selectedEvent?.start?.toString() || "Não definido"}
+              <strong>Data e Hora:</strong>{" "}
+              {selectedEvent?.start
+                ? new Date(selectedEvent.start).toLocaleString()
+                : "Não definido"}
             </p>
             <p>
-              <strong>Data Fim:</strong>{" "}
-              {selectedEvent?.end?.toString() || "Não definido"}
+              <strong>Local:</strong>{" "}
+              {selectedEvent?.extendedProps?.localEvento || "Não definido"}
             </p>
             <p>
-              <strong>Cor:</strong>{" "}
-              <span
-                style={{
-                  backgroundColor: selectedEvent?.backgroundColor,
-                  display: "inline-block",
-                  width: "20px",
-                  height: "20px",
-                }}
-              />
+              <strong>Cliente:</strong>{" "}
+              {selectedEvent?.extendedProps?.nomeCliente || "Não definido"}
+            </p>
+            <p>
+              <strong>Convidados:</strong>{" "}
+              {selectedEvent?.extendedProps?.convidados || 0}
+            </p>
+            <p>
+              <strong>Observação:</strong>{" "}
+              {selectedEvent?.extendedProps?.observacao || "Nenhuma"}
             </p>
 
             <div className="mt-5 flex justify-between">
               <Button
                 type="button"
                 className="bg-yellow-500"
-                onClick={() => setIsEditing(true)}
+                onClick={handleEditEvent} // Abre o AddEventDialog
               >
                 Editar
               </Button>
               <Button
                 type="button"
                 className="bg-red-700"
-                onClick={handleDelete}
+                onClick={() => onDeleteEvent(selectedEvent.id)}
               >
                 Excluir
               </Button>
             </div>
           </div>
-        ) : (
-          // Edição do Evento
-          <form className="p-5">
-            <label>Título:</label>
-            <input
-              type="text"
-              value={eventTitle}
-              onChange={(e) => setEventTitle(e.target.value)}
-              className="mb-3 w-full rounded-md border p-2 text-black"
-              required
-            />
-
-            <label>Descrição:</label>
-            <textarea
-              value={eventDescription}
-              onChange={(e) => setEventDescription(e.target.value)}
-              className="mb-3 w-full rounded-md border p-2 text-black"
-            />
-
-            <label>Data Início:</label>
-            <input
-              type="datetime-local"
-              value={eventStartDate}
-              onChange={(e) => setEventStartDate(e.target.value)}
-              className="mb-3 w-full rounded-md border p-2 text-black"
-            />
-
-            <label>Data Fim:</label>
-            <input
-              type="datetime-local"
-              value={eventEndDate}
-              onChange={(e) => setEventEndDate(e.target.value)}
-              className="mb-3 w-full rounded-md border p-2 text-black"
-            />
-
-            <label>Status:</label>
-            <select
-              value={eventStatus}
-              onChange={(e) => setEventStatus(e.target.value)}
-              className="mb-3 w-full rounded-md border p-2 text-black"
-            >
-              <option value="Pendente">Pendente</option>
-              <option value="Confirmado">Confirmado</option>
-              <option value="Cancelado">Cancelado</option>
-            </select>
-
-            <label>Cor:</label>
-            <input
-              type="color"
-              value={eventColor}
-              onChange={(e) => setEventColor(e.target.value)}
-              className="mb-3"
-            />
-
-            <div className="mt-5 flex justify-between">
-              <Button
-                type="button"
-                className="bg-green-500"
-                onClick={handleUpdate}
-              >
-                Salvar
-              </Button>
-              <Button
-                type="button"
-                className="bg-gray-500"
-                onClick={() => setIsEditing(false)}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

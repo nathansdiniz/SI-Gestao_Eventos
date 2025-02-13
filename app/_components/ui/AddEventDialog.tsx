@@ -89,7 +89,11 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
   // Atualiza o formData quando defaultValues muda
   useEffect(() => {
     if (defaultValues) {
-      setFormData(defaultValues);
+      setFormData({
+        ...defaultValues,
+        dataEvento: defaultValues.dataEvento || selectedDate.start,
+        diaTodo: defaultValues.diaTodo || selectedDate.allDay,
+      });
     } else {
       setFormData((prev) => ({
         ...prev,

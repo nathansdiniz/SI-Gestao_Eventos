@@ -10,7 +10,7 @@ const CalendarPage: React.FC = () => {
         {" "}
         <main>
           <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
-          <h1 style={{ textAlign: "center", margin: "20px 0" }}>Agenda</h1>
+          <h1 style={{ textAlign: "center", margin: "20px 0" }}>Eventos</h1>
 
           <CustomCalendar />
         </main>
