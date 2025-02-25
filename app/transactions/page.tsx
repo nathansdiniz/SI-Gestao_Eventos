@@ -1,13 +1,13 @@
-import { db } from "../_lib/prisma";
 import { DataTable } from "../_components/ui/data-table";
-import { transactionColumns } from "./_columns";
 import AddTransactionButton from "../_components/add-transaction-button";
 import Layout from "../_components/slide-bar";
 import { ScrollArea } from "../_components/ui/scroll-area";
+import { financeiroColumns } from "../transacoes/_colums";
+import minhasTransações from "../_actions/criar-atualizarFinanceiro";
 
 const TransactionsPage = async () => {
   try {
-    const transactions = await db.transaction.findMany({});
+    const transactions = await minhasTransações();
     return (
       <>
         <Layout>
@@ -20,7 +20,7 @@ const TransactionsPage = async () => {
                 <AddTransactionButton />
               </div>
               <ScrollArea>
-                <DataTable columns={transactionColumns} data={transactions} />
+                <DataTable columns={financeiroColumns} data={transactions} />
               </ScrollArea>
             </div>
           </>

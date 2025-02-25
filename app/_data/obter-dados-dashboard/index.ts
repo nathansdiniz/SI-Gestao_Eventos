@@ -3,20 +3,17 @@ import { TransactionType } from "@prisma/client";
 import { TotalGastosPorCategoria, TransacaoPorcentagemPorTipo } from "./types";
 import { auth } from "@clerk/nextjs/server";
 
-export const obterDashboard = async (mes: string) => {
+export const obterDashboard = async (mes: string, empresa: string) => {
   const { userId } = await auth();
   if (!userId) {
     throw new Error("Não autorizado.");
   }
-  const ano =
-    Number(mes) === new Date().getMonth() + 1
-      ? new Date().getFullYear()
-      : new Date().getFullYear() - 1;
   const where = {
     datacompetencia: {
-      gte: new Date(`${ano}-${mes}/01`),
-      lt: new Date(`${ano}-${mes}/31`),
+      gte: new Date(`${mes}/01`),
+      lt: new Date(`${mes}/31`),
     },
+    id_empresa: Number(empresa),
   };
 
   const investidoTotal = Number(
@@ -85,8 +82,32 @@ export const obterDashboard = async (mes: string) => {
   const ultimasTransacoes = await db.financeiroME.findMany({
     where,
     orderBy: { datacompetencia: "desc" },
-    take: 15,
+    take: 10,
   });
+  const saldo_previstoSaidas = Number(
+    (
+      await db.financeiroME.aggregate({
+        where: { ...where, tipocobranca: "Despesa", pago: "nao" },
+        _sum: { valor: true },
+      })
+    )?._sum?.valor,
+  );
+  const saldo_previstoEntradas = Number(
+    (
+      await db.financeiroME.aggregate({
+        where: { ...where, tipocobranca: "Receita", pago: "nao" },
+        _sum: { valor: true },
+      })
+    )?._sum?.valor,
+  );
+  const saldo_previsto = Number(
+    (
+      await db.financeiroME.aggregate({
+        where: { ...where, pago: "nao" },
+        _sum: { valor: true },
+      })
+    )?._sum?.valor,
+  );
   return {
     investidoTotal,
     depositoTotal,
@@ -94,6 +115,9 @@ export const obterDashboard = async (mes: string) => {
     saldo,
     tiposPorcentagem,
     totalGastosPCategoria,
+    saldo_previsto,
+    saldo_previstoEntradas,
+    saldo_previstoSaidas,
     ultimasTransacoes: JSON.parse(JSON.stringify(ultimasTransacoes)),
   };
 };

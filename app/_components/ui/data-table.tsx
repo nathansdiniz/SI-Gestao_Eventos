@@ -7,6 +7,7 @@ import {
   useReactTable,
   SortingState,
   getSortedRowModel,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -17,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "./table";
+import { DataTablePagination } from "./DataTablePaginacao";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,6 +36,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
     },
@@ -83,6 +86,7 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
+      <DataTablePagination table={table} />
     </div>
   );
 }

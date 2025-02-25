@@ -33,6 +33,13 @@ const Empresas = () => {
             redirecionar="/administrativo/funcionarios"
             size="large"
           ></CardMenu>
+          <CardMenu
+            title="Orcamentos"
+            icon={<Users size={84} />}
+            descricao="Gerencie todas os Orcamentos."
+            redirecionar="/administrativo/orcamentos"
+            size="large"
+          ></CardMenu>
         </div>
       </div>
     </Layout>

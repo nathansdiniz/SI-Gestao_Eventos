@@ -4,46 +4,9 @@ import { db } from "@/app/_lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { Novo_UP_historicoLogs } from "../historicosLogs";
+import { FinanceiroPropos } from "@/app/_props";
 
-interface ParametrosFinanceiro {
-  id?: number | undefined; // Deixa como opcional, pois pode ser um novo registro
-  evento: string | null;
-  datapagamento: Date | null;
-  datacompetencia: Date | null;
-  tipocobranca: string | null;
-  idrecebidode: string | null;
-  recebidode: string | null;
-  informede: string | null;
-  descricao: string | null;
-  valor: number | null;
-  juros: number | null;
-  multa: number | null;
-  desconto: number | null;
-  pago: string | null;
-  idconta: string | null;
-  conta: string | null;
-  idcategoria: string | null;
-  categoria: string | null;
-  idcentrodecusto: string | null;
-  centrodecusto: string | null;
-  mododepagamento: string | null;
-  parcelas:
-    | {
-        id: number | null;
-        datapagamento: string | null;
-        valor: number | null;
-        descricao: string | null;
-      }
-    | null
-    | undefined; // Permite null aqui
-  idevento: string | null;
-  id_empresa: number | null;
-  data_criacao: Date;
-  data_update: Date;
-  userID?: string | null; // Isso será adicionado automaticamente
-}
-
-export const addUpdateFinanceiro = async (params: ParametrosFinanceiro) => {
+export const addUpdateFinanceiro = async (params: FinanceiroPropos) => {
   const { userId } = auth();
   if (!userId) {
     throw new Error("Unauthorized");
@@ -71,6 +34,7 @@ export const addUpdateFinanceiro = async (params: ParametrosFinanceiro) => {
     data_update: new Date(),
     id: id ?? nextId, // Se o id não for passado, usa o próximo id
     parcelas: rest.parcelas ? rest.parcelas : undefined,
+    documentos_anexados: rest.documentos_anexados ?? undefined,
   };
 
   if (id) {
@@ -85,6 +49,7 @@ export const addUpdateFinanceiro = async (params: ParametrosFinanceiro) => {
         data_update: new Date(),
         id: nextId, // Se o id não for passado, usa o próximo id
         parcelas: rest.parcelas ? rest.parcelas : undefined,
+        documentos_anexados: rest.documentos_anexados ?? undefined,
       }, // Inclui 'id' ao criar
     });
     await Novo_UP_historicoLogs({
@@ -105,6 +70,7 @@ export const addUpdateFinanceiro = async (params: ParametrosFinanceiro) => {
         data_update: new Date(),
         id: nextId, // Se o id não for passado, usa o próximo id
         parcelas: rest.parcelas ? rest.parcelas : undefined,
+        documentos_anexados: rest.documentos_anexados ?? undefined,
       }, // Inclui 'id' como numérico, agora garantido
     });
     await Novo_UP_historicoLogs({
@@ -119,3 +85,39 @@ export const addUpdateFinanceiro = async (params: ParametrosFinanceiro) => {
 
   revalidatePath("/administrativo/financeiro");
 };
+
+const minhasTransações = async () => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+  const transactions = await db.financeiroME.findMany({
+    where: { userID: userId },
+    orderBy: { datacompetencia: "desc" },
+  });
+  const dadosConvertidos = transactions.map((dado) => ({
+    ...dado,
+    valor: dado.valor ? Number(dado.valor.toString()) : null,
+    juros: dado.juros ? Number(dado.juros.toString()) : null,
+    multa: dado.multa ? Number(dado.multa.toString()) : null,
+    desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
+    documentos_anexados:
+      typeof dado.documentos_anexados === "string"
+        ? JSON.parse(dado.documentos_anexados)
+        : dado.documentos_anexados,
+    parcelas:
+      dado.parcelas === 1
+        ? 1
+        : dado.parcelas &&
+            typeof dado.parcelas === "string" &&
+            dado.parcelas.trim() !== ""
+          ? JSON.parse(dado.parcelas)
+          : dado.parcelas,
+    recorrencia:
+      (dado.recorrencia as "Nenhuma" | "Semanal" | "Mensal" | undefined) ||
+      "Nenhuma",
+  }));
+  return dadosConvertidos;
+};
+
+export default minhasTransações;

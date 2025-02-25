@@ -21,17 +21,21 @@ const Financeiro = async () => {
         gte: new Date(`${ano - 1}-06-01`).toISOString(), // Data inicial do mês
         lt: new Date(`${ano}-12-01`).toISOString(), // Data do próximo mês (exclusivo)
       },
+      validacao: "Aprovado",
     },
   });
 
   // Chamada da API para obter os dados
-
   const dadosConvertidos = dadosfinanceiros.map((dado) => ({
     ...dado,
     valor: dado.valor ? Number(dado.valor.toString()) : null,
     juros: dado.juros ? Number(dado.juros.toString()) : null,
     multa: dado.multa ? Number(dado.multa.toString()) : null,
     desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
+    documentos_anexados:
+      typeof dado.documentos_anexados === "string"
+        ? JSON.parse(dado.documentos_anexados)
+        : dado.documentos_anexados,
     parcelas:
       dado.parcelas === 1
         ? 1
@@ -40,6 +44,9 @@ const Financeiro = async () => {
             dado.parcelas.trim() !== ""
           ? JSON.parse(dado.parcelas)
           : dado.parcelas,
+    recorrencia:
+      (dado.recorrencia as "Nenhuma" | "Semanal" | "Mensal" | undefined) ||
+      "Nenhuma",
   }));
   return (
     <>

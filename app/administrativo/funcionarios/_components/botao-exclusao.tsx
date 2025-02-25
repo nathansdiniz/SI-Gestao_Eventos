@@ -10,7 +10,6 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/app/_components/ui/dialog";
-import { SelecionarEvento } from "@/app/_components/ui/select-pesquisa";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -125,8 +124,6 @@ const ExcluirFuncionarioDialog = ({
             Tem certeza que deseja excluir esse funcionário?
           </DialogDescription>
         </DialogHeader>
-
-        <SelecionarEvento></SelecionarEvento>
 
         <DialogFooter className="mt-4 flex items-center justify-center gap-4">
           <DialogClose asChild>

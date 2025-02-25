@@ -8,9 +8,8 @@ import {
   CircleArrowUpIcon,
   DownloadIcon,
   FileTextIcon,
-  PencilIcon,
+  PaperclipIcon,
   SheetIcon,
-  TrashIcon,
 } from "lucide-react";
 import Pop_upFiltros from "./popup-filtros";
 import TiposCobrancaBadge from "./tipoCobranca";
@@ -21,49 +20,15 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
+import { FinanceiroPropos } from "@/app/_props";
+import FileUploadDialog from "@/app/eventos/[id]/validacao/_components/Dialog-Anexos";
+import BotaoAdicionarFinancas from "@/app/_components/add-Financeiro";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
 
-interface ParcelasProps {
-  id: number | null;
-  datapagamento: string | null;
-  descricao: string | null;
-  valor: number | null;
-}
-
-interface FinanceiroProps {
-  id: number;
-  evento: string | null;
-  datapagamento: Date | null;
-  datacompetencia: Date | null;
-  tipocobranca: string | null;
-  idrecebidode: string | null;
-  recebidode: string | null;
-  informede: string | null;
-  descricao: string | null;
-  valor: number | null;
-  juros: number | null;
-  multa: number | null;
-  desconto: number | null;
-  pago: string | null;
-  idconta: string | null;
-  conta: string | null;
-  idcategoria: string | null;
-  categoria: string | null;
-  idcentrodecusto: string | null;
-  centrodecusto: string | null;
-  mododepagamento: string | null;
-  parcelas: ParcelasProps | null;
-  idevento: string | null;
-  userID: string | null;
-  data_criacao: Date;
-  data_update: Date;
-  id_empresa: number | null;
-}
-
 interface TabelaFinanceiraProps {
-  dadosfinanceiros: FinanceiroProps[];
+  dadosfinanceiros: FinanceiroPropos[];
 }
 
 interface FilterState {
@@ -75,8 +40,9 @@ interface FilterState {
 
 const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
   const [dadosFiltrados, setDadosFiltrados] =
-    useState<FinanceiroProps[]>(dadosfinanceiros);
+    useState<FinanceiroPropos[]>(dadosfinanceiros);
   const [botaoSelecionado, setBotaoSelecionado] = useState<string | null>(null);
+  const [isOpenAnexo, setIsOpenAnexo] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     tipo: null,
     status: null,
@@ -89,16 +55,22 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     depositoTotal: 0,
     saldo: 0,
     gastosTotal: 0,
+    saldo_previstoEntradas: 0,
+    saldo_previstoSaidas: 0,
+    saldo_previsto: 0,
   });
 
   useEffect(() => {
     calcularTotais(dadosFiltrados);
   }, [dadosFiltrados]);
 
-  const calcularTotais = (dados: FinanceiroProps[]) => {
+  const calcularTotais = (dados: FinanceiroPropos[]) => {
     let investidoTotal = 0;
     let depositoTotal = 0;
     let gastosTotal = 0;
+    let saldo_previstoEntradas = 0;
+    let saldo_previstoSaidas = 0;
+    let saldo_previsto = 0;
 
     dados.forEach((item) => {
       const valor = Number(item.valor || 0);
@@ -109,6 +81,18 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       } else {
         gastosTotal += valor;
       }
+
+      if (item.pago === "nao") {
+        saldo_previsto += valor;
+        switch (item.tipocobranca) {
+          case "Despesa":
+            saldo_previstoSaidas += valor;
+            break;
+          case "Receita":
+            saldo_previstoEntradas += valor;
+            break;
+        }
+      }
     });
 
     setDashboard({
@@ -116,10 +100,13 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       depositoTotal,
       saldo: depositoTotal - gastosTotal - investidoTotal,
       gastosTotal,
+      saldo_previsto,
+      saldo_previstoEntradas,
+      saldo_previstoSaidas,
     });
   };
 
-  const financeiroColumns: ColumnDef<FinanceiroProps>[] = [
+  const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
     {
       accessorKey: "datacompetencia",
       header: "Data",
@@ -186,17 +173,13 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 bg-yellow-600 text-white"
-            onClick={() => handleEditClick(row.original)}
+            className="h-8 w-8 bg-blue-600 text-white"
+            onClick={() => {
+              setSelectedRow(row.original);
+              setIsOpenAnexo(true);
+            }}
           >
-            <PencilIcon />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-red-800 text-white"
-          >
-            <TrashIcon />
+            <PaperclipIcon></PaperclipIcon>
           </Button>
         </div>
       ),
@@ -208,13 +191,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
   }, [dadosfinanceiros, filters]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<FinanceiroProps>();
-
-  const handleEditClick = (row: FinanceiroProps) => {
-    console.log(row);
-    setSelectedRow(row);
-    setIsDialogOpen(true);
-  };
+  const [selectedRow, setSelectedRow] = useState<FinanceiroPropos>();
 
   const filtrarReceitas = () => {
     const receitas = dadosfinanceiros.filter(
@@ -402,12 +379,12 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         },
       },
     };
-
+    const dataInicio = filtro.dataInicio.toLocaleDateString();
+    const dataFim = filtro.dataFim.toLocaleDateString();
+    console.log(dataInicio, dataFim);
     pdfMake
       .createPdf(docDefinition)
-      .download(
-        `relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()}.pdf`,
-      );
+      .download(`relatorio_financeiro ${dataInicio} - ${dataFim}.pdf`);
 
     toast("Baixando Relátorio!", {
       description: (
@@ -451,12 +428,14 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       })),
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
+    const dataInicio = filtro.dataInicio.toLocaleDateString();
+    const dataFim = filtro.dataFim.toLocaleDateString();
+    console.log(dataInicio, dataFim);
+    XLSX.utils.book_append_sheet(workbook, worksheet, `dados`);
+    XLSX.writeFile(
       workbook,
-      worksheet,
-      `relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()}.xlsx`,
+      `relatorio_financeiro ${dataInicio} ${dataFim}.xlsx`,
     );
-    XLSX.writeFile(workbook, "relatorio_financeiro.xlsx");
     toast("Baixando Relátorio Excel.", {
       description: (
         <div className="flex items-center">
@@ -483,6 +462,13 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         financeiroId="0"
         defaultValues={selectedRow}
         setIsOpen={(isOpen: boolean) => setIsDialogOpen(isOpen)}
+      />
+      <FileUploadDialog
+        isOpen={isOpenAnexo}
+        onClose={() => setIsDialogOpen(false)}
+        financeiroId="0"
+        dados={selectedRow || ({} as FinanceiroPropos)}
+        setIsOpen={(isOpenAnexo: boolean) => setIsOpenAnexo(isOpenAnexo)}
       />
       <Pop_upFiltros onFilterChange={handleFilterChange} />
       <div>
@@ -524,6 +510,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         </Button>
       </div>
       <div className="flex justify-end space-x-4 p-4">
+        <BotaoAdicionarFinancas />
         <Button
           onClick={exportToPDF}
           className="text-white"

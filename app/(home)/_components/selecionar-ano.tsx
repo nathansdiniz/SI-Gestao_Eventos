@@ -1,4 +1,5 @@
 "use client";
+import { getEmpresas } from "@/app/_actions/criar-atualizarEmpresas";
 import {
   Select,
   SelectContent,
@@ -7,36 +8,50 @@ import {
 } from "@/app/_components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { useRouter, useSearchParams } from "next/navigation";
-const MONTH_OPTIONS = [
-  { value: "2023", label: "2023" },
-  { value: "2024", label: "2024" },
-  { value: "2025", label: "2025" },
-];
+import { useEffect, useState } from "react";
 
-interface mesProps {
-  mes: string;
-}
-
-const SelecionarAno = ({ mes }: mesProps) => {
+const SelecionarEmpresa = () => {
   const { push } = useRouter();
-  const filtrarMesDados = (ano: string) => {
-    push(`?mes${mes}&ano=${ano}`);
-  };
   const searchParams = useSearchParams();
-  const mesAtual = searchParams.get("ano");
-  console.log(mesAtual);
+  const empresaAtual = searchParams.get("src");
+  const mesAtual = searchParams.get("mes");
+
+  const [empresas, setEmpresas] = useState<
+    {
+      id: number;
+      empresa: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const res = await getEmpresas();
+        setEmpresas(res);
+      } catch (error) {
+        console.error("Erro ao buscar empresas:", error);
+      }
+    };
+
+    fetchEmpresas();
+  }, []);
+
+  const filtrarEmpresaDados = (valor: string) => {
+    push(`?mes=${mesAtual}&src=${valor}`);
+  };
+
   return (
     <Select
-      onValueChange={(valor) => filtrarMesDados(valor)}
-      defaultValue={mesAtual ?? ""}
+      onValueChange={(valor) => filtrarEmpresaDados(valor)}
+      defaultValue={empresaAtual ?? ""}
     >
       <SelectTrigger className="w-80">
-        <SelectValue placeholder="Ano" />
+        <SelectValue placeholder="Selecione a Empresa" />
       </SelectTrigger>
       <SelectContent>
-        {MONTH_OPTIONS.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
+        {empresas.map((empresa) => (
+          <SelectItem key={empresa.id} value={empresa.id.toString()}>
+            {empresa.empresa}
           </SelectItem>
         ))}
       </SelectContent>
@@ -44,4 +59,4 @@ const SelecionarAno = ({ mes }: mesProps) => {
   );
 };
 
-export default SelecionarAno;
+export default SelecionarEmpresa;

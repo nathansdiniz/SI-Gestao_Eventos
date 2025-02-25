@@ -13,19 +13,25 @@ import BotaoVoltar from "../_components/botao-voltar";
 interface HomeProps {
   searchParams: {
     mes: string;
+    src: string;
   };
 }
 
-const Home = async ({ searchParams: { mes } }: HomeProps) => {
+const Home = async ({ searchParams: { mes, src } }: HomeProps) => {
   const { userId } = await auth();
   if (!userId) {
     redirect("/login");
   }
 
-  const mesInvalido = !mes || !isMatch(mes, "MM");
-  if (mesInvalido) redirect(`?mes=${new Date().getMonth() + 1}`);
+  const mesInvalido = !mes || !isMatch(mes, "yyyy-MM");
+  if (mesInvalido)
+    redirect(`?mes=${new Date().getFullYear()}-${new Date().getMonth() + 1}`);
 
-  const dashboard = await obterDashboard(mes);
+  if (!src) {
+    redirect(`/?mes=${mes}&src=01`); // Substitua "defaultEmpresaId" pelo ID da src padrão
+  }
+
+  const dashboard = await obterDashboard(mes, src);
 
   return (
     <>
@@ -34,7 +40,9 @@ const Home = async ({ searchParams: { mes } }: HomeProps) => {
           <BotaoVoltar redirecionar="/menu" />
           <div className="flex justify-between">
             <h1 className="text-4xl font-bold">Dashboard</h1>
-            <SelecionarMes />
+            <div className="flex gap-4">
+              <SelecionarMes />
+            </div>
           </div>
 
           {/* Gráfico de Pizza ao lado dos Cards */}

@@ -7,14 +7,9 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { Button } from "./button";
 import AddEventDialog from "./AddEventDialog";
-import EventDetailsDialog from "./EditEventDialog";
+import EventDetailsDialog from "./DetalhesEventDialog";
 import { PlusIcon } from "lucide-react";
-import {
-  fetchEventos,
-  adicionarEvento,
-  atualizarEvento,
-  excluirEvento,
-} from "@/app/_actions/eventos";
+import { fetchEventos, excluirEvento } from "@/app/_actions/eventos";
 
 // Interface correspondente ao modelo do Prisma
 interface Evento {
@@ -91,67 +86,8 @@ const Calendar: React.FC = () => {
   }, []);
 
   // Função para adicionar um evento
-  const handleAddEvent = async (newEvent: {
-    title: string;
-    start: Date;
-    end?: Date;
-  }) => {
-    const evento: Evento = {
-      id: 0, // ID será gerado pelo banco de dados
-      tipoEvento: "Evento",
-      dataDeCadastro: new Date(),
-      nomeCliente: "Cliente Padrão",
-      horaEvento: newEvent.start.toISOString(),
-      dataEvento: newEvent.start,
-      localEvento: "Local Padrão",
-      nomeEvento: newEvent.title,
-      convidados: 0,
-      datasAdicionais: "",
-      status: "Pendente",
-      id_empresa: 1, // Defina o ID da empresa
-      diaTodo: false,
-    };
-
-    try {
-      const eventoAdicionado = await adicionarEvento(evento);
-      const calendarApi = selectedDate!.view.calendar;
-      calendarApi.addEvent({
-        id: eventoAdicionado.id.toString(),
-        title: eventoAdicionado.nomeEvento || "Sem título",
-        start: eventoAdicionado.dataEvento?.toISOString(),
-        end: eventoAdicionado.dataEvento?.toISOString(),
-      });
-      setIsAddDialogOpen(false);
-    } catch (error) {
-      console.error("Erro ao adicionar evento:", error);
-    }
-  };
 
   // Função para atualizar um evento
-  const handleUpdateEvent = async (updatedEvent: EventApi) => {
-    const evento: Evento = {
-      id: Number(updatedEvent.id),
-      tipoEvento: updatedEvent.extendedProps.tipoEvento,
-      dataDeCadastro: new Date(),
-      nomeCliente: updatedEvent.extendedProps.nomeCliente,
-      horaEvento: updatedEvent.start?.toString() || "",
-      dataEvento: updatedEvent.start ? new Date(updatedEvent.start) : undefined,
-      localEvento: updatedEvent.extendedProps.localEvento,
-      nomeEvento: updatedEvent.title,
-      convidados: 0,
-      datasAdicionais: "",
-      status: updatedEvent.extendedProps.status,
-      id_empresa: 1, // Defina o ID da empresa
-      diaTodo: false,
-    };
-
-    try {
-      await atualizarEvento(evento);
-      setIsDialogOpen(false);
-    } catch (error) {
-      console.error("Erro ao atualizar evento:", error);
-    }
-  };
 
   // Função para excluir um evento
   const handleDeleteEvent = async (eventId: string) => {
@@ -258,7 +194,7 @@ const Calendar: React.FC = () => {
         selectedDate={
           selectedDate || { start: new Date(), end: new Date(), allDay: true }
         }
-        onSave={function (eventData: Evento): void {
+        onSave={function (): void {
           throw new Error("Function not implemented.");
         }}
       />

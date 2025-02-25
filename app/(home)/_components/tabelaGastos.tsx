@@ -11,14 +11,14 @@ const GastosCategoria = ({ gastosPorCategoria }: GastosCategoria) => {
   return (
     <ScrollArea className="col-span-2 h-full rounded-md border pb-6">
       <CardHeader>
-        <CardTitle>Saídas por Categoria</CardTitle>
+        <CardTitle className="text-center">Saídas por Categoria</CardTitle>
       </CardHeader>
 
       <CardContent>
         {gastosPorCategoria
           .sort((a, b) => b.percentageOfTotal - a.percentageOfTotal) // Ordenando do maior para o menor
           .map((categoria) => (
-            <div key={categoria.category} className="space-y-6">
+            <div key={categoria.category} className="space-y-3">
               <div className="flex w-full justify-between">
                 <p className="text-sm font-bold">{categoria.category}</p>
                 <p className="text-sm font-bold">

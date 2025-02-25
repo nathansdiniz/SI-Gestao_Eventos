@@ -42,20 +42,43 @@ const Financeiro = async () => {
   let investidoTotal = 0;
   let depositoTotal = 0;
   let gastosTotal = 0;
+  let saldo_previstoEntradas = 0;
+  let saldo_previstoSaidas = 0;
+  let saldo_previsto = 0;
 
-  dadosfinanceiros.map((item: { tipocobranca: string | null; valor: any }) => {
-    item.valor = Number(item.valor);
-    if (item.tipocobranca === "Investimento")
-      investidoTotal += Number(item.valor);
-    else if (item.tipocobranca === "Receita")
-      depositoTotal += Number(item.valor);
-    else gastosTotal += Number(item.valor);
-  });
+  dadosfinanceiros.map(
+    (item: {
+      tipocobranca: string | null;
+      valor: any;
+      pago: string | null;
+    }) => {
+      item.valor = Number(item.valor);
+      if (item.tipocobranca === "Investimento")
+        investidoTotal += Number(item.valor);
+      else if (item.tipocobranca === "Receita")
+        depositoTotal += Number(item.valor);
+      else gastosTotal += Number(item.valor);
+      if (item.pago === "nao") {
+        saldo_previsto += Number(item.valor);
+        switch (item.tipocobranca) {
+          case "Despesa":
+            saldo_previstoSaidas += Number(item.valor);
+            break;
+          case "Receita":
+            saldo_previstoEntradas += Number(item.valor);
+            break;
+        }
+      }
+    },
+  );
   const dashboard = {
     investidoTotal: investidoTotal,
     depositoTotal: depositoTotal,
     saldo: depositoTotal - gastosTotal - investidoTotal,
     gastosTotal: gastosTotal,
+    saldo_previsto: saldo_previsto,
+    saldo_previstoEntradas: saldo_previstoEntradas,
+    saldo_previstoSaidas: saldo_previstoSaidas,
   };
 
   const dadosConvertidos = dadosfinanceiros.map((dado) => ({

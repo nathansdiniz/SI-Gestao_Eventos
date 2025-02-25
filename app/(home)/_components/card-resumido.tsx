@@ -25,6 +25,7 @@ const CardResumido = ({
         >
           {title}
         </p>
+        {size === "large" ? <BotaoAdicionarFinancas /> : null}
       </CardHeader>
       <CardContent className="flex justify-between">
         <p
@@ -36,7 +37,28 @@ const CardResumido = ({
           }).format(amount)}
         </p>
 
-        {size === "large" && <BotaoAdicionarFinancas />}
+        {size === "large" ? (
+          <>
+            <p className={`text-2xl" font-bold`}>
+              {Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(amount)}
+            </p>
+            <p className={`text-2xl" font-bold`}>
+              {Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(amount)}
+            </p>
+            <p className={`text-2xl" font-bold`}>
+              {Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(amount)}
+            </p>
+          </>
+        ) : null}
       </CardContent>
     </Card>
   );

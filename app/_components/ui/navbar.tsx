@@ -3,17 +3,42 @@ import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { SidebarTrigger } from "./sidebar";
-import { usePathname } from "next/navigation";
-import { Button } from "./button";
+import { usePathname, useSearchParams } from "next/navigation";
+import SelecionarEmpresa from "@/app/(home)/_components/selecionar-ano";
+import { useEffect, useState } from "react";
+import { getEmpresas } from "@/app/_actions/criar-atualizarEmpresas";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const empresaAtual = useSearchParams().get("src");
+  const [empresas, setEmpresas] = useState<
+    {
+      id: number;
+      empresa: string;
+    }[]
+  >([]);
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const res = await getEmpresas();
+        setEmpresas(res);
+      } catch (error) {
+        console.error("Erro ao buscar empresas:", error);
+      }
+    };
+
+    fetchEmpresas();
+  }, []);
+  const empresaSelecionada = empresas.find(
+    (empresa) => empresa.id === Number(empresaAtual),
+  );
+
   return (
-    <nav className="flex justify-between border-b border-solid px-8 py-4">
-      <div className="flex items-center gap-10">
+    <nav className="flex flex-col items-center justify-between border-b border-solid px-8 py-4 md:flex-row">
+      <div className="flex items-center gap-4 md:gap-10">
         <SidebarTrigger />
         <Image
-          src="/grupo in hub.png"
+          src={`/LOGO ${empresaSelecionada?.empresa || "grupo in hub"}.png`}
           alt="logo grupo in hub"
           width={70}
           height={20}
@@ -48,7 +73,6 @@ const Navbar = () => {
         >
           Eventos
         </Link>
-
         <Link
           href="/relatorios"
           className={
@@ -59,20 +83,10 @@ const Navbar = () => {
         >
           Relatórios
         </Link>
-        <Link
-          href="/transactions"
-          className={
-            pathname === "/transactions"
-              ? "font-bold text-primary"
-              : "text-muted-foreground"
-          }
-        >
-          Transações
-        </Link>
       </div>
 
-      <div className="flex h-full items-center justify-center">
-        <Button variant={"ghost"}>Trocar Empresa</Button>
+      <div className="mt-4 flex items-center gap-4 md:mt-0 md:gap-10">
+        <SelecionarEmpresa />
         <UserButton showName />
       </div>
     </nav>

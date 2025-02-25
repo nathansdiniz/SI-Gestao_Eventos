@@ -72,7 +72,7 @@ const UltimasTransacoes = ({ ultimasTransacoes }: UltimasTransacoesProps) => {
           <Link href="/administrativo/financeiro">Ver mais</Link>
         </Button>
       </CardHeader>
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-3">
         {ultimasTransacoes.map((transaction) => (
           <div
             key={transaction.id}

@@ -36,3 +36,12 @@ export const atualizarEvento = async (evento: any) => {
 export const excluirEvento = async (id: number) => {
   return await prisma.eventosme.delete({ where: { id } });
 };
+
+export async function getEventData(id: number) {
+  const dadosEvento = await prisma.eventosme.findFirst({
+    where: {
+      id: id,
+    },
+  });
+  return dadosEvento;
+}

@@ -1,14 +1,22 @@
+import React from "react";
+import CustomCalendar from "@/app/_components/ui/big-calendar";
 import Layout from "../_components/slide-bar";
-import Layout_Eventos from "./layout-evento";
+import BotaoVoltar from "../_components/botao-voltar";
 
-const PaginaEventos = async () => {
+const CalendarPage: React.FC = () => {
   return (
-    <Layout>
-      <>
-        <Layout_Eventos></Layout_Eventos>
-      </>
-    </Layout>
+    <>
+      <Layout>
+        {" "}
+        <main>
+          <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
+          <h1 style={{ textAlign: "center", margin: "20px 0" }}>Eventos</h1>
+
+          <CustomCalendar />
+        </main>
+      </Layout>
+    </>
   );
 };
 
-export default PaginaEventos;
+export default CalendarPage;

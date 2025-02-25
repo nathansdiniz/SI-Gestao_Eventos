@@ -20,12 +20,17 @@ import {
 } from "@/app/_components/ui/popover";
 import consultarEventos from "@/app/_actions/consultar-inputEventos";
 
-export function SelecionarEvento() {
+interface SelecionarEventoProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export function SelecionarEvento({ value, onChange }: SelecionarEventoProps) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
   const [eventos, setEventos] = React.useState<
     { id: number; nomeEvento: string | null }[]
   >([]);
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   React.useEffect(() => {
     async function fetchEventos() {
@@ -41,6 +46,10 @@ export function SelecionarEvento() {
 
     fetchEventos();
   }, []);
+
+  const filteredEventos = eventos.filter((evento) =>
+    evento.nomeEvento?.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -60,16 +69,20 @@ export function SelecionarEvento() {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Buscar evento..." />
+          <CommandInput
+            placeholder="Buscar evento..."
+            value={searchTerm}
+            onValueChange={setSearchTerm}
+          />
           <CommandList>
             <CommandEmpty>Nenhum evento encontrado.</CommandEmpty>
             <CommandGroup>
-              {eventos.map((evento) => (
+              {filteredEventos.map((evento) => (
                 <CommandItem
                   key={evento.id}
                   value={evento.id.toString()}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    onChange(currentValue === value ? "" : currentValue);
                     setOpen(false);
                   }}
                 >

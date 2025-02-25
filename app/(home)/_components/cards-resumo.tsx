@@ -1,24 +1,41 @@
 "use client";
 import { TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
 import CardResumido from "./card-resumido";
+import CardSaldos from "./card-saldos";
 
 interface CardResumo {
   mes: string;
   investidoTotal: number;
   depositoTotal: number;
   saldo: number;
+  saldo_previsto: number;
+  saldo_previstoEntradas: number;
+  saldo_previstoSaidas: number;
   gastosTotal: number;
 }
 
-const CardResumo = ({ depositoTotal, saldo, gastosTotal }: CardResumo) => {
+const CardResumo = ({
+  depositoTotal,
+  saldo,
+  gastosTotal,
+  saldo_previsto,
+  saldo_previstoEntradas,
+  saldo_previstoSaidas,
+}: CardResumo) => {
   return (
     <>
       <div className="space-y-6">
         {/*Primeiro Card*/}
-        <CardResumido
+        <CardSaldos
           icon={<WalletIcon size={16} />}
-          title="Saldo"
-          amount={saldo}
+          title1="Saldo Real             "
+          saldo1={saldo}
+          title2="Provisonamento de Saldo"
+          saldo2={saldo_previsto}
+          title3="Provisionamento de Entradas"
+          saldo3={saldo_previstoEntradas}
+          title4="Provisionamento de Saídas"
+          saldo4={saldo_previstoSaidas}
           size="large"
         />
 

@@ -123,6 +123,58 @@ model EntradasEventos {
   ultima_alteracao_validacao String?
 userID                    String?
 }
+model financeiroEventos {
+ id              Int      @unique
+  evento          String?
+  datapagamento   DateTime?
+  datacompetencia DateTime?
+  tipocobranca    String?
+  idrecebidode    String?
+  recebidode      String?
+  informede       String?
+  descricao       String?
+  valor           Float?
+  juros           Float?
+  multa           Float?
+  desconto        Float?
+  pago            String?
+  idconta         String?
+  conta           String?
+  idcategoria     String?
+  categoria       String?
+  idcentrodecusto String?
+  centrodecusto   String?
+  mododepagamento String?
+  parcelas        Json?
+  idevento        String?
+  id_empresa      Int?
+  data_criacao    DateTime  @default(now())
+  data_update     DateTime  @default(now())
+  validacao                  String?
+  informacoes_extras      String?
+  ultima_alteracao_validacao String?
+  recorrencia String?
+  periodo_final DateTime?
+  documentos_anexados    Json?
+userID                    String?
+}
+
+model contasBancarias{
+  id      Int       @id @default(autoincrement())
+  nomeConta String
+  banco     String
+  tipo_conta    String
+  agencia       String
+  conta         String
+  saldoBancario  Decimal?
+  totalEntradas  Decimal?
+  totalSaidas    Decimal?
+  ultima_atualizacao_saldo DateTime
+  data_criacao   DateTime
+  data_atualizacao DateTime
+   userID                    String?
+  id_empresa                Int
+}
 
 model Producao {
   id                Int       @id @default(autoincrement())
@@ -287,6 +339,14 @@ userID    String?
 diaTodo   Boolean   @default(false)
 
 }
+model EventosInforGerais {
+  id          Int     @id @default(autoincrement())
+  id_eventos Int?
+  id_empresa  Int?
+  documento    String?
+  userID                    String?
+}
+
 
 model EventsType {
   id          Int     @id @default(autoincrement())
@@ -391,6 +451,7 @@ model Saidas {
   evento_nome      String?
   data_criacao     DateTime  @default(now())
   data_atualizacao DateTime  @updatedAt
+  id_empresa                Int?
   userID                    String?
 }
 
@@ -469,7 +530,13 @@ model FinanceiroME {
   id_empresa      Int?
   data_criacao    DateTime  @default(now())
   data_update     DateTime  @default(now())
-  userID                    String?
+  validacao                  String?
+  informacoes_extras      String?
+  ultima_alteracao_validacao String?
+  recorrencia String?
+  periodo_final DateTime?
+  documentos_anexados    Json?
+userID                    String?
 }
 
 model ModelosRelatorios {

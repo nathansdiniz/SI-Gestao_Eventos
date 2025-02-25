@@ -71,3 +71,11 @@ export const addUpdateEmpresas = async (params: ParametrosEmpresas) => {
 
   revalidatePath("/administrativo/empresas");
 };
+
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+export async function getEmpresas() {
+  return await prisma.empresas.findMany();
+}

@@ -7,14 +7,17 @@ import {
 } from "@/app/_components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { useRouter, useSearchParams } from "next/navigation";
+
+const CURRENT_YEAR = new Date().getFullYear() - 1;
+const YEARS = Array.from({ length: 10 }, (_, i) => CURRENT_YEAR + i);
 const MONTH_OPTIONS = [
   { value: "01", label: "Janeiro" },
   { value: "02", label: "Fevereiro" },
-  { value: "03", label: "Marco" },
+  { value: "03", label: "Março" },
   { value: "04", label: "Abril" },
   { value: "05", label: "Maio" },
   { value: "06", label: "Junho" },
-  { value: "07", label: "Jullho" },
+  { value: "07", label: "Julho" },
   { value: "08", label: "Agosto" },
   { value: "09", label: "Setembro" },
   { value: "10", label: "Outubro" },
@@ -24,26 +27,33 @@ const MONTH_OPTIONS = [
 
 const SelecionarMes = () => {
   const { push } = useRouter();
-  const filtrarMesDados = (mes: string) => {
-    push(`?mes=${mes}`);
-  };
   const searchParams = useSearchParams();
   const mesAtual = searchParams.get("mes");
-  console.log(mesAtual);
+  const empresaAtual = searchParams.get("src");
+
+  const filtrarMesDados = (valor: string) => {
+    push(`?mes=${valor}&src=${empresaAtual}`);
+  };
+
   return (
     <Select
       onValueChange={(valor) => filtrarMesDados(valor)}
       defaultValue={mesAtual ?? ""}
     >
       <SelectTrigger className="w-80">
-        <SelectValue placeholder="Mês" />
+        <SelectValue placeholder="Selecione o Mês e Ano" />
       </SelectTrigger>
       <SelectContent>
-        {MONTH_OPTIONS.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
+        {YEARS.map((year) =>
+          MONTH_OPTIONS.map((month) => (
+            <SelectItem
+              key={`${year}-${month.value}`}
+              value={`${year}-${month.value}`}
+            >
+              {`${month.label} ${year}`}
+            </SelectItem>
+          )),
+        )}
       </SelectContent>
     </Select>
   );

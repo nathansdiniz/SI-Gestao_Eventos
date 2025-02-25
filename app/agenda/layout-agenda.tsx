@@ -12,12 +12,11 @@ import { Button } from "../_components/ui/button";
 import { CalendarPlus, CalendarX2Icon, CircleCheckBigIcon } from "lucide-react";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core";
 import BotaoVoltar from "../_components/botao-voltar";
-import { DeleteEventDialog } from "./_components/excluir-eventos";
-import { AddEventDialog } from "./_components/add-editarEvento"; // Importe o AddEventDialog
+import { DeleteEventDialog } from "./_components/excluir-agenda";
+import { AddEventDialog } from "./_components/add-editarAgenda"; // Importe o AddEventDialog
 import {
   adicionarEvento,
   atualizarEvento,
-  excluirEvento,
   dadosAgenda,
 } from "@/app/_actions/agenda";
 import { toast } from "sonner";
@@ -39,7 +38,7 @@ interface Evento {
   diaTodo?: boolean;
 }
 
-export default function Layout_Eventos() {
+export default function Layout_Agenda() {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [mostrarModal, setMostrarModal] = useState(false); // Estado para controlar o modal de adição
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);

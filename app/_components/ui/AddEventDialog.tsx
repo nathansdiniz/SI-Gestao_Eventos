@@ -110,7 +110,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -118,10 +118,12 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
       if (formData.id === 0) {
         // Adicionar novo evento
         const novoEvento = await adicionarEvento(formData);
-        onSave(novoEvento);
+        isOpen = false;
+        onSave({ ...formData, id: novoEvento.id });
       } else {
         // Atualizar evento existente
         const eventoAtualizado = await atualizarEvento(formData);
+        isOpen = false;
         onSave(eventoAtualizado);
       }
       onClose();

@@ -44,7 +44,7 @@ export const addUpdateClientes = async (params: ClientesProps) => {
   }
 
   // Consultar o maior id existente na tabela
-  const maxIdRecord = await db.funcionarios.findFirst({
+  const maxIdRecord = await db.clientes.findFirst({
     orderBy: {
       id: "desc", // Ordena pelo id em ordem decrescente
     },

@@ -8,6 +8,8 @@ import {
 } from "@/app/_components/ui/dialog";
 import { Button } from "./button";
 import AddEventDialog from "./AddEventDialog";
+import { ListPlusIcon } from "lucide-react";
+import Link from "next/link";
 
 interface EventDetailsDialogProps {
   isOpen: boolean;
@@ -183,6 +185,14 @@ const EventDetailsDialog: React.FC<EventDetailsDialogProps> = ({
             </p>
 
             <div className="mt-5 flex justify-between">
+              {selectedEvent ? (
+                <Link href={`/eventos/${selectedEvent.id}/`}>
+                  <ListPlusIcon />
+                  Ver Detalhes
+                </Link>
+              ) : (
+                <span>Ver Detalhes</span>
+              )}
               <Button
                 type="button"
                 className="bg-yellow-500"
@@ -193,7 +203,7 @@ const EventDetailsDialog: React.FC<EventDetailsDialogProps> = ({
               <Button
                 type="button"
                 className="bg-red-700"
-                onClick={() => onDeleteEvent(selectedEvent.id)}
+                onClick={() => onDeleteEvent(selectedEvent?.id)}
               >
                 Excluir
               </Button>

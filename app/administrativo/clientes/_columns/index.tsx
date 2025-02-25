@@ -3,7 +3,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/app/_components/ui/button";
 import { ArrowUpDownIcon } from "lucide-react";
 import BotaoEditarFuncionario from "../_components/botao-update";
-import ExcluirFuncionarioButton from "../_components/botao-exclusaoCliente";
 import ExcluirClientesButton from "../_components/botao-exclusaoCliente";
 
 interface ClientesProps {
