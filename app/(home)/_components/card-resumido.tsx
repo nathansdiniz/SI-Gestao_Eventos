@@ -17,8 +17,8 @@ const CardResumido = ({
   size = "small",
 }: CardResumidProps) => {
   return (
-    <Card>
-      <CardHeader className="flew-row items-start gap-4">
+    <Card className="flew-row justify-items-center gap-4">
+      <CardHeader className="flew-row justify-items-center gap-4">
         {icon}
         <p
           className={`${size === "small" ? "text-muted-foreground" : "text-white opacity-70"}`}
@@ -29,7 +29,7 @@ const CardResumido = ({
       </CardHeader>
       <CardContent className="flex justify-between">
         <p
-          className={`font-bold ${size === "small" ? "text-2xl" : "text-4xl"}`}
+          className={`font-bold ${size === "small" ? "text-base" : "text-xl"}`}
         >
           {Intl.NumberFormat("pt-BR", {
             style: "currency",
@@ -39,19 +39,19 @@ const CardResumido = ({
 
         {size === "large" ? (
           <>
-            <p className={`text-2xl" font-bold`}>
+            <p className={`text-sm" font-bold`}>
               {Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               }).format(amount)}
             </p>
-            <p className={`text-2xl" font-bold`}>
+            <p className={`text-sm" font-bold`}>
               {Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               }).format(amount)}
             </p>
-            <p className={`text-2xl" font-bold`}>
+            <p className={`text-sm" font-bold`}>
               {Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",

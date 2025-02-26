@@ -68,28 +68,28 @@ const UltimasTransacoes = ({ ultimasTransacoes }: UltimasTransacoesProps) => {
     <ScrollArea className="rounded-md border">
       <CardHeader className="space-y-8">
         <CardTitle className="text-center">Últimas Transações</CardTitle>
-        <Button variant="outline" className="rounded-2xl font-bold">
+        <Button variant="outline" className="rounded-xl font-bold">
           <Link href="/administrativo/financeiro">Ver mais</Link>
         </Button>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-1">
         {ultimasTransacoes.map((transaction) => (
           <div
             key={transaction.id}
             className="flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="rounded-lg bg-white bg-opacity-[3%] p-5 text-white">
                 <Image
                   src={`/${TRANSACTION_PAYMENT_METHOD_ICONS[transaction.mododepagamento as keyof typeof TRANSACTION_PAYMENT_METHOD_ICONS] ?? "bank-transfer.png"}`}
-                  height={20}
-                  width={20}
+                  height={16}
+                  width={16}
                   alt={transaction.mododepagamento}
                 />
               </div>
               <div>
-                <p className="text-sm font-bold">{transaction.descricao}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs font-bold">{transaction.descricao}</p>
+                <p className="text-xs text-muted-foreground">
                   {new Date(transaction.datacompetencia).toLocaleDateString(
                     "pt-BR",
                     {
@@ -101,7 +101,7 @@ const UltimasTransacoes = ({ ultimasTransacoes }: UltimasTransacoesProps) => {
                 </p>
               </div>
             </div>
-            <p className={`text-sm font-bold ${obterCordoValor(transaction)}`}>
+            <p className={`text-xs font-bold ${obterCordoValor(transaction)}`}>
               {obterPrefixoValor(transaction)}
               {formatarMoeda(Number(transaction.valor))}
             </p>

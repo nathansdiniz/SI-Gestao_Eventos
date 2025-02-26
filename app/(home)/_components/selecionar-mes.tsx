@@ -40,7 +40,7 @@ const SelecionarMes = () => {
       onValueChange={(valor) => filtrarMesDados(valor)}
       defaultValue={mesAtual ?? ""}
     >
-      <SelectTrigger className="w-80">
+      <SelectTrigger className="w-40 text-xs">
         <SelectValue placeholder="Selecione o Mês e Ano" />
       </SelectTrigger>
       <SelectContent>

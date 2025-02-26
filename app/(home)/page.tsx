@@ -38,23 +38,28 @@ const Home = async ({ searchParams: { mes, src } }: HomeProps) => {
       <Layout>
         <div className="space-y-6 p-6">
           <BotaoVoltar redirecionar="/menu" />
-          <div className="flex justify-between">
+
+          {/* Cabeçalho */}
+          <div className="flex flex-col justify-between md:flex-row">
             <h1 className="text-4xl font-bold">Dashboard</h1>
-            <div className="flex gap-4">
+            <div className="mt-2 flex gap-4 md:mt-0">
               <SelecionarMes />
             </div>
           </div>
 
           {/* Gráfico de Pizza ao lado dos Cards */}
-          <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-2 flex flex-col gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {/* Cards Resumo */}
+            <div className="flex flex-col gap-6 md:col-span-2">
               <CardResumo mes={mes} {...dashboard} />
             </div>
+
+            {/* Gráfico de Pizza */}
             <GraficoPizza {...dashboard} />
           </div>
 
-          {/* Tabelas ocupando duas colunas de forma igual */}
-          <div className="grid grid-cols-2 gap-6">
+          {/* Tabelas Responsivas */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="h-full p-4">
               <GastosCategoria
                 gastosPorCategoria={dashboard.totalGastosPCategoria.filter(

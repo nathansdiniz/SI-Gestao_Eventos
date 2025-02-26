@@ -12,7 +12,10 @@ interface BotaoAdicionarFinancasProps {
   nomeEvento: string; // Replace 'any' with the appropriate type if known
 }
 
-const BotaoAdicionarFinancas = ({ idEvento }: BotaoAdicionarFinancasProps) => {
+const BotaoAdicionarFinancas = ({
+  idEvento,
+  nomeEvento,
+}: BotaoAdicionarFinancasProps) => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
   return (
@@ -28,6 +31,7 @@ const BotaoAdicionarFinancas = ({ idEvento }: BotaoAdicionarFinancasProps) => {
         isOpen={dialogIsOpen}
         setIsOpen={setDialogIsOpen}
         financeiroId={idEvento}
+        nomeEvento={nomeEvento}
         onClose={() => setDialogIsOpen(false)}
       />
     </>

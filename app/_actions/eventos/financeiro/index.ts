@@ -54,8 +54,16 @@ export const adicionarAtualizarFinanceiroEvento = async (
   const nextId = maxIdRecord ? maxIdRecord.id + 1 : 1; // Se não houver id, começa com 1
   return await prisma.financeiroEventos.upsert({
     where: { id: Financeiroevento.id },
-    update: { ...Financeiroevento, id: Financeiroevento.id },
-    create: { ...Financeiroevento, id: nextId },
+    update: {
+      ...Financeiroevento,
+      id: Financeiroevento.id,
+      idevento: Financeiroevento.idevento,
+    },
+    create: {
+      ...Financeiroevento,
+      idevento: Financeiroevento.idevento,
+      id: nextId,
+    },
   });
 };
 

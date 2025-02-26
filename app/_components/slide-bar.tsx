@@ -7,10 +7,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="flex flex-1 flex-col">
-        <Navbar></Navbar>
-        {children}
+      <main className="flex h-full w-full flex-1 flex-col overflow-auto">
+        <Navbar />
+        <div className="h-full w-full overflow-y-auto p-4">{children}</div>
       </main>
+
       <Toaster></Toaster>
     </SidebarProvider>
   );

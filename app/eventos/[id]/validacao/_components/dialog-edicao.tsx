@@ -128,6 +128,7 @@ const EditDialogFinancas = ({
       await adicionarAtualizarFinanceiroEvento({
         ...data,
         id: data.id ?? 0,
+        idevento: financeiroId,
         evento: nomeEvento,
       });
       toast("Registro Financeiro salvo com sucesso!", {

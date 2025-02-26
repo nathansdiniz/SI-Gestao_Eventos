@@ -4,8 +4,6 @@ import { Button } from "@/app/_components/ui/button";
 import { DataTable } from "@/app/_components/ui/data-table";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import {
-  ArrowDownCircleIcon,
-  CircleArrowUpIcon,
   DownloadIcon,
   FileTextIcon,
   PaperclipIcon,
@@ -25,7 +23,6 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { FinanceiroPropos } from "@/app/_props";
 import FileUploadDialog from "@/app/eventos/[id]/validacao/_components/Dialog-Anexos";
-import BotaoAdicionarFinancas from "@/app/_components/add-Financeiro";
 import { useSearchParams } from "next/navigation";
 import {
   obterEventos,
@@ -34,6 +31,8 @@ import {
 import TiposValidacaoBadge from "./tipoValidacao";
 import BotaoRedirecionar from "@/app/_components/ui/botao-redirecionar";
 import BotaoVoltar from "@/app/_components/botao-voltar";
+import BotaoAdicionarFinancas from "../../validacao/_components/adicionarTransação";
+import TiposPagosBadge from "@/app/_components/PagoouNao";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
@@ -53,12 +52,11 @@ const TabelaFinanceira = () => {
     [],
   );
   const [dadosFiltrados, setDadosFiltrados] = useState<FinanceiroPropos[]>([]);
-  const [botaoSelecionado, setBotaoSelecionado] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     tipo: null,
     status: null,
     dataInicio: new Date("2024-01-01"),
-    dataFim: new Date(),
+    dataFim: new Date("2025-12-31"),
   });
 
   const [dashboard, setDashboard] = useState({
@@ -207,6 +205,9 @@ const TabelaFinanceira = () => {
     {
       accessorKey: "pago",
       header: "Pago",
+      cell: ({ row }) => (
+        <TiposPagosBadge pago={row.original.pago ? row.original.pago : ""} />
+      ),
     },
     {
       accessorKey: "datapagamento",
@@ -231,7 +232,7 @@ const TabelaFinanceira = () => {
     },
     {
       accessorKey: "validacao",
-      header: "Tipo de Cobrança",
+      header: "Validação",
       cell: ({ row }) => (
         <TiposValidacaoBadge
           validacao={row.original.validacao ? row.original.validacao : ""}
@@ -287,45 +288,6 @@ const TabelaFinanceira = () => {
     console.log(row);
     setSelectedRow(row);
     setIsDialogOpen(true);
-  };
-
-  const filtrarReceitas = () => {
-    const receitas = dadosfinanceiros.filter(
-      (item) => item.tipocobranca === "Receita" || item.evento === nomeEvento,
-    );
-    setDadosFiltrados(receitas);
-    setBotaoSelecionado("receitas");
-    setFilters({
-      tipo: "Receita",
-      status: null,
-      dataInicio: new Date("2024-01-01"),
-      dataFim: new Date(),
-    });
-  };
-
-  const filtrarDespesas = () => {
-    const despesas = dadosfinanceiros.filter(
-      (item) => item.tipocobranca !== "Receita",
-    );
-    setDadosFiltrados(despesas);
-    setBotaoSelecionado("despesas");
-    setFilters({
-      tipo: "Despesa",
-      status: null,
-      dataInicio: new Date("2024-01-01"),
-      dataFim: new Date(),
-    });
-  };
-
-  const mostrarTodos = () => {
-    setDadosFiltrados(dadosfinanceiros);
-    setBotaoSelecionado("todos");
-    setFilters({
-      tipo: null,
-      status: null,
-      dataInicio: new Date("2024-01-01"),
-      dataFim: new Date(),
-    });
   };
 
   const handleFilterChange = (newFilters: FilterState) => {
@@ -590,62 +552,38 @@ const TabelaFinanceira = () => {
         <CardResumo mes="12" {...dashboard} />
       </div>
 
-      <div className="flex items-center justify-center space-x-10 p-6">
-        <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
-            botaoSelecionado === "todos"
-              ? "bg-blue-700 text-white"
-              : "bg-gray-200"
-          }`}
-          onClick={mostrarTodos}
-        >
-          Todas as Movimentações
-        </Button>
-        <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
-            botaoSelecionado === "receitas"
-              ? "bg-blue-700 text-white"
-              : "bg-green-800 text-white"
-          }`}
-          onClick={filtrarReceitas}
-        >
-          <CircleArrowUpIcon color="#ffffff" size={64} />
-          Entradas
-        </Button>
-        <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
-            botaoSelecionado === "despesas"
-              ? "bg-blue-700 text-white"
-              : "bg-red-800 text-white"
-          }`}
-          onClick={filtrarDespesas}
-        >
-          <ArrowDownCircleIcon color="#ffffff" size={96} />
-          Saídas
-        </Button>
-      </div>
-      <div className="flex justify-end space-x-4 p-4">
-        <BotaoAdicionarFinancas />
+      <div className="flex flex-col justify-end gap-4 p-4 md:flex-row">
+        <BotaoAdicionarFinancas
+          idEvento={idEvento ?? ""}
+          nomeEvento={nomeEvento}
+        />
         <Button
           onClick={exportToPDF}
-          className="text-white"
+          className="flex items-center gap-2 text-white"
           variant={"outline"}
         >
-          <FileTextIcon size={40}></FileTextIcon>
+          <FileTextIcon size={32} className="md:size-40" />
           Exportar para PDF
         </Button>
-        <Button onClick={exportToExcel} className="bg-green-500 text-white">
-          <SheetIcon size={40}></SheetIcon>
+        <Button
+          onClick={exportToExcel}
+          className="flex items-center gap-2 bg-green-500 text-white"
+        >
+          <SheetIcon size={32} className="md:size-40" />
           Exportar para Excel
         </Button>
       </div>
-      <ScrollArea className="space-y-6">
-        <DataTable
-          key={"tabelaFinanceira"}
-          columns={financeiroColumns}
-          data={dadosFiltrados}
-        />
-      </ScrollArea>
+
+      {/* Tabela Responsiva */}
+      <div className="overflow-x-auto">
+        <ScrollArea className="space-y-6">
+          <DataTable
+            key={"tabelaFinanceira"}
+            columns={financeiroColumns}
+            data={dadosFiltrados}
+          />
+        </ScrollArea>
+      </div>
     </div>
   );
 };

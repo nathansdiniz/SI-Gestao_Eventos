@@ -34,8 +34,8 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="flex flex-col items-center justify-between border-b border-solid px-8 py-4 md:flex-row">
-      <div className="flex items-center gap-4 md:gap-10">
+    <nav className="flex flex-col items-center justify-between border-b border-solid px-8 py-2 md:flex-row">
+      <div className="flex items-center gap-2 text-xs md:gap-4">
         <SidebarTrigger />
         <Image
           src={`/LOGO ${empresaSelecionada?.empresa || "grupo in hub"}.png`}
@@ -85,7 +85,7 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className="mt-4 flex items-center gap-4 md:mt-0 md:gap-10">
+      <div className="mt-4 flex items-center gap-2 md:mt-0 md:gap-4">
         <SelecionarEmpresa />
         <UserButton showName />
       </div>

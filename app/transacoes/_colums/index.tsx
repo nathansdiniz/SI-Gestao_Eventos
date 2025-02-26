@@ -4,8 +4,29 @@ import { Button } from "@/app/_components/ui/button";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import TiposCobrancaBadge from "../_components/tipoCobranca";
 import { FinanceiroPropos } from "@/app/_props";
+import { Checkbox } from "@/app/_components/ui/checkbox";
 
 export const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+  },
   {
     accessorKey: "datacompetencia",
     header: "Data",

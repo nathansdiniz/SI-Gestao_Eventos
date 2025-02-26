@@ -471,13 +471,16 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         setIsOpen={(isOpenAnexo: boolean) => setIsOpenAnexo(isOpenAnexo)}
       />
       <Pop_upFiltros onFilterChange={handleFilterChange} />
-      <div>
+
+      {/* Card de Resumo */}
+      <div className="p-4">
         <CardResumo mes="12" {...dashboard} />
       </div>
 
-      <div className="flex items-center justify-center space-x-10 p-6">
+      {/* Botões Responsivos */}
+      <div className="flex flex-col items-center justify-center gap-4 p-6 md:flex-row">
         <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
+          className={`md:w-50 h-20 w-full rounded-sm text-sm font-bold md:h-28 ${
             botaoSelecionado === "todos"
               ? "bg-blue-700 text-white"
               : "bg-gray-200"
@@ -487,50 +490,63 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           Todas as Movimentações
         </Button>
         <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
+          className={`md:w-50 h-20 w-full rounded-sm text-sm font-bold md:h-28 ${
             botaoSelecionado === "receitas"
               ? "bg-blue-700 text-white"
               : "bg-green-800 text-white"
           }`}
           onClick={filtrarReceitas}
         >
-          <CircleArrowUpIcon color="#ffffff" size={64} />
+          <CircleArrowUpIcon color="#ffffff" size={48} className="md:size-64" />
           Entradas
         </Button>
         <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
+          className={`md:w-50 h-20 w-full rounded-sm text-sm font-bold md:h-28 ${
             botaoSelecionado === "despesas"
               ? "bg-blue-700 text-white"
               : "bg-red-800 text-white"
           }`}
           onClick={filtrarDespesas}
         >
-          <ArrowDownCircleIcon color="#ffffff" size={96} />
+          <ArrowDownCircleIcon
+            color="#ffffff"
+            size={48}
+            className="md:size-96"
+          />
           Saídas
         </Button>
       </div>
-      <div className="flex justify-end space-x-4 p-4">
+
+      {/* Botões de Ação */}
+      <div className="flex flex-col justify-end gap-4 p-4 md:flex-row">
         <BotaoAdicionarFinancas />
         <Button
           onClick={exportToPDF}
-          className="text-white"
+          className="flex items-center gap-2 text-white"
           variant={"outline"}
         >
-          <FileTextIcon size={40}></FileTextIcon>
+          <FileTextIcon size={32} className="md:size-40" />
           Exportar para PDF
         </Button>
-        <Button onClick={exportToExcel} className="bg-green-500 text-white">
-          <SheetIcon size={40}></SheetIcon>
+        <Button
+          onClick={exportToExcel}
+          className="flex items-center gap-2 bg-green-500 text-white"
+        >
+          <SheetIcon size={32} className="md:size-40" />
           Exportar para Excel
         </Button>
       </div>
-      <ScrollArea className="space-y-6">
-        <DataTable
-          key={"tabelaFinanceira"}
-          columns={financeiroColumns}
-          data={dadosFiltrados}
-        />
-      </ScrollArea>
+
+      {/* Tabela Responsiva */}
+      <div className="overflow-x-auto">
+        <ScrollArea className="space-y-6">
+          <DataTable
+            key={"tabelaFinanceira"}
+            columns={financeiroColumns}
+            data={dadosFiltrados}
+          />
+        </ScrollArea>
+      </div>
     </>
   );
 };

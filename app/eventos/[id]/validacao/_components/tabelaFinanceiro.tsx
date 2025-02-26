@@ -30,9 +30,10 @@ import {
   obterEventos,
   obterFinanceiroEvento,
 } from "@/app/_actions/eventos/financeiro";
-import ValidacaoDialogFinancas from "@/app/transacoes/_components/dialog-Ações";
+import ValidacaoDialogFinancas from "./dialog-Ações";
 import TiposValidacaoBadge from "../../financeiro/_components/tipoValidacao";
 import BotaoVoltar from "@/app/_components/botao-voltar";
+import TiposPagosBadge from "@/app/_components/PagoouNao";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
@@ -214,6 +215,9 @@ const TabelaFinanceira = () => {
     {
       accessorKey: "pago",
       header: "Pago",
+      cell: ({ row }) => (
+        <TiposPagosBadge pago={row.original.pago ? row.original.pago : ""} />
+      ),
     },
     {
       accessorKey: "datapagamento",

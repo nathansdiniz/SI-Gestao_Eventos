@@ -40,7 +40,7 @@ const CardSaldos = ({
       <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col items-center">
           <p
-            className={`font-bold ${size === "small" ? "text-2xl" : "text-4xl"}`}
+            className={`font-bold ${size === "small" ? "text-xl" : "text-xl"}`}
           >
             {Intl.NumberFormat("pt-BR", {
               style: "currency",
@@ -56,7 +56,7 @@ const CardSaldos = ({
         {size === "large" && (
           <>
             <div className="flex flex-col items-center">
-              <p className="text-xl font-bold">
+              <p className="text-sm font-bold">
                 {Intl.NumberFormat("pt-BR", {
                   style: "currency",
                   currency: "BRL",
@@ -65,7 +65,7 @@ const CardSaldos = ({
               <p className="text-white opacity-70">{title2}</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-xl font-bold">
+              <p className="text-sm font-bold">
                 {Intl.NumberFormat("pt-BR", {
                   style: "currency",
                   currency: "BRL",
@@ -74,7 +74,7 @@ const CardSaldos = ({
               <p className="text-white opacity-70">{title3}</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-xl font-bold">
+              <p className="text-sm font-bold">
                 {Intl.NumberFormat("pt-BR", {
                   style: "currency",
                   currency: "BRL",

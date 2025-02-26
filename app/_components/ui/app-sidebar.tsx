@@ -88,7 +88,7 @@ export function AppSidebar() {
           width={70}
           height={20}
         />
-        <a href="" className="font-sans text-amber-200">
+        <a href="" className="font-sans text-sm text-amber-200">
           Sistema Integrado de Eventos
         </a>
       </SidebarHeader>
@@ -96,11 +96,11 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Acesso Rápido</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1 text-xs">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <a href={item.url} className="text-xs">
                       <item.icon />
                       <span>{item.title}</span>
                     </a>

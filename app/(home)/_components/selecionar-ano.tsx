@@ -45,7 +45,7 @@ const SelecionarEmpresa = () => {
       onValueChange={(valor) => filtrarEmpresaDados(valor)}
       defaultValue={empresaAtual ?? ""}
     >
-      <SelectTrigger className="w-80">
+      <SelectTrigger className="w-40 text-xs">
         <SelectValue placeholder="Selecione a Empresa" />
       </SelectTrigger>
       <SelectContent>

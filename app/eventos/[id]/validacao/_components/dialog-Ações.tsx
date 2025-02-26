@@ -24,11 +24,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
-import { addUpdateFinanceiro } from "@/app/_actions/criar-atualizarFinanceiro";
 import consultarEventos from "@/app/_actions/consultar-inputEventos";
 import { formSchemaFinanceiro } from "@/app/_props";
 import { Textarea } from "@/app/_components/ui/textarea";
 import { Input } from "@/app/_components/ui/input";
+import { atualizarFinanceiroEvento } from "@/app/_actions/eventos/financeiro";
 
 type FormSchema = z.infer<typeof formSchemaFinanceiro>;
 
@@ -148,7 +148,7 @@ const ValidacaoDialogFinancas = ({
     data.validacao = acaoValidada;
     console.log(data, acaoValidada);
     try {
-      await addUpdateFinanceiro({
+      await atualizarFinanceiroEvento({
         ...data,
         id: data.id ?? 0,
       });

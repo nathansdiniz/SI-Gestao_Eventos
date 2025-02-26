@@ -29,11 +29,11 @@ const CardMenu = ({
     <Card
       onClick={() => router.push(redirecionar)}
       className={`flex cursor-pointer flex-col justify-between transition-shadow hover:shadow-lg ${
-        size === "large" ? "h-96 w-96 p-8" : "h-64 w-64 p-4"
+        size === "large" ? "h-65 w-80 p-4" : "h-64 w-64 p-4"
       }`}
     >
       <CardHeader>
-        <p className={`text-center text-2xl font-semibold text-white`}>
+        <p className={`text-center text-xl font-semibold text-white`}>
           {title}
         </p>
       </CardHeader>
