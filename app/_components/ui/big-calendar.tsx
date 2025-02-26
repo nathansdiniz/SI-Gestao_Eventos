@@ -177,7 +177,17 @@ const Calendar: React.FC = () => {
             setSelectedEvent(event.event);
             setIsDialogOpen(true);
           }}
-          events={currentEvents}
+          events={
+            currentEvents
+              ? currentEvents.map((event) => ({
+                  id: event.id,
+                  title: event.title,
+                  start: event.start || new Date(),
+                  end: event.end || undefined,
+                  allDay: event.allDay,
+                }))
+              : []
+          }
           buttonText={{
             today: "Hoje",
             month: "Mês",
