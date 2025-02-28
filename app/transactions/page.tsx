@@ -1,9 +1,7 @@
-import { DataTable } from "../_components/ui/data-table";
 import AddTransactionButton from "../_components/add-transaction-button";
 import Layout from "../_components/slide-bar";
-import { ScrollArea } from "../_components/ui/scroll-area";
-import { financeiroColumns } from "../transacoes/_colums";
 import minhasTransações from "../_actions/criar-atualizarFinanceiro";
+import TabelaFinanceira from "../_components/tabelaFinanceiro";
 
 const TransactionsPage = async () => {
   try {
@@ -19,9 +17,9 @@ const TransactionsPage = async () => {
                 <h1 className="text-2xl font-bold">Transações</h1>
                 <AddTransactionButton />
               </div>
-              <ScrollArea>
-                <DataTable columns={financeiroColumns} data={transactions} />
-              </ScrollArea>
+              <TabelaFinanceira
+                dadosfinanceiros={transactions}
+              ></TabelaFinanceira>
             </div>
           </>
         </Layout>

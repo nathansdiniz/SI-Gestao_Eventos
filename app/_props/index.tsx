@@ -35,7 +35,13 @@ export interface FinanceiroPropos {
   validacao: string | null;
   informacoes_extras: string | null;
   ultima_alteracao_validacao: string | null;
-  recorrencia: "Nenhuma" | "Semanal" | "Mensal" | undefined;
+  recorrencia:
+    | "Nenhuma"
+    | "Semanal"
+    | "Mensal"
+    | "Diaria"
+    | "Quinzenal"
+    | undefined;
   periodo_final: Date | null;
   documentos_anexados: object | null;
   userID: string | null;
@@ -79,7 +85,9 @@ export const formSchemaFinanceiro = z.object({
   informacoes_extras: z.string().nullable(),
   ultima_alteracao_validacao: z.string().nullable(),
   userID: z.string().nullable(),
-  recorrencia: z.enum(["Nenhuma", "Semanal", "Mensal"]).default("Nenhuma"),
+  recorrencia: z
+    .enum(["Nenhuma", "Semanal", "Mensal", "Quinzenal", "Diaria"])
+    .default("Nenhuma"),
   periodo_final: z.date().nullable(),
   documentos_anexados: z.object({}).nullable(),
 });

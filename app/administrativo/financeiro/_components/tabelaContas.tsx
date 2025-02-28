@@ -9,6 +9,7 @@ import EditDialog from "./dialog-edicao";
 import { ColumnDef } from "@tanstack/react-table";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import Link from "next/link";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
@@ -71,12 +72,12 @@ const TabelaContas = ({
     // Tipagem aqui!
     {
       accessorKey: "datacompetencia",
-      header: "Data",
+      header: "Data de Vencimento",
       cell: ({ row: { original: transaction } }) =>
         transaction.datacompetencia
           ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
               day: "2-digit",
-              month: "long",
+              month: "2-digit",
               year: "numeric",
             })
           : "",
@@ -93,10 +94,19 @@ const TabelaContas = ({
         />
       ),
     },
+    { accessorKey: "informede", header: "Cliente" },
+
     {
       accessorKey: "evento",
-      header: "Responsável",
-      cell: ({ row }) => row.original.evento || "Não informado.",
+      header: "Evento",
+      cell: ({ row: { original: transaction } }) => (
+        <Link
+          href={`/eventos/${transaction.idevento}`}
+          className={"text-muted-foreground"}
+        >
+          {transaction.evento}
+        </Link>
+      ),
     },
     {
       accessorKey: "valor",

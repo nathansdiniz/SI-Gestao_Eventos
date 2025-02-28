@@ -114,8 +114,92 @@ const minhasTransações = async () => {
           ? JSON.parse(dado.parcelas)
           : dado.parcelas,
     recorrencia:
-      (dado.recorrencia as "Nenhuma" | "Semanal" | "Mensal" | undefined) ||
-      "Nenhuma",
+      (dado.recorrencia as
+        | "Nenhuma"
+        | "Semanal"
+        | "Mensal"
+        | "Diaria"
+        | "Quinzenal"
+        | undefined) || "Nenhuma",
+  }));
+  return dadosConvertidos;
+};
+
+export const FinancasEventoPagarReceber = async () => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+  const ano = new Date().getFullYear();
+  const transactions = await db.financeiroEventos.findMany({
+    where: {
+      datacompetencia: {
+        gte: new Date(`${ano - 1}-06-01`).toISOString(), // Data inicial do mês
+        lt: new Date(`${ano}-12-01`).toISOString(), // Data do próximo mês (exclusivo)
+      },
+      pago: "nao",
+    },
+    orderBy: { datacompetencia: "desc" },
+  });
+  const dadosConvertidos = transactions.map((dado) => ({
+    ...dado,
+    valor: dado.valor ? Number(dado.valor.toString()) : null,
+    juros: dado.juros ? Number(dado.juros.toString()) : null,
+    multa: dado.multa ? Number(dado.multa.toString()) : null,
+    desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
+    documentos_anexados:
+      typeof dado.documentos_anexados === "string"
+        ? JSON.parse(dado.documentos_anexados)
+        : dado.documentos_anexados,
+    parcelas:
+      dado.parcelas === 1
+        ? 1
+        : dado.parcelas &&
+            typeof dado.parcelas === "string" &&
+            dado.parcelas.trim() !== ""
+          ? JSON.parse(dado.parcelas)
+          : dado.parcelas,
+    recorrencia:
+      (dado.recorrencia as
+        | "Nenhuma"
+        | "Semanal"
+        | "Mensal"
+        | "Diaria"
+        | "Quinzenal"
+        | undefined) || "Nenhuma",
+  }));
+  return dadosConvertidos;
+};
+export const FinancasdoEvento = async () => {
+  const transactions = await db.financeiroEventos.findMany({
+    orderBy: { datacompetencia: "desc" },
+  });
+  const dadosConvertidos = transactions.map((dado) => ({
+    ...dado,
+    valor: dado.valor ? Number(dado.valor.toString()) : null,
+    juros: dado.juros ? Number(dado.juros.toString()) : null,
+    multa: dado.multa ? Number(dado.multa.toString()) : null,
+    desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
+    documentos_anexados:
+      typeof dado.documentos_anexados === "string"
+        ? JSON.parse(dado.documentos_anexados)
+        : dado.documentos_anexados,
+    parcelas:
+      dado.parcelas === 1
+        ? 1
+        : dado.parcelas &&
+            typeof dado.parcelas === "string" &&
+            dado.parcelas.trim() !== ""
+          ? JSON.parse(dado.parcelas)
+          : dado.parcelas,
+    recorrencia:
+      (dado.recorrencia as
+        | "Nenhuma"
+        | "Semanal"
+        | "Mensal"
+        | "Diaria"
+        | "Quinzenal"
+        | undefined) || "Nenhuma",
   }));
   return dadosConvertidos;
 };

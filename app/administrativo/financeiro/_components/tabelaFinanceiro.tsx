@@ -71,9 +71,11 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     let saldo_previstoEntradas = 0;
     let saldo_previstoSaidas = 0;
     let saldo_previsto = 0;
+    let saldoREal = 0;
 
     dados.forEach((item) => {
       const valor = Number(item.valor || 0);
+      if (item.pago === "sim") saldoREal += valor;
       if (item.tipocobranca === "Investimento") {
         investidoTotal += valor;
       } else if (item.tipocobranca === "Receita") {
@@ -98,7 +100,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     setDashboard({
       investidoTotal,
       depositoTotal,
-      saldo: depositoTotal - gastosTotal - investidoTotal,
+      saldo: saldoREal,
       gastosTotal,
       saldo_previsto,
       saldo_previstoEntradas,
@@ -465,8 +467,6 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       />
       <FileUploadDialog
         isOpen={isOpenAnexo}
-        onClose={() => setIsDialogOpen(false)}
-        financeiroId="0"
         dados={selectedRow || ({} as FinanceiroPropos)}
         setIsOpen={(isOpenAnexo: boolean) => setIsOpenAnexo(isOpenAnexo)}
       />

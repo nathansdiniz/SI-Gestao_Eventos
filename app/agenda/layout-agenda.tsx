@@ -20,11 +20,12 @@ import {
   dadosAgenda,
 } from "@/app/_actions/agenda";
 import { toast } from "sonner";
+import { EditEventDialog } from "./_components/Detalhesdialog";
 
-interface Evento {
+export interface Agenda {
   idAgendaGeral: number;
   titulo_agenda: string | null;
-  tipo_agenda: number | null;
+  tipo_agenda: number | null; // Corrigido para string | null
   responsavel_agenda: string | null;
   datahora_inicial: string | null;
   datahora_final: string | null;
@@ -39,10 +40,11 @@ interface Evento {
 }
 
 export default function Layout_Agenda() {
-  const [eventos, setEventos] = useState<Evento[]>([]);
+  const [eventos, setEventos] = useState<Agenda[]>([]);
   const [mostrarModal, setMostrarModal] = useState(false); // Estado para controlar o modal de adição
+  const [mostrarModalDetalhes, setMostrarModalDetalhes] = useState(false); // Estado para controlar o modal de adição
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
-  const [novoEvento, setNovoEvento] = useState<Evento>({
+  const [novoEvento, setNovoEvento] = useState<Agenda>({
     idAgendaGeral: 0,
     titulo_agenda: "",
     tipo_agenda: 0,
@@ -110,9 +112,11 @@ export default function Layout_Agenda() {
     const eventoClicado = eventos.find(
       (evento) => evento.idAgendaGeral.toString() === info.event.id,
     );
+
     if (eventoClicado) {
+      console.log("Evento Clicado:", eventoClicado);
       setNovoEvento(eventoClicado);
-      setMostrarModal(true); // Abre o modal de edição
+      setMostrarModalDetalhes(true); // Abre o modal de detalhes
     }
   }
 
@@ -175,7 +179,7 @@ export default function Layout_Agenda() {
   }
 
   // Função para adicionar ou atualizar um evento
-  const handleAdicionarEvento = async (evento: Evento) => {
+  const handleAdicionarEvento = async (evento: Agenda) => {
     try {
       const novoEventoAdicionado = await adicionarEvento({
         idAgendaGeral: Number(evento.idAgendaGeral),
@@ -188,25 +192,7 @@ export default function Layout_Agenda() {
         titulo_agenda: evento.titulo_agenda ?? "",
       });
       setEventos([
-        {
-          idAgendaGeral: Number(evento.idAgendaGeral),
-          datahora_inicial: evento.datahora_inicial
-            ? new Date(evento.datahora_inicial).toISOString()
-            : "",
-          datahora_final: evento.datahora_final
-            ? new Date(evento.datahora_final).toISOString()
-            : "",
-          titulo_agenda: evento.titulo_agenda ?? "",
-          tipo_agenda: evento.tipo_agenda,
-          responsavel_agenda: evento.responsavel_agenda,
-          localizacao: evento.localizacao,
-          informacoes_extras: evento.informacoes_extras,
-          userID: evento.userID,
-          data_criacao: evento.data_criacao,
-          data_atualizacao: evento.data_atualizacao,
-          status_compromisso: evento.status_compromisso,
-          id_empresa: evento.id_empresa,
-        },
+        ...eventos,
         {
           ...novoEventoAdicionado,
           datahora_inicial: novoEventoAdicionado.datahora_inicial
@@ -288,7 +274,7 @@ export default function Layout_Agenda() {
         isOpen={mostrarModal}
         onClose={() => setMostrarModal(false)}
         onSubmit={(data) => {
-          const evento: Evento = {
+          const evento: Agenda = {
             idAgendaGeral: novoEvento.idAgendaGeral,
             titulo_agenda: data.titulo,
             tipo_agenda: novoEvento.tipo_agenda,
@@ -307,13 +293,19 @@ export default function Layout_Agenda() {
           handleAdicionarEvento(evento);
         }}
         defaultValues={{
-          titulo: novoEvento.titulo_agenda || "",
-          inicio: novoEvento.datahora_inicial || "",
-          fim: novoEvento.datahora_final || "",
-          nomeCliente: novoEvento.responsavel_agenda || "",
-          localEvento: novoEvento.localizacao || "",
-          descricao: novoEvento.informacoes_extras || "",
+          titulo: novoEvento.titulo_agenda ?? "",
+          inicio: novoEvento.datahora_inicial ?? "",
+          fim: novoEvento.datahora_final ?? "",
+          nomeCliente: novoEvento.responsavel_agenda ?? "",
+          localEvento: novoEvento.localizacao ?? "",
+          descricao: novoEvento.informacoes_extras ?? "",
+          ...novoEvento,
         }}
+      />
+      <EditEventDialog
+        isOpen={mostrarModalDetalhes}
+        onClose={() => setMostrarModalDetalhes(false)}
+        evento={novoEvento}
       />
 
       {/* Modal de Excluir Evento */}

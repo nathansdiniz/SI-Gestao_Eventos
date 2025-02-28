@@ -9,7 +9,6 @@ import {
   PaperclipIcon,
   PencilIcon,
   SheetIcon,
-  SquareArrowOutUpRightIcon,
   TrashIcon,
 } from "lucide-react";
 import Pop_upFiltros from "./popup-filtros";
@@ -24,19 +23,18 @@ import { toast } from "sonner";
 import { FinanceiroPropos } from "@/app/_props";
 import FileUploadDialog from "@/app/eventos/[id]/validacao/_components/Dialog-Anexos";
 import { useSearchParams } from "next/navigation";
-import {
-  obterEventos,
-  obterFinanceiroEvento,
-} from "@/app/_actions/eventos/financeiro";
+import { obterEventos } from "@/app/_actions/eventos/financeiro";
 import TiposValidacaoBadge from "./tipoValidacao";
-import BotaoRedirecionar from "@/app/_components/ui/botao-redirecionar";
-import BotaoVoltar from "@/app/_components/botao-voltar";
 import BotaoAdicionarFinancas from "../../validacao/_components/adicionarTransação";
 import TiposPagosBadge from "@/app/_components/PagoouNao";
+import Link from "next/link";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
 
+interface TabelaFinanceiraProps {
+  dadosfinanceiros: FinanceiroPropos[];
+}
 interface FilterState {
   tipo: string | null;
   status: string | null;
@@ -44,14 +42,12 @@ interface FilterState {
   dataFim: Date;
 }
 
-const TabelaFinanceira = () => {
+const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
   const searchParams = useSearchParams();
   const idEvento = searchParams.get("view");
   const [nomeEvento, setNomeEvento] = useState<string>("");
-  const [dadosfinanceiros, setDadosFinanceiros] = useState<FinanceiroPropos[]>(
-    [],
-  );
-  const [dadosFiltrados, setDadosFiltrados] = useState<FinanceiroPropos[]>([]);
+  const [dadosFiltrados, setDadosFiltrados] =
+    useState<FinanceiroPropos[]>(dadosfinanceiros);
   const [filters, setFilters] = useState<FilterState>({
     tipo: null,
     status: null,
@@ -68,46 +64,6 @@ const TabelaFinanceira = () => {
     saldo_previstoSaidas: 0,
     saldo_previsto: 0,
   });
-
-  useEffect(() => {
-    const fetchDadosFinanceiros = async () => {
-      if (idEvento) {
-        const dadosfinanceiros = await obterFinanceiroEvento(idEvento);
-        console.log(dadosfinanceiros);
-        const dadosConvertidos = dadosfinanceiros.map((dado) => ({
-          ...dado,
-          valor: dado.valor ? Number(dado.valor.toString()) : null,
-          juros: dado.juros ? Number(dado.juros.toString()) : null,
-          multa: dado.multa ? Number(dado.multa.toString()) : null,
-          desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
-          documentos_anexados:
-            typeof dado.documentos_anexados === "string"
-              ? JSON.parse(dado.documentos_anexados)
-              : dado.documentos_anexados,
-          parcelas:
-            dado.parcelas === 1
-              ? 1
-              : dado.parcelas &&
-                  typeof dado.parcelas === "string" &&
-                  dado.parcelas.trim() !== ""
-                ? JSON.parse(dado.parcelas)
-                : dado.parcelas,
-          recorrencia:
-            (dado.recorrencia as
-              | "Nenhuma"
-              | "Semanal"
-              | "Mensal"
-              | undefined) || "Nenhuma",
-        }));
-
-        setDadosFinanceiros(dadosConvertidos);
-        setDadosFiltrados(dadosConvertidos);
-        calcularTotais(dadosConvertidos);
-      }
-    };
-
-    fetchDadosFinanceiros();
-  }, [idEvento]);
 
   useEffect(() => {
     const fetchNomeEvento = async () => {
@@ -170,8 +126,20 @@ const TabelaFinanceira = () => {
 
   const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
     {
+      accessorKey: "data_criacao",
+      header: "Data de Registro",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datacompetencia
+          ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          : "",
+    },
+    {
       accessorKey: "datacompetencia",
-      header: "Data",
+      header: "Data de Vencimento",
       cell: ({ row: { original: transaction } }) =>
         transaction.datacompetencia
           ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
@@ -185,6 +153,7 @@ const TabelaFinanceira = () => {
       accessorKey: "descricao",
       header: "Descrição",
     },
+    { accessorKey: "informede", header: "Cliente" },
     {
       accessorKey: "tipocobranca",
       header: "Tipo de Cobrança",
@@ -198,9 +167,15 @@ const TabelaFinanceira = () => {
     },
     {
       accessorKey: "evento",
-      header: "Responsável",
-      cell: ({ row: { original: transaction } }) =>
-        transaction.evento || "Não informado.",
+      header: "Evento",
+      cell: ({ row: { original: transaction } }) => (
+        <Link
+          href={`/eventos/${transaction.idevento}`}
+          className={"text-muted-foreground"}
+        >
+          {transaction.evento}
+        </Link>
+      ),
     },
     {
       accessorKey: "pago",
@@ -216,7 +191,7 @@ const TabelaFinanceira = () => {
         transaction.datapagamento
           ? new Date(transaction.datapagamento).toLocaleDateString("pt-BR", {
               day: "2-digit",
-              month: "numeric",
+              month: "2-digit",
               year: "numeric",
             })
           : "",
@@ -514,24 +489,6 @@ const TabelaFinanceira = () => {
 
   return (
     <div className="m-5 space-y-6 p-6">
-      <div className="space-y-6 p-6">
-        {/* Botão Voltar */}
-        <div>
-          <BotaoVoltar redirecionar={`/eventos/${idEvento}`} />
-        </div>
-
-        {/* Título */}
-        <h1 className="text-center text-2xl font-bold">
-          Movimentações Financeiras
-        </h1>
-        <BotaoRedirecionar
-          titulo="A Pagar e A Receber"
-          icone={
-            <SquareArrowOutUpRightIcon size={34}></SquareArrowOutUpRightIcon>
-          }
-          redirecionar="/administrativo/financeiro/pagar-receber"
-        ></BotaoRedirecionar>
-      </div>
       <EditDialogFinancas
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
@@ -542,8 +499,6 @@ const TabelaFinanceira = () => {
 
       <FileUploadDialog
         isOpen={isOpenAnexo}
-        onClose={() => setIsDialogOpen(false)}
-        financeiroId="0"
         dados={selectedRow || ({} as FinanceiroPropos)}
         setIsOpen={(isOpenAnexo: boolean) => setIsOpenAnexo(isOpenAnexo)}
       />

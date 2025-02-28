@@ -20,6 +20,13 @@ export const obterFinanceiroEvento = async (idevento: string | null) => {
     },
   });
 };
+export const obterdados1FinanceiroEvento = async (id: number | null) => {
+  return await prisma.financeiroEventos.findMany({
+    where: {
+      id: Number(id),
+    },
+  });
+};
 // Adicionar Financeiroevento
 export const adicionarFinanceiroEvento = async (Financeiroevento: any) => {
   const maxIdRecord = await prisma.financeiroEventos.findFirst({
@@ -88,3 +95,22 @@ export async function getEventFinanceiroData(id: number) {
   });
   return dadosEvento;
 }
+
+export const obterDocumentosAnexados = async (financeiroId: number) => {
+  const financeiro = await prisma.financeiroEventos.findUnique({
+    where: { id: financeiroId },
+    select: { documentos_anexados: true },
+  });
+
+  return financeiro?.documentos_anexados || [];
+};
+
+export const atualizarDocumentosAnexados = async (
+  financeiroId: number,
+  arquivos: string[],
+) => {
+  return await prisma.financeiroEventos.update({
+    where: { id: financeiroId },
+    data: { documentos_anexados: arquivos },
+  });
+};

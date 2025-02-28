@@ -42,7 +42,7 @@ const TiposValidacaoBadge = ({ validacao }: TiposCobrancaBadgeProps) => {
   return (
     <Badge className="font bold bg-white bg-opacity-10 text-white">
       <CircleIcon className="mr-2 fill-white" size={10} />
-      Outros
+      NÃO VALIDADO
     </Badge>
   );
 };

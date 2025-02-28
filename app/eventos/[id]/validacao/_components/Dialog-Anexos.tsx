@@ -18,14 +18,11 @@ import {
 } from "@/app/_components/ui/tabs";
 import { Button } from "@/app/_components/ui/button";
 import { FinanceiroPropos } from "@/app/_props";
-import { atualizarFinanceiroEvento } from "@/app/_actions/eventos/financeiro";
-import { db } from "@/app/_lib/prisma";
+import { obterdados1FinanceiroEvento } from "@/app/_actions/eventos/financeiro";
 
 interface FinanceiroDialogProps {
   isOpen: boolean;
   dados: FinanceiroPropos;
-  financeiroId?: string;
-  onClose?: () => void;
   setIsOpen: (isOpen: boolean) => void;
 }
 
@@ -37,22 +34,22 @@ const FileUploadDialog = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileList, setFileList] = useState<string[]>([]);
 
-  useEffect(() => {
-    // Fetch the list of files from the server
-    const fetchFiles = async () => {
-      try {
-        const response = await db.financeiroME.findFirst({
-          where: { id: dados.id },
-        });
-        const data = response?.documentos_anexados;
-        if (data) {
-          setFileList(data as string[]);
-        }
-      } catch (error) {
-        console.error("Error fetching files:", error);
-      }
-    };
+  // Função para buscar os arquivos existentes
+  const fetchFiles = async () => {
+    try {
+      const response = await obterdados1FinanceiroEvento(dados.id);
+      const data = response?.[0]?.documentos_anexados;
 
+      if (data) {
+        console.log("Arquivos carregados:", data);
+        setFileList(data as string[]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar arquivos:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchFiles();
   }, [dados.id]);
 
@@ -73,28 +70,33 @@ const FileUploadDialog = ({
     formData.append("financeiroId", dados.id.toString());
 
     try {
-      const response = await fetch("/_apis/upload", {
+      const response = await fetch("/api/uploadImage", {
         method: "POST",
         body: formData,
       });
 
-      if (response.ok) {
-        alert("Arquivo enviado com sucesso!");
-        setSelectedFile(null);
-        // Refresh the file list
-        const data = await response.json();
-        setFileList(data.files);
-
-        // Atualizar o banco de dados com o novo arquivo
-        const filePath = data.files[0];
-        const updatedDados = {
-          ...dados,
-          documentos_anexos: filePath,
-        };
-        await atualizarFinanceiroEvento(updatedDados);
-      } else {
-        alert("Falha ao enviar o arquivo.");
+      if (!response.ok) {
+        console.error("Erro no upload:", await response.text());
+        alert("Erro ao enviar o arquivo.");
+        return;
       }
+
+      const data = await response.json();
+      console.log("Resposta da API:", data);
+
+      if (!data.files || !Array.isArray(data.files)) {
+        console.error("Resposta inesperada da API:", data);
+        alert("Erro ao processar os arquivos.");
+        return;
+      }
+      alert("Arquivo enviado com sucesso.");
+
+      // Atualiza a lista de arquivos
+      setFileList((prevFiles) => [...prevFiles, ...data.files]);
+      setSelectedFile(null);
+
+      // Atualiza os arquivos após o upload
+      fetchFiles();
     } catch (error) {
       console.error("Erro ao enviar o arquivo:", error);
       alert("Erro ao enviar o arquivo.");
@@ -112,30 +114,44 @@ const FileUploadDialog = ({
       }}
     >
       <DialogTrigger asChild></DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[100vh] max-w-[100vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Gerenciar Arquivos</DialogTitle>
           <DialogDescription>
             Listar e fazer upload de arquivos
           </DialogDescription>
         </DialogHeader>
+
         <Tabs defaultValue="list">
           <TabsList>
             <TabsTrigger value="list">Listar Arquivos</TabsTrigger>
             <TabsTrigger value="upload">Upload de Arquivos</TabsTrigger>
           </TabsList>
+
           <TabsContent value="list">
-            <ul>
-              {fileList.map((file, index) => (
-                <li key={index}>{file}</li>
-              ))}
-            </ul>
+            {fileList.length > 0 ? (
+              <ul>
+                {fileList.map((file, index) => (
+                  <li key={index}>
+                    <a href={file} target="_blank" rel="noopener noreferrer">
+                      {file}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Nenhum arquivo disponível.</p>
+            )}
           </TabsContent>
+
           <TabsContent value="upload">
             <input type="file" onChange={handleFileChange} />
-            <Button onClick={handleUpload}>Enviar Arquivo</Button>
+            <Button onClick={handleUpload} className="mt-2">
+              Enviar Arquivo
+            </Button>
           </TabsContent>
         </Tabs>
+
         <DialogFooter className="mt-4 flex flex-wrap justify-center gap-4">
           <DialogClose asChild>
             <Button type="button" variant="outline" size="lg">

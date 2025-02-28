@@ -5,22 +5,15 @@ import { DataTable } from "@/app/_components/ui/data-table";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import {
   ArrowDownCircleIcon,
-  CheckCheckIcon,
   CircleArrowUpIcon,
-  Clock10Icon,
   DownloadIcon,
   FileTextIcon,
   PaperclipIcon,
   PencilIcon,
   SheetIcon,
-  TriangleAlertIcon,
-  X,
+  TrashIcon,
 } from "lucide-react";
-import Pop_upFiltros from "./popup-filtros";
-import TiposCobrancaBadge from "./tipoCobranca";
 import { ColumnDef } from "@tanstack/react-table";
-import EditDialogFinancas from "./dialog-edicao";
-import CardResumo from "@/app/(home)/_components/cards-resumo";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import * as XLSX from "xlsx";
@@ -28,7 +21,12 @@ import { toast } from "sonner";
 import { FinanceiroPropos } from "@/app/_props";
 import FileUploadDialog from "@/app/eventos/[id]/validacao/_components/Dialog-Anexos";
 import BotaoAdicionarFinancas from "@/app/_components/add-Financeiro";
-import ValidacaoDialogFinancas from "./dialog-Ações";
+import TiposCobrancaBadge from "../transacoes/_components/tipoCobranca";
+import Pop_upFiltros from "../transacoes/_components/popup-filtros";
+import TiposValidacaoBadge from "../eventos/[id]/financeiro/_components/tipoValidacao";
+import TiposPagosBadge from "./PagoouNao";
+import Link from "next/link";
+import EditDialogFinancas from "../administrativo/financeiro/_components/dialog-edicao";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
@@ -56,71 +54,33 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     dataFim: new Date(),
   });
 
-  const [dashboard, setDashboard] = useState({
-    investidoTotal: 0,
-    depositoTotal: 0,
-    saldo: 0,
-    gastosTotal: 0,
-    saldo_previstoEntradas: 0,
-    saldo_previstoSaidas: 0,
-    saldo_previsto: 0,
-  });
-
-  useEffect(() => {
-    calcularTotais(dadosFiltrados);
-  }, [dadosFiltrados]);
-
-  const calcularTotais = (dados: FinanceiroPropos[]) => {
-    let investidoTotal = 0;
-    let depositoTotal = 0;
-    let gastosTotal = 0;
-    let saldo_previstoEntradas = 0;
-    let saldo_previstoSaidas = 0;
-    let saldo_previsto = 0;
-
-    dados.forEach((item) => {
-      const valor = Number(item.valor || 0);
-      if (item.tipocobranca === "Investimento") {
-        investidoTotal += valor;
-      } else if (item.tipocobranca === "Receita") {
-        depositoTotal += valor;
-      } else {
-        gastosTotal += valor;
-      }
-
-      if (item.pago === "nao") {
-        saldo_previsto += valor;
-        switch (item.tipocobranca) {
-          case "Despesa":
-            saldo_previstoSaidas += valor;
-            break;
-          case "Receita":
-            saldo_previstoEntradas += valor;
-            break;
-        }
-      }
-    });
-
-    setDashboard({
-      investidoTotal,
-      depositoTotal,
-      saldo: depositoTotal - gastosTotal - investidoTotal,
-      gastosTotal,
-      saldo_previsto,
-      saldo_previstoEntradas,
-      saldo_previstoSaidas,
-    });
+  const handleEditClick = (row: FinanceiroPropos) => {
+    console.log(row);
+    setSelectedRow(row);
+    setIsDialogOpen(true);
   };
 
   const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
     {
-      accessorKey: "datacompetencia",
-      header: "Data",
+      accessorKey: "data_criacao",
+      header: "Data de Registro",
       cell: ({ row: { original: transaction } }) =>
         transaction.datacompetencia
           ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
               day: "2-digit",
-              month: "long",
+              month: "2-digit",
+              year: "numeric",
+            })
+          : "",
+    },
+    {
+      accessorKey: "datacompetencia",
+      header: "Data de Vencimento",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datacompetencia
+          ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
               year: "numeric",
             })
           : "",
@@ -129,6 +89,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       accessorKey: "descricao",
       header: "Descrição",
     },
+    { accessorKey: "informede", header: "Cliente" },
     {
       accessorKey: "tipocobranca",
       header: "Tipo de Cobrança",
@@ -142,13 +103,22 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     },
     {
       accessorKey: "evento",
-      header: "Responsável",
-      cell: ({ row: { original: transaction } }) =>
-        transaction.evento || "Não informado.",
+      header: "Evento",
+      cell: ({ row: { original: transaction } }) => (
+        <Link
+          href={`/eventos/${transaction.idevento}`}
+          className={"text-muted-foreground"}
+        >
+          {transaction.evento}
+        </Link>
+      ),
     },
     {
       accessorKey: "pago",
       header: "Pago",
+      cell: ({ row }) => (
+        <TiposPagosBadge pago={row.original.pago ? row.original.pago : ""} />
+      ),
     },
     {
       accessorKey: "datapagamento",
@@ -157,7 +127,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         transaction.datapagamento
           ? new Date(transaction.datapagamento).toLocaleDateString("pt-BR", {
               day: "2-digit",
-              month: "long",
+              month: "2-digit",
               year: "numeric",
             })
           : "",
@@ -170,6 +140,15 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           style: "currency",
           currency: "BRL",
         }).format(Number(transaction.valor)),
+    },
+    {
+      accessorKey: "validacao",
+      header: "Validação",
+      cell: ({ row }) => (
+        <TiposValidacaoBadge
+          validacao={row.original.validacao ? row.original.validacao : ""}
+        />
+      ),
     },
     {
       accessorKey: "actions",
@@ -188,42 +167,6 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 bg-green-600 text-white"
-            onClick={() => handleAcoesClick(row.original, "Validar Registro")}
-          >
-            <CheckCheckIcon />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-orange-600 text-white"
-            onClick={() =>
-              handleAcoesClick(row.original, "Pendência no Registro")
-            }
-          >
-            <TriangleAlertIcon />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-yellow-600 text-white"
-            onClick={() =>
-              handleAcoesClick(row.original, "Em espera o Registro")
-            }
-          >
-            <Clock10Icon />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-red-600 text-white"
-            onClick={() => handleAcoesClick(row.original, "Rejeitar Registro")}
-          >
-            <X />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
             className="h-8 w-8 bg-blue-600 text-white"
             onClick={() => {
               setSelectedRow(row.original);
@@ -231,6 +174,13 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
             }}
           >
             <PaperclipIcon></PaperclipIcon>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-red-600 text-white"
+          >
+            <TrashIcon></TrashIcon>
           </Button>
         </div>
       ),
@@ -243,21 +193,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<FinanceiroPropos>();
-  const [isAcao, setAcao] = useState("");
 
-  const handleEditClick = (row: FinanceiroPropos) => {
-    console.log(row);
-    setSelectedRow(row);
-    setIsDialogOpen(true);
-  };
-
-  const [isAcoesgOpen, setIsAcoesOpen] = useState(false);
-  const handleAcoesClick = (row: FinanceiroPropos, titulo: string) => {
-    console.log(row);
-    setSelectedRow(row);
-    setIsAcoesOpen(true);
-    setAcao(titulo);
-  };
   const filtrarReceitas = () => {
     const receitas = dadosfinanceiros.filter(
       (item) => item.tipocobranca === "Receita",
@@ -268,7 +204,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       tipo: "Receita",
       status: null,
       dataInicio: new Date("2024-01-01"),
-      dataFim: new Date(),
+      dataFim: new Date("2030-12-31"),
     });
   };
 
@@ -528,27 +464,19 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         defaultValues={selectedRow}
         setIsOpen={(isOpen: boolean) => setIsDialogOpen(isOpen)}
       />
-      <ValidacaoDialogFinancas
-        isOpen={isAcoesgOpen}
-        onClose={() => setIsAcoesOpen(false)}
-        financeiroId="0"
-        defaultValues={selectedRow}
-        setIsOpen={(isAcoesgOpen: boolean) => setIsAcoesOpen(isAcoesgOpen)}
-        titulo={isAcao}
-      />
       <FileUploadDialog
         isOpen={isOpenAnexo}
         dados={selectedRow || ({} as FinanceiroPropos)}
         setIsOpen={(isOpenAnexo: boolean) => setIsOpenAnexo(isOpenAnexo)}
       />
       <Pop_upFiltros onFilterChange={handleFilterChange} />
-      <div>
-        <CardResumo mes="12" {...dashboard} />
-      </div>
 
-      <div className="flex items-center justify-center space-x-10 p-6">
+      {/* Card de Resumo */}
+
+      {/* Botões Responsivos */}
+      <div className="flex flex-col items-center justify-center gap-4 p-6 md:flex-row">
         <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
+          className={`md:w-50 h-20 w-full rounded-sm text-sm font-bold md:h-28 ${
             botaoSelecionado === "todos"
               ? "bg-blue-700 text-white"
               : "bg-gray-200"
@@ -558,50 +486,63 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           Todas as Movimentações
         </Button>
         <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
+          className={`md:w-50 h-20 w-full rounded-sm text-sm font-bold md:h-28 ${
             botaoSelecionado === "receitas"
               ? "bg-blue-700 text-white"
               : "bg-green-800 text-white"
           }`}
           onClick={filtrarReceitas}
         >
-          <CircleArrowUpIcon color="#ffffff" size={64} />
+          <CircleArrowUpIcon color="#ffffff" size={48} className="md:size-64" />
           Entradas
         </Button>
         <Button
-          className={`h-32 w-96 rounded-sm text-2xl font-bold ${
+          className={`md:w-50 h-20 w-full rounded-sm text-sm font-bold md:h-28 ${
             botaoSelecionado === "despesas"
               ? "bg-blue-700 text-white"
               : "bg-red-800 text-white"
           }`}
           onClick={filtrarDespesas}
         >
-          <ArrowDownCircleIcon color="#ffffff" size={96} />
+          <ArrowDownCircleIcon
+            color="#ffffff"
+            size={48}
+            className="md:size-96"
+          />
           Saídas
         </Button>
       </div>
-      <div className="flex justify-end space-x-4 p-4">
+
+      {/* Botões de Ação */}
+      <div className="flex flex-col justify-end gap-4 p-4 md:flex-row">
         <BotaoAdicionarFinancas />
         <Button
           onClick={exportToPDF}
-          className="text-white"
+          className="flex items-center gap-2 text-white"
           variant={"outline"}
         >
-          <FileTextIcon size={40}></FileTextIcon>
+          <FileTextIcon size={32} className="md:size-40" />
           Exportar para PDF
         </Button>
-        <Button onClick={exportToExcel} className="bg-green-500 text-white">
-          <SheetIcon size={40}></SheetIcon>
+        <Button
+          onClick={exportToExcel}
+          className="flex items-center gap-2 bg-green-500 text-white"
+        >
+          <SheetIcon size={32} className="md:size-40" />
           Exportar para Excel
         </Button>
       </div>
-      <ScrollArea className="space-y-6">
-        <DataTable
-          key={"tabelaFinanceira"}
-          columns={financeiroColumns}
-          data={dadosFiltrados}
-        />
-      </ScrollArea>
+
+      {/* Tabela Responsiva */}
+      <div className="overflow-x-auto">
+        <ScrollArea className="space-y-6">
+          <DataTable
+            key={"tabelaFinanceira"}
+            columns={financeiroColumns}
+            data={dadosFiltrados}
+          />
+        </ScrollArea>
+      </div>
     </>
   );
 };

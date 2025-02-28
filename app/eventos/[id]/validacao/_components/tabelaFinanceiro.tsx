@@ -11,6 +11,8 @@ import {
   Clock10Icon,
   DownloadIcon,
   FileTextIcon,
+  Link,
+  SendIcon,
   SheetIcon,
   TriangleAlertIcon,
   X,
@@ -26,17 +28,17 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { FinanceiroPropos } from "@/app/_props";
 import FileUploadDialog from "@/app/_components/dialog-VerAnexosAdd";
-import {
-  obterEventos,
-  obterFinanceiroEvento,
-} from "@/app/_actions/eventos/financeiro";
+import { obterEventos } from "@/app/_actions/eventos/financeiro";
 import ValidacaoDialogFinancas from "./dialog-Ações";
 import TiposValidacaoBadge from "../../financeiro/_components/tipoValidacao";
-import BotaoVoltar from "@/app/_components/botao-voltar";
 import TiposPagosBadge from "@/app/_components/PagoouNao";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
+
+interface TabelaFinanceiraProps {
+  dadosfinanceiros: FinanceiroPropos[];
+}
 
 interface FilterState {
   tipo: string | null;
@@ -45,14 +47,12 @@ interface FilterState {
   dataFim: Date;
 }
 
-const TabelaFinanceira = () => {
+const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
   const searchParams = useSearchParams();
   const idEvento = searchParams.get("view");
   const [nomeEvento, setNomeEvento] = useState<string>("");
-  const [dadosfinanceiros, setDadosFinanceiros] = useState<FinanceiroPropos[]>(
-    [],
-  );
-  const [dadosFiltrados, setDadosFiltrados] = useState<FinanceiroPropos[]>([]);
+  const [dadosFiltrados, setDadosFiltrados] =
+    useState<FinanceiroPropos[]>(dadosfinanceiros);
   const [botaoSelecionado, setBotaoSelecionado] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     tipo: null,
@@ -70,46 +70,6 @@ const TabelaFinanceira = () => {
     saldo_previstoSaidas: 0,
     saldo_previsto: 0,
   });
-
-  useEffect(() => {
-    const fetchDadosFinanceiros = async () => {
-      if (idEvento) {
-        const dadosfinanceiros = await obterFinanceiroEvento(idEvento);
-        console.log(dadosfinanceiros);
-        const dadosConvertidos = dadosfinanceiros.map((dado) => ({
-          ...dado,
-          valor: dado.valor ? Number(dado.valor.toString()) : null,
-          juros: dado.juros ? Number(dado.juros.toString()) : null,
-          multa: dado.multa ? Number(dado.multa.toString()) : null,
-          desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
-          documentos_anexados:
-            typeof dado.documentos_anexados === "string"
-              ? JSON.parse(dado.documentos_anexados)
-              : dado.documentos_anexados,
-          parcelas:
-            dado.parcelas === 1
-              ? 1
-              : dado.parcelas &&
-                  typeof dado.parcelas === "string" &&
-                  dado.parcelas.trim() !== ""
-                ? JSON.parse(dado.parcelas)
-                : dado.parcelas,
-          recorrencia:
-            (dado.recorrencia as
-              | "Nenhuma"
-              | "Semanal"
-              | "Mensal"
-              | undefined) || "Nenhuma",
-        }));
-
-        setDadosFinanceiros(dadosConvertidos);
-        setDadosFiltrados(dadosConvertidos);
-        calcularTotais(dadosConvertidos);
-      }
-    };
-
-    fetchDadosFinanceiros();
-  }, [idEvento]);
 
   useEffect(() => {
     const fetchNomeEvento = async () => {
@@ -178,126 +138,6 @@ const TabelaFinanceira = () => {
     setAcao(titulo);
   };
   console.log(nomeEvento);
-  const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
-    {
-      accessorKey: "datacompetencia",
-      header: "Data",
-      cell: ({ row: { original: transaction } }) =>
-        transaction.datacompetencia
-          ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "numeric",
-              year: "numeric",
-            })
-          : "",
-    },
-    {
-      accessorKey: "descricao",
-      header: "Descrição",
-    },
-    {
-      accessorKey: "tipocobranca",
-      header: "Tipo de Cobrança",
-      cell: ({ row }) => (
-        <TiposCobrancaBadge
-          tipocobranca={
-            row.original.tipocobranca ? row.original.tipocobranca : ""
-          }
-        />
-      ),
-    },
-    {
-      accessorKey: "evento",
-      header: "Responsável",
-      cell: ({ row: { original: transaction } }) =>
-        transaction.evento || "Não informado.",
-    },
-    {
-      accessorKey: "pago",
-      header: "Pago",
-      cell: ({ row }) => (
-        <TiposPagosBadge pago={row.original.pago ? row.original.pago : ""} />
-      ),
-    },
-    {
-      accessorKey: "datapagamento",
-      header: "Data Pagamento",
-      cell: ({ row: { original: transaction } }) =>
-        transaction.datapagamento
-          ? new Date(transaction.datapagamento).toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "numeric",
-              year: "numeric",
-            })
-          : "",
-    },
-    {
-      accessorKey: "valor",
-      header: "Valor",
-      cell: ({ row: { original: transaction } }) =>
-        new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(Number(transaction.valor)),
-    },
-    {
-      accessorKey: "validacao",
-      header: "Validação",
-      cell: ({ row }) => (
-        <TiposValidacaoBadge
-          validacao={row.original.validacao ? row.original.validacao : ""}
-        />
-      ),
-    },
-    {
-      accessorKey: "ultima_alteracao_validacao",
-      header: "Informações Adicionais",
-    },
-    {
-      accessorKey: "actions",
-      header: "Ações",
-      cell: ({ row }) => (
-        <div className="flex flex-row space-x-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-yellow-600 text-white"
-            onClick={() =>
-              handleAcoesClick(row.original, "Em espera o Registro")
-            }
-          >
-            <Clock10Icon />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-green-600 text-white"
-            onClick={() => handleAcoesClick(row.original, "Validar Registro")}
-          >
-            <CheckCheckIcon />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-red-600 text-white"
-            onClick={() => handleAcoesClick(row.original, "Rejeitar Registro")}
-          >
-            <X />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-orange-600 text-white"
-            onClick={() =>
-              handleAcoesClick(row.original, "Pendência no Registro")
-            }
-          >
-            <TriangleAlertIcon />
-          </Button>
-        </div>
-      ),
-    },
-  ];
 
   useEffect(() => {
     aplicarFiltros(filters);
@@ -308,18 +148,19 @@ const TabelaFinanceira = () => {
   const [selectedRow, setSelectedRow] = useState<FinanceiroPropos>();
 
   const filtrarEstados = (estado: string) => {
+    let dadosFiltradosTemporarios = [...dadosfinanceiros];
     console.log(estado);
-    const despesas = dadosfinanceiros.filter(
+    dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter(
       (item) => item.validacao === estado,
     );
-    console.log(despesas);
-    setDadosFiltrados(despesas);
+    console.log(dadosFiltradosTemporarios);
+    setDadosFiltrados([...dadosFiltradosTemporarios]); // Garante que o React detecte a mudança
     setBotaoSelecionado(estado);
     setFilters({
       tipo: null,
       status: null,
       dataInicio: new Date("2024-01-01"),
-      dataFim: new Date(),
+      dataFim: new Date("2030-04-01"),
     });
   };
   const mostrarTodos = () => {
@@ -373,6 +214,155 @@ const TabelaFinanceira = () => {
     setDadosFiltrados(dadosFiltradosTemporarios);
   };
 
+  const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
+    {
+      accessorKey: "data_criacao",
+      header: "Data de Registro",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datacompetencia
+          ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          : "",
+    },
+    {
+      accessorKey: "datacompetencia",
+      header: "Data de Vencimento",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datacompetencia
+          ? new Date(transaction.datacompetencia).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          : "",
+    },
+    {
+      accessorKey: "descricao",
+      header: "Descrição",
+    },
+    {
+      accessorKey: "tipocobranca",
+      header: "Tipo de Cobrança",
+      cell: ({ row }) => (
+        <TiposCobrancaBadge
+          tipocobranca={
+            row.original.tipocobranca ? row.original.tipocobranca : ""
+          }
+        />
+      ),
+    },
+    { accessorKey: "informede", header: "Cliente" },
+    {
+      accessorKey: "evento",
+      header: "Evento",
+      cell: ({ row: { original: transaction } }) => (
+        <Link
+          href={`/eventos/${transaction.idevento}`}
+          className={"text-muted-foreground"}
+        >
+          {transaction.evento}
+        </Link>
+      ),
+    },
+    {
+      accessorKey: "pago",
+      header: "Pago",
+      cell: ({ row }) => (
+        <TiposPagosBadge pago={row.original.pago ? row.original.pago : ""} />
+      ),
+    },
+    {
+      accessorKey: "datapagamento",
+      header: "Data Pagamento",
+      cell: ({ row: { original: transaction } }) =>
+        transaction.datapagamento
+          ? new Date(transaction.datapagamento).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          : "",
+    },
+    {
+      accessorKey: "valor",
+      header: "Valor",
+      cell: ({ row: { original: transaction } }) =>
+        new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(Number(transaction.valor)),
+    },
+    {
+      accessorKey: "validacao",
+      header: "Validação",
+      cell: ({ row }) => (
+        <TiposValidacaoBadge
+          validacao={row.original.validacao ? row.original.validacao : ""}
+        />
+      ),
+    },
+    {
+      accessorKey: "ultima_alteracao_validacao",
+      header: "Informações Adicionais",
+    },
+    {
+      accessorKey: "actions",
+      header: "Ações",
+      cell: ({ row }) => (
+        <div className="flex flex-row space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-yellow-600 text-white"
+            onClick={() =>
+              handleAcoesClick(row.original, "Em espera o Registro")
+            }
+          >
+            <Clock10Icon />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-green-600 text-white"
+            onClick={() => handleAcoesClick(row.original, "Validar Registro")}
+          >
+            <CheckCheckIcon />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-blue-600 text-white"
+            onClick={() =>
+              handleAcoesClick(row.original, "Enviar pro Financeiro")
+            }
+          >
+            <SendIcon />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-red-600 text-white"
+            onClick={() => handleAcoesClick(row.original, "Rejeitar Registro")}
+          >
+            <X />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-orange-600 text-white"
+            onClick={() =>
+              handleAcoesClick(row.original, "Pendência no Registro")
+            }
+          >
+            <TriangleAlertIcon />
+          </Button>
+        </div>
+      ),
+    },
+  ];
   // Função para exportar para PDF
   const exportToPDF = () => {
     // 📌 Obtendo data e hora da emissão
@@ -552,10 +542,9 @@ const TabelaFinanceira = () => {
       },
     });
   };
+
   return (
-    <div className="m-5 space-y-6">
-      <BotaoVoltar redirecionar={`/eventos/${idEvento}`} />
-      <h1 className="text-center text-2xl font-bold">Validações Financeiras</h1>
+    <>
       <EditDialogFinancas
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
@@ -660,7 +649,7 @@ const TabelaFinanceira = () => {
           data={dadosFiltrados}
         />
       </ScrollArea>
-    </div>
+    </>
   );
 };
 

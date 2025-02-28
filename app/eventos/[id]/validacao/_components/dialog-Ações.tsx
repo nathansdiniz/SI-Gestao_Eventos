@@ -197,7 +197,7 @@ const ValidacaoDialogFinancas = ({
       }}
     >
       <DialogTrigger asChild></DialogTrigger>
-      <DialogContent className="max-h-[40vh] max-w-[40vw] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] max-w-[40vw] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{titulo} o Registro Financeiro</DialogTitle>
           <DialogDescription>

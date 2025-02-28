@@ -10,6 +10,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { FinanceiroPropos } from "@/app/_props";
+import Link from "next/link";
+import TiposValidacaoBadge from "../../financeiro/_components/tipoValidacao";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
@@ -62,10 +64,19 @@ const TabelaContas = ({
         />
       ),
     },
+    { accessorKey: "informede", header: "Cliente" },
+
     {
       accessorKey: "evento",
-      header: "Responsável",
-      cell: ({ row }) => row.original.evento || "Não informado.",
+      header: "Evento",
+      cell: ({ row: { original: transaction } }) => (
+        <Link
+          href={`/eventos/${transaction.idevento}`}
+          className={"text-muted-foreground"}
+        >
+          {transaction.evento}
+        </Link>
+      ),
     },
     {
       accessorKey: "valor",
@@ -75,6 +86,15 @@ const TabelaContas = ({
           style: "currency",
           currency: "BRL",
         }).format(Number(row.original.valor)),
+    },
+    {
+      accessorKey: "validacao",
+      header: "Validação",
+      cell: ({ row }) => (
+        <TiposValidacaoBadge
+          validacao={row.original.validacao ? row.original.validacao : ""}
+        />
+      ),
     },
     {
       id: "actions",

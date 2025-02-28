@@ -33,9 +33,9 @@ import {
 } from "@/app/_components/ui/select";
 import { toast } from "sonner";
 import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
-import { addUpdateFinanceiro } from "@/app/_actions/criar-atualizarFinanceiro";
 import consultarEventos from "@/app/_actions/consultar-inputEventos";
 import { formSchemaFinanceiro } from "@/app/_props";
+import { adicionarAtualizarFinanceiroEvento } from "@/app/_actions/eventos/financeiro";
 
 type FormSchema = z.infer<typeof formSchemaFinanceiro>;
 
@@ -43,6 +43,7 @@ interface EditDialogProps {
   isOpen: boolean;
   defaultValues?: Partial<FormSchema>;
   financeiroId?: string;
+  nomeEvento?: string;
   onClose?: () => void;
   onSave?: (data: FormSchema) => void;
   setIsOpen: (isOpen: boolean) => void;
@@ -52,13 +53,14 @@ const EditDialogFinancas = ({
   isOpen,
   defaultValues,
   setIsOpen,
+  nomeEvento,
   financeiroId,
 }: EditDialogProps) => {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchemaFinanceiro),
     defaultValues: {
       id: undefined,
-      evento: "",
+      evento: nomeEvento ?? "",
       datapagamento: null,
       datacompetencia: null,
       tipocobranca: "",
@@ -79,7 +81,7 @@ const EditDialogFinancas = ({
       centrodecusto: "",
       mododepagamento: "",
       parcelas: null,
-      idevento: "",
+      idevento: financeiroId,
       id_empresa: null,
       data_criacao: new Date(),
       data_update: new Date(),
@@ -122,43 +124,64 @@ const EditDialogFinancas = ({
 
   const onSubmit = async (data: FormSchema) => {
     console.log(data);
+
     try {
-      await addUpdateFinanceiro({ ...data, id: data.id ?? 0 });
-      toast("Registro Financeiro salvo com sucesso!", {
+      const registros = [data];
+      const dataAtual = new Date(data.datacompetencia ?? ""); // Converte para Date
+      const dataFinal = new Date(data.periodo_final ?? ""); // Data final
+
+      while (dataAtual <= dataFinal) {
+        // Avança a data com base na recorrência
+        if (data.recorrencia === "Mensal") {
+          dataAtual.setMonth(dataAtual.getMonth() + 1);
+        } else if (data.recorrencia === "Semanal") {
+          dataAtual.setDate(dataAtual.getDate() + 7);
+        } else if (data.recorrencia === "Diaria") {
+          dataAtual.setDate(dataAtual.getDate() + 1);
+        } else if (data.recorrencia === "Quinzenal") {
+          dataAtual.setDate(dataAtual.getDate() + 15);
+        }
+
+        registros.push({
+          ...data,
+          id: undefined, // Garante um novo ID para cada registro
+          datacompetencia: new Date(dataAtual), // Clona corretamente a data
+        });
+      }
+
+      // Salva todos os registros no banco de dados
+      for (const registro of registros) {
+        await adicionarAtualizarFinanceiroEvento({
+          ...registro,
+          id: registro.id ?? 0,
+          idevento: financeiroId,
+          evento: nomeEvento,
+        });
+      }
+      console.log(registros);
+
+      toast("Registros financeiros salvos com sucesso!", {
         description: (
           <div className="flex items-center">
             <CircleCheckBigIcon className="mr-2 text-white" />
-            <span>{`${data.descricao} salva em ${new Date().toLocaleString()}`}</span>
+            <span>{`${registros.length} registros criados`}</span>
           </div>
         ),
-        action: {
-          label: "X",
-          onClick: () => console.log("X"),
-        },
-        style: {
-          background: "#007300",
-          textDecorationColor: "#f1f4ff",
-        },
+        style: { background: "#007300", textDecorationColor: "#f1f4ff" },
       });
+
       setIsOpen(false);
       form.reset();
     } catch (error) {
       toast("Falha ao salvar os dados!", {
         description: <AlertTriangleIcon />,
-        action: {
-          label: "X",
-          onClick: () => console.log("X"),
-        },
-        style: {
-          background: "#af080d",
-          textDecorationColor: "#f1f4ff",
-        },
+        style: { background: "#af080d", textDecorationColor: "#f1f4ff" },
       });
       console.error("Erro ao salvar dados:", error);
     }
   };
 
-  const isUpdate = Boolean(financeiroId);
+  const isUpdate = Boolean(defaultValues?.id);
 
   return (
     <Dialog
@@ -438,7 +461,7 @@ const EditDialogFinancas = ({
               name="datacompetencia"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Data Competência</FormLabel>
+                  <FormLabel>Data de Vencimento</FormLabel>
                   <div className="relative w-full">
                     <input
                       type="date"
@@ -510,8 +533,14 @@ const EditDialogFinancas = ({
                       <SelectItem key={"Nenhuma"} value={"Nenhuma"}>
                         {"Nenhuma"}
                       </SelectItem>
+                      <SelectItem key={"Diaria"} value={"Diaria"}>
+                        {"Diaria"}
+                      </SelectItem>
                       <SelectItem key={"Semanal"} value={"Semanal"}>
                         {"Semanal"}
+                      </SelectItem>
+                      <SelectItem key={"Quinzenal"} value={"Quinzenal"}>
+                        {"Quinzenal"}
                       </SelectItem>
                       <SelectItem key={"Mensal"} value={"Mensal"}>
                         {"Mensal"}

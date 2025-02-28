@@ -29,7 +29,7 @@ const PaginaInformacoesEvento = async ({ params: { id } }: Props) => {
               </h1>
             </div>
             <div className="flex justify-center">
-              <ScrollArea className="min-w-48">
+              <ScrollArea className="max-w-48">
                 <Card>
                   <CardHeader className="text-center font-sans text-sm">
                     Informações do Evento

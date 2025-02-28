@@ -3,40 +3,23 @@ import CardResumo from "@/app/(home)/_components/cards-resumo";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import TabelaContas from "../_components/tabelaContas";
-import { db } from "@/app/_lib/prisma";
 import BotaoVoltar from "@/app/_components/botao-voltar";
+import { FinancasEventoPagarReceber } from "@/app/_actions/criar-atualizarFinanceiro";
 
-const Financeiro = async () => {
+interface Props {
+  params: {
+    id: string; // Ou 'number', dependendo do tipo esperado para 'id'
+  };
+}
+const Financeiro = async ({ params: { id } }: Props) => {
   const { userId } = await auth();
   if (!userId) {
     redirect("/login");
   }
+  const operacaoId = Number(id);
+  console.log(operacaoId, "id aqui");
 
-  /* const baseURL = "https://app1.meeventos.com.br/inmidialed";
-  const apiKey = process.env.TOKEN_ME_EVENTOS;
-  const res = await fetch(
-    `${baseURL}/api/v1/financial?field_sort=datacompetencia&sort=desc`,
-    {
-      method: "GET", // ou POST, PUT, DELETE, etc.
-      headers: {
-        Authorization: `${apiKey}`, // Inclua o token no cabeçalho
-        "Content-Type": "application/json", // Se você estiver enviando JSON
-        // outros headers, se necessário
-      },
-      // body: JSON.stringify(dados), // Se for uma requisição POST com dados
-    },
-  );
-
-  const dadosfinanceiros = await res.json(); // o*/
-  const ano = new Date().getFullYear();
-  const dadosfinanceiros = await db.financeiroME.findMany({
-    where: {
-      datacompetencia: {
-        gte: new Date(`${ano - 1}-06-01`).toISOString(), // Data inicial do mês
-        lt: new Date(`${ano}-12-01`).toISOString(), // Data do próximo mês (exclusivo)
-      },
-    },
-  });
+  const dadosfinanceiros = await FinancasEventoPagarReceber();
   // Chamada da API para obter os dados
 
   let investidoTotal = 0;
@@ -80,17 +63,7 @@ const Financeiro = async () => {
     saldo_previstoEntradas: saldo_previstoEntradas,
     saldo_previstoSaidas: saldo_previstoSaidas,
   };
-  const dadosConvertidos = dadosfinanceiros.map((dado) => ({
-    ...dado,
-    valor: dado.valor ? Number(dado.valor.toString()) : null,
-    juros: dado.juros ? Number(dado.juros.toString()) : null,
-    multa: dado.multa ? Number(dado.multa.toString()) : null,
-    desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
-    parcelas:
-      typeof dado.parcelas === "string"
-        ? JSON.parse(dado.parcelas)
-        : dado.parcelas,
-  }));
+
   return (
     <>
       <Layout>
@@ -106,7 +79,7 @@ const Financeiro = async () => {
           <div className="flex space-x-6">
             <TabelaContas
               titulo="A Receber"
-              dadosfinanceiros={dadosConvertidos.filter(
+              dadosfinanceiros={dadosfinanceiros.filter(
                 (item: {
                   tipocobranca: string | null;
                   pago: string | null;
@@ -119,7 +92,7 @@ const Financeiro = async () => {
             ></TabelaContas>
             <TabelaContas
               titulo="A Pagar"
-              dadosfinanceiros={dadosConvertidos.filter(
+              dadosfinanceiros={dadosfinanceiros.filter(
                 (item: {
                   tipocobranca: string | null;
                   pago: string | null;

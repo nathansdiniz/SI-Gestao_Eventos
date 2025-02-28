@@ -1,5 +1,7 @@
 "use server";
 import { db } from "@/app/_lib/prisma";
+import { Agenda } from "@/app/agenda/layout-agenda";
+import { auth } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -11,6 +13,10 @@ interface Evento {
   datahora_final: string;
   localizacao?: string;
   informacoes_extras?: string;
+}
+const { userId } = auth();
+if (!userId) {
+  throw new Error("Unauthorized");
 }
 
 export const dadosAgenda = async () => {
@@ -39,6 +45,7 @@ export const adicionarEvento = async (evento: Evento) => {
       datahora_final: new Date(evento.datahora_final),
       localizacao: evento.localizacao,
       informacoes_extras: evento.informacoes_extras,
+      userID: userId,
       id_empresa: 1,
     },
   });
@@ -53,6 +60,7 @@ export const atualizarEvento = async (evento: Evento) => {
       datahora_final: new Date(evento.datahora_final),
       localizacao: evento.localizacao,
       informacoes_extras: evento.informacoes_extras,
+      userID: userId,
       id_empresa: 1,
     },
   });
@@ -61,5 +69,21 @@ export const atualizarEvento = async (evento: Evento) => {
 export const excluirEvento = async (id: number) => {
   return await prisma.agendaGeral.delete({
     where: { idAgendaGeral: id },
+  });
+};
+
+export const atualizarAgenda = async (evento: Agenda) => {
+  return await prisma.agendaGeral.update({
+    where: { idAgendaGeral: evento.idAgendaGeral },
+    data: {
+      ...evento,
+      titulo_agenda: evento.titulo_agenda,
+      datahora_inicial: new Date(evento.datahora_inicial ?? ""),
+      datahora_final: new Date(evento.datahora_final ?? ""),
+      localizacao: evento.localizacao,
+      informacoes_extras: evento.informacoes_extras,
+      userID: userId,
+      id_empresa: 1,
+    },
   });
 };

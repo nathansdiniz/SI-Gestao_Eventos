@@ -72,7 +72,7 @@ const FileUploadDialog = ({
     formData.append("financeiroId", dados.id.toString());
 
     try {
-      const response = await fetch("/api/upload", {
+      const response = await fetch("/api/uploadImage", {
         method: "POST",
         body: formData,
       });
