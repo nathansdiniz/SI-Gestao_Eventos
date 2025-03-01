@@ -17,7 +17,7 @@ import {
   TriangleAlertIcon,
   X,
 } from "lucide-react";
-import Pop_upFiltros from "./popup-filtros";
+
 import TiposCobrancaBadge from "./tipoCobranca";
 import { ColumnDef } from "@tanstack/react-table";
 import EditDialogFinancas from "./dialog-edicao";
@@ -27,11 +27,12 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { FinanceiroPropos } from "@/app/_props";
-import FileUploadDialog from "@/app/_components/dialog-VerAnexosAdd";
 import { obterEventos } from "@/app/_actions/eventos/financeiro";
 import ValidacaoDialogFinancas from "./dialog-Ações";
 import TiposValidacaoBadge from "../../financeiro/_components/tipoValidacao";
 import TiposPagosBadge from "@/app/_components/PagoouNao";
+import Pop_upFiltros from "@/app/_components/popup-filtros";
+import FileUploadDialog from "./Dialog-Anexos";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
@@ -41,10 +42,17 @@ interface TabelaFinanceiraProps {
 }
 
 interface FilterState {
-  tipo: string | null;
-  status: string | null;
-  dataInicio: Date;
-  dataFim: Date;
+  tipo: string | null; // Tipo de cobrança
+  status: string | null; // Status de pagamento
+  dataInicio: Date | null; // Data de início
+  dataFim: Date | null; // Data de fim
+  descricao: string | null; // Descrição
+  informede: string | null; // Cliente
+  evento: string | null; // Evento
+  pago: string | null; // Pago
+  validacao: string | null; // Validação
+  dataCompetencia: Date | null; // Data de competência
+  valor: string | null; // Valor
 }
 
 const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
@@ -57,8 +65,15 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
   const [filters, setFilters] = useState<FilterState>({
     tipo: null,
     status: null,
-    dataInicio: new Date("2024-01-01"),
-    dataFim: new Date(),
+    dataInicio: null,
+    dataFim: null,
+    descricao: null,
+    informede: null,
+    evento: null,
+    pago: null,
+    validacao: null,
+    dataCompetencia: null,
+    valor: null,
   });
 
   const [dashboard, setDashboard] = useState({
@@ -69,6 +84,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     saldo_previstoEntradas: 0,
     saldo_previstoSaidas: 0,
     saldo_previsto: 0,
+    saldoEvento: 0,
   });
 
   useEffect(() => {
@@ -95,15 +111,21 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     let saldo_previstoEntradas = 0;
     let saldo_previstoSaidas = 0;
     let saldo_previsto = 0;
+    let saldoEvento = 0;
 
     dados.forEach((item) => {
       const valor = Number(item.valor || 0);
       if (item.tipocobranca === "Investimento") {
         investidoTotal += valor;
+        saldoEvento += valor;
       } else if (item.tipocobranca === "Receita") {
         depositoTotal += valor;
+        saldoEvento += valor;
+      } else if (item.tipocobranca === "Transferência") {
+        saldoEvento += valor;
       } else {
         gastosTotal += valor;
+        saldoEvento -= valor;
       }
 
       if (item.pago === "nao") {
@@ -127,8 +149,10 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       saldo_previsto,
       saldo_previstoEntradas,
       saldo_previstoSaidas,
+      saldoEvento,
     });
   };
+
   const [isAcoesgOpen, setIsAcoesOpen] = useState(false);
   const [isAcao, setAcao] = useState("");
   const handleAcoesClick = (row: FinanceiroPropos, titulo: string) => {
@@ -153,65 +177,33 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter(
       (item) => item.validacao === estado,
     );
-    console.log(dadosFiltradosTemporarios);
-    setDadosFiltrados([...dadosFiltradosTemporarios]); // Garante que o React detecte a mudança
+
+    setDadosFiltrados(dadosFiltradosTemporarios);
     setBotaoSelecionado(estado);
-    setFilters({
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      validacao: estado,
+      dataInicio: null,
+      dataFim: null,
       tipo: null,
       status: null,
-      dataInicio: new Date("2024-01-01"),
-      dataFim: new Date("2030-04-01"),
-    });
+    }));
   };
   const mostrarTodos = () => {
     setDadosFiltrados(dadosfinanceiros);
-    setBotaoSelecionado("todos");
-    setFilters({
+    setBotaoSelecionado(null);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      validacao: null,
+      dataInicio: null,
+      dataFim: null,
       tipo: null,
       status: null,
-      dataInicio: new Date("2024-01-01"),
-      dataFim: new Date(),
-    });
+    }));
   };
 
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
-  };
-
-  const aplicarFiltros = (filtros: FilterState) => {
-    let dadosFiltradosTemporarios = [...dadosfinanceiros];
-
-    if (filtros.tipo) {
-      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter(
-        (item) => item.tipocobranca === filtros.tipo,
-      );
-    }
-
-    if (filtros.status) {
-      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter(
-        (item) => item.pago === filtros.status,
-      );
-    }
-
-    if (filtros.dataInicio) {
-      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter((item) => {
-        const dataCompetencia = item.datacompetencia
-          ? new Date(item.datacompetencia)
-          : null;
-        return dataCompetencia && dataCompetencia >= filtros.dataInicio;
-      });
-    }
-
-    if (filtros.dataFim) {
-      dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter((item) => {
-        const dataCompetencia = item.datacompetencia
-          ? new Date(item.datacompetencia)
-          : null;
-        return dataCompetencia && dataCompetencia <= filtros.dataFim;
-      });
-    }
-
-    setDadosFiltrados(dadosFiltradosTemporarios);
   };
 
   const financeiroColumns: ColumnDef<FinanceiroPropos>[] = [
@@ -263,7 +255,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           href={`/eventos/${transaction.idevento}`}
           className={"text-muted-foreground"}
         >
-          {transaction.evento}
+          {transaction.evento || ""}
         </Link>
       ),
     },
@@ -364,14 +356,83 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
     },
   ];
   // Função para exportar para PDF
+  const filtrarPorData = (
+    dados: FinanceiroPropos[],
+    dataInicio: Date | null,
+    dataFim: Date | null,
+  ): FinanceiroPropos[] => {
+    return dados.filter((item) => {
+      const dataCompetencia = item.datacompetencia
+        ? new Date(item.datacompetencia)
+        : null;
+      if (!dataCompetencia) return false;
+      return (
+        (!dataInicio || dataCompetencia >= dataInicio) &&
+        (!dataFim || dataCompetencia <= dataFim)
+      );
+    });
+  };
+
+  const aplicarFiltros = (filtros: FilterState) => {
+    let dadosFiltradosTemporarios = [...dadosfinanceiros];
+
+    // Filtros de texto
+    const filtrosTexto = [
+      "descricao",
+      "informede",
+      "evento",
+      "tipo",
+      "status",
+      "pago",
+      "validacao",
+      "valor",
+    ];
+    filtrosTexto.forEach((filtro) => {
+      const valorFiltro = filtros[filtro as keyof FilterState];
+      if (valorFiltro) {
+        dadosFiltradosTemporarios = dadosFiltradosTemporarios.filter((item) => {
+          const valorItem =
+            filtro === "tipo"
+              ? item.tipocobranca
+              : filtro === "status"
+                ? item.pago
+                : filtro === "validacao"
+                  ? item.validacao
+                  : filtro === "valor"
+                    ? item.valor
+                    : filtro === "pago"
+                      ? item.pago
+                      : filtro === "descricao"
+                        ? item.descricao
+                        : filtro === "informede"
+                          ? item.informede
+                          : filtro === "evento"
+                            ? item.evento
+                            : "";
+          return String(valorItem)
+            .toLowerCase()
+            .includes(String(valorFiltro).toLowerCase());
+        });
+      }
+    });
+    dadosFiltradosTemporarios = filtrarPorData(
+      dadosFiltradosTemporarios,
+      filtros.dataInicio,
+      filtros.dataFim,
+    );
+
+    setDadosFiltrados(dadosFiltradosTemporarios);
+  };
+
+  // Função para exportar para PDF
   const exportToPDF = () => {
     // 📌 Obtendo data e hora da emissão
     const filtro = filters;
     const dataEmissao = new Date();
     const dataFormatada = dataEmissao.toLocaleDateString("pt-BR");
     const horaFormatada = dataEmissao.toLocaleTimeString("pt-BR");
-    filtro.dataInicio.setHours(25);
-    filtro.dataFim.setHours(25);
+    filtro.dataInicio?.setHours(25);
+    filtro.dataFim?.setHours(25);
 
     // 📌 Calculando o total
     const total = dadosFiltrados.reduce((acc, item) => {
@@ -470,18 +531,19 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         },
       },
     };
-
+    const dataInicio = filtro.dataInicio?.toLocaleDateString();
+    const dataFim =
+      filtro.dataFim?.toLocaleDateString() || new Date().toLocaleDateString();
+    console.log(dataInicio, dataFim, "data");
     pdfMake
       .createPdf(docDefinition)
-      .download(
-        `relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()}.pdf`,
-      );
+      .download(`relatorio_financeiro ${dataInicio} - ${dataFim}.pdf`);
 
     toast("Baixando Relátorio!", {
       description: (
         <div className="flex items-center">
           <DownloadIcon className="mr-2 text-white" />
-          <span>{`relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()} emitido em ${new Date().toLocaleString()}`}</span>
+          <span>{`relatorio_financeiro ${filtro.dataInicio?.toLocaleDateString()} - ${filtro.dataFim?.toLocaleDateString()} emitido em ${new Date().toLocaleString()}`}</span>
         </div>
       ),
       action: {
@@ -498,8 +560,8 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
   // Função para exportar para Excel
   const exportToExcel = () => {
     const filtro = filters;
-    filtro.dataInicio.setHours(25);
-    filtro.dataFim.setHours(25);
+    filtro.dataInicio?.setHours(25);
+    filtro.dataFim?.setHours(25);
     const worksheet = XLSX.utils.json_to_sheet(
       dadosFiltrados.map((item) => ({
         Data: item.datacompetencia
@@ -519,17 +581,20 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       })),
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
+    const dataInicio = filtro.dataInicio?.toLocaleDateString();
+    const dataFim =
+      filtro.dataFim?.toLocaleDateString() || new Date().toLocaleDateString();
+    console.log(dataInicio, dataFim, "data");
+    XLSX.utils.book_append_sheet(workbook, worksheet, `dados`);
+    XLSX.writeFile(
       workbook,
-      worksheet,
-      `relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()}.xlsx`,
+      `relatorio_financeiro ${dataInicio} ${dataFim}.xlsx`,
     );
-    XLSX.writeFile(workbook, "relatorio_financeiro.xlsx");
     toast("Baixando Relátorio Excel.", {
       description: (
         <div className="flex items-center">
           <DownloadIcon className="mr-2 text-white" />
-          <span>{`Relatorio_financeiro ${filtro.dataInicio.toLocaleDateString()} - ${filtro.dataFim.toLocaleDateString()} emitido em ${new Date().toLocaleString()}`}</span>
+          <span>{`Relatorio_financeiro ${filtro.dataInicio?.toLocaleDateString()} - ${filtro.dataFim?.toLocaleDateString()} emitido em ${new Date().toLocaleString()}`}</span>
         </div>
       ),
       action: {
@@ -554,8 +619,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       />
       <FileUploadDialog
         isOpen={isOpenAnexo}
-        onClose={() => setIsDialogOpen(false)}
-        financeiroId="0"
+        pasta="documentosEventos"
         dados={selectedRow || ({} as FinanceiroPropos)}
         setIsOpen={(isOpenAnexo: boolean) => setIsOpenAnexo(isOpenAnexo)}
       />
@@ -577,7 +641,9 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
           className={`w-50 h-20 rounded-sm text-2xl font-bold ${
             botaoSelecionado === "todos"
               ? "bg-blue-700 text-white"
-              : "bg-gray-200"
+              : botaoSelecionado === null
+                ? "bg-blue-700 text-white"
+                : "bg-gray-200"
           }`}
           onClick={mostrarTodos}
         >

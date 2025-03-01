@@ -7,6 +7,9 @@ const prisma = new PrismaClient();
 export const fetchFinanceiroEvento = async () => {
   return await prisma.financeiroEventos.findMany();
 };
+export const obterFinanceiroEventos = async () => {
+  return await prisma.financeiroEventos.findMany();
+};
 export const obterEventos = async (idEvento: number) => {
   return await prisma.eventosme.findUnique({
     where: { id: Number(idEvento) },

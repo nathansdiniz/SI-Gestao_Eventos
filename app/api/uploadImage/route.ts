@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import { db } from "@/app/_lib/prisma";
@@ -8,7 +7,9 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
-    const documentId = formData.get("documentId") as string; // ID do documento no banco
+    const documentId = formData.get("financeiroId") as string; // ID do documento no banco
+    const pasta = formData.get("pasta") as string;
+    console.log(documentId);
 
     if (!file || !documentId) {
       return NextResponse.json({
@@ -26,36 +27,41 @@ export async function POST(req: Request) {
     await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
 
     // Caminho relativo salvo no banco
-    const fileUrl = `/uploads/documentoEventos${file.name}`;
+    const fileUrl = `/uploads/${pasta}/id_${documentId}_${file.name}`;
 
     // Atualiza ou cria registro no banco de dados
-    const existingDocument = await db.financeiroEventos.findUnique({
-      where: { id: Number(documentId) },
-    });
+    if (pasta === "documentosEventos") {
+      const existingDocument = await db.financeiroEventos.findUnique({
+        where: { id: Number(documentId) },
+      });
+      const anexos = (existingDocument?.documentos_anexados as string[]) || [];
 
-    if (existingDocument) {
+      anexos.push(fileUrl);
       // Atualiza documentos_anexados se já existir
       await db.financeiroEventos.update({
         where: { id: Number(documentId) },
         data: {
-          documentos_anexados: {
-            push: fileUrl, // Adiciona ao array existente
-          },
+          documentos_anexados: anexos,
         },
       });
-    } else {
-      // Cria um novo registro caso não exista
-      await db.financeiroEventos.create({
+    } else if (pasta === "documentosFinanceiros") {
+      const existingDocument = await db.financeiroME.findUnique({
+        where: { id: Number(documentId) },
+      });
+      const anexos = (existingDocument?.documentos_anexados as string[]) || [];
+
+      anexos.push(fileUrl);
+      // Atualiza documentos_anexados se já existir
+
+      await db.financeiroME.update({
+        where: { id: Number(documentId) },
         data: {
-          id: Number(documentId),
-          documentos_anexados: { fileUrl }, // Cria um array com o primeiro item
+          documentos_anexados: anexos,
         },
       });
     }
 
-    revalidatePath("/");
-
-    return NextResponse.json({ status: "success", fileUrl });
+    return NextResponse.json({ status: "success", file: fileUrl });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ status: "fail", error: e });

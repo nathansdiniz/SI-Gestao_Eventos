@@ -38,73 +38,44 @@ const LoginPage = async () => {
                 style={{ stopColor: "#DAA520", stopOpacity: 1 }}
               />
             </linearGradient>
-
-            {/* Filtro de onda */}
-            <filter
-              id="waveFilter"
-              x="-20%"
-              y="-20%"
-              width="140%"
-              height="140%"
-            >
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency="0.01 0.01"
-                numOctaves="3"
-                seed="1"
-                result="turbulence"
-              >
-                <animate
-                  attributeName="baseFrequency"
-                  values="0.01 0.01; 0.02 0.02; 0.01 0.01"
-                  dur="10s"
-                  repeatCount="indefinite"
-                />
-              </feTurbulence>
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="turbulence"
-                xChannelSelector="R"
-                yChannelSelector="G"
-                scale="20"
-              />
-            </filter>
           </defs>
 
           {/* Fundo preto */}
           <rect width="100%" height="100%" fill="#000000" />
 
-          {/* Primeira onda dourada com filtro e animação de forma */}
+          {/* Primeira onda dourada */}
           <path
-            fill="url(#goldGradient)"
-            d="M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350 Z"
-            filter="url(#waveFilter)"
+            fill="none"
+            stroke="url(#goldGradient)"
+            strokeWidth="4" // Aumenta a espessura da onda
+            d="M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350" // Ajusta a posição da onda
           >
             <animate
               attributeName="d"
               values="
-                M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350 Z;
-                M0,360 C200,310 400,410 600,360 C800,310 1000,410 1200,360 C1400,310 1600,410 1800,360 Z;
-                M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350 Z"
-              dur="10s"
+                M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350;
+                M0,360 C200,310 400,410 600,360 C800,310 1000,410 1200,360 C1400,310 1600,410 1800,360;
+                M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350"
+              dur="10s" // Aumenta a duração da animação
               repeatCount="indefinite"
               keyTimes="0; 0.5; 1"
             />
           </path>
 
-          {/* Segunda onda dourada com filtro e animação de forma */}
+          {/* Segunda onda dourada */}
           <path
-            fill="url(#goldGradient)"
-            d="M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500 Z"
-            filter="url(#waveFilter)"
+            fill="none"
+            stroke="url(#goldGradient)"
+            strokeWidth="4" // Aumenta a espessura da onda
+            d="M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500" // Ajusta a posição da onda
           >
             <animate
               attributeName="d"
               values="
-                M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500 Z;
-                M0,510 C200,460 400,560 600,510 C800,460 1000,560 1200,510 C1400,460 1600,560 1800,510 Z;
-                M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500 Z"
-              dur="12s"
+                M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500;
+                M0,510 C200,460 400,560 600,510 C800,460 1000,560 1200,510 C1400,460 1600,560 1800,510;
+                M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500"
+              dur="12s" // Aumenta a duração da animação (diferente da primeira onda)
               repeatCount="indefinite"
               keyTimes="0; 0.5; 1"
             />

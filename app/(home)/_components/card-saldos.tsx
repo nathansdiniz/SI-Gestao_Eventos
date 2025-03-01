@@ -29,13 +29,19 @@ const CardSaldos = ({
 }: CardResumidProps) => {
   return (
     <Card>
-      <CardHeader className="flew-row items-start gap-4">
-        <p
-          className={`${size === "small" ? "text-muted-foreground" : "text-white opacity-70"}`}
-        >
+      <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <div className="flex flex-row items-center gap-2">
           {icon}
-          Saldos Atuais
-        </p>
+          <p
+            className={`${
+              size === "small"
+                ? "text-muted-foreground"
+                : "text-white opacity-70"
+            }`}
+          >
+            Saldos Atuais
+          </p>
+        </div>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col items-center">

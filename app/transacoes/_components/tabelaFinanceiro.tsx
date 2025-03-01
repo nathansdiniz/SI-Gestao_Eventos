@@ -538,6 +538,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       />
       <FileUploadDialog
         isOpen={isOpenAnexo}
+        pasta="documentosFinanceiros"
         dados={selectedRow || ({} as FinanceiroPropos)}
         setIsOpen={(isOpenAnexo: boolean) => setIsOpenAnexo(isOpenAnexo)}
       />

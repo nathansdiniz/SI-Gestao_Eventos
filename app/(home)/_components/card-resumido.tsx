@@ -18,13 +18,19 @@ const CardResumido = ({
 }: CardResumidProps) => {
   return (
     <Card className="flew-row justify-items-center gap-4">
-      <CardHeader className="flew-row justify-items-center gap-4">
-        {icon}
-        <p
-          className={`${size === "small" ? "text-muted-foreground" : "text-white opacity-70"}`}
-        >
-          {title}
-        </p>
+      <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <div className="flex flex-row items-center gap-2">
+          {icon}
+          <p
+            className={`${
+              size === "small"
+                ? "text-muted-foreground"
+                : "text-white opacity-70"
+            }`}
+          >
+            {title}
+          </p>
+        </div>
         {size === "large" ? <BotaoAdicionarFinancas /> : null}
       </CardHeader>
       <CardContent className="flex justify-between">

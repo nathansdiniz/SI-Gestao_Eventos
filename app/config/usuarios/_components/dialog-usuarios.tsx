@@ -51,7 +51,6 @@ export const UpsertUserDialog = ({
   children,
   defaultValues,
   isEdit,
-  onClose,
 }: UpsertUserDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const title = isEdit ? "Editar Usuário" : "Criar Novo Usuário";

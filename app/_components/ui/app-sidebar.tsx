@@ -23,7 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/app/_components/ui/sidebar";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getEmpresas } from "@/app/_actions/criar-atualizarEmpresas";
 
@@ -83,7 +83,6 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const pathname = usePathname();
   const empresaAtual = useSearchParams().get("src");
   const [empresas, setEmpresas] = useState<
     {

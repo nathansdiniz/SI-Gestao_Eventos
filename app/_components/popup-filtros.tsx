@@ -9,6 +9,7 @@ import { FilterIcon } from "lucide-react";
 import { useState } from "react";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { Input } from "@/app/_components/ui/input";
+import { MoneyInput } from "./ui/money-input";
 
 interface Pop_upFiltrosProps {
   onFilterChange: (filters: FilterState) => void;
@@ -62,36 +63,48 @@ const Pop_upFiltros = ({ onFilterChange }: Pop_upFiltrosProps) => {
           Filtros
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] space-y-4">
-        <div>
-          <h3 className="text-md font-bold">Filtros</h3>
+      <PopoverContent className="w-60 space-y-2">
+        <div className="space-y-2">
+          <h3 className="text-md text-center font-bold">Filtros</h3>
         </div>
         <div className="flex flex-col gap-4">
+          <label className="text-xs font-bold" htmlFor="descricao">
+            Descrição:
+          </label>
           <Input
             type="text"
             placeholder="Descrição"
             value={filters.descricao || ""}
             onChange={(e) => handleFilterChange("descricao", e.target.value)}
           />
+          <label className="text-xs font-bold" htmlFor="informede">
+            Cliente:
+          </label>
           <Input
             type="text"
             placeholder="Cliente"
             value={filters.informede || ""}
             onChange={(e) => handleFilterChange("informede", e.target.value)}
           />
+          <label className="text-xs font-bold" htmlFor="Evento">
+            Evento:
+          </label>
           <Input
             type="text"
             placeholder="Evento"
             value={filters.evento || ""}
             onChange={(e) => handleFilterChange("evento", e.target.value)}
           />
-          <Input
-            type="text"
-            placeholder="Valor"
+          <label className="text-xs font-bold" htmlFor="Valor">
+            Valor:
+          </label>
+          <MoneyInput
             value={filters.valor || ""}
             onChange={(e) => handleFilterChange("valor", e.target.value)}
           />
-          <label htmlFor="tipo">Tipo:</label>
+          <label className="text-xs font-bold" htmlFor="tipo">
+            Tipo de Pagamento:
+          </label>
           <select
             id="tipo"
             className="w-full rounded-sm border bg-black p-1 text-white"
@@ -103,30 +116,38 @@ const Pop_upFiltros = ({ onFilterChange }: Pop_upFiltrosProps) => {
             <option value="Despesa">Saídas</option>
             <option value="null">Outros</option>
           </select>
-          <label htmlFor="status">Status:</label>
+          <label className="text-xs font-bold" htmlFor="pago">
+            Status Pagamento:
+          </label>
           <select
-            id="status"
+            id="pago"
             className="w-full rounded-sm border bg-black p-1 text-white"
-            value={filters.status || ""}
-            onChange={(e) => handleFilterChange("status", e.target.value)}
+            value={filters.pago || ""}
+            onChange={(e) => handleFilterChange("pago", e.target.value)}
           >
             <option value="">Todos</option>
             <option value="sim">Pago</option>
             <option value="nao">Pendente</option>
           </select>
-          <Input
-            type="text"
-            placeholder="Pagamento"
-            value={filters.pago || ""}
-            onChange={(e) => handleFilterChange("pago", e.target.value)}
-          />
-          <Input
-            type="text"
-            placeholder="Validação"
+
+          <label className="text-xs font-bold" htmlFor="status">
+            Validação:
+          </label>
+          <select
+            id="status"
+            className="w-full rounded-sm border bg-black p-1 text-white"
             value={filters.validacao || ""}
             onChange={(e) => handleFilterChange("validacao", e.target.value)}
-          />
-          <label htmlFor="dataInicio">Data Início:</label>
+          >
+            <option value="">Todos</option>
+            <option value="Em espera">Em Espera</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Aprovado">Aprovado</option>
+            <option value="Reprovado">Reprovado</option>
+          </select>
+          <label className="text-xs font-bold" htmlFor="dataInicio">
+            Data Início:
+          </label>
           <Input
             type="date"
             id="dataInicio"
@@ -140,7 +161,9 @@ const Pop_upFiltros = ({ onFilterChange }: Pop_upFiltrosProps) => {
               handleFilterChange("dataInicio", new Date(e.target.value))
             }
           />
-          <label htmlFor="dataFim">Data Fim:</label>
+          <label className="text-xs font-bold" htmlFor="dataFim">
+            Data Fim:
+          </label>
           <Input
             type="date"
             id="dataFim"

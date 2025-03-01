@@ -125,6 +125,15 @@ const minhasTransações = async () => {
   return dadosConvertidos;
 };
 
+export const obterdados1Financeiro = async (id: number | null) => {
+  console.log(id, "aquiiiiii");
+  return await db.financeiroME.findMany({
+    where: {
+      id: Number(id),
+    },
+  });
+};
+
 export const FinancasEventoPagarReceber = async () => {
   const { userId } = auth();
   if (!userId) {

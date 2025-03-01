@@ -9,6 +9,7 @@ import { obterDashboard } from "../_data/obter-dados-dashboard";
 import GastosCategoria from "./_components/tabelaGastos";
 import UltimasTransacoes from "./_components/ultimas-transacoes";
 import BotaoVoltar from "../_components/botao-voltar";
+import CardTabelaFinancas from "../_components/card-tabela";
 
 interface HomeProps {
   searchParams: {
@@ -70,6 +71,20 @@ const Home = async ({ searchParams: { mes, src } }: HomeProps) => {
             <div className="h-full p-4">
               <UltimasTransacoes
                 ultimasTransacoes={dashboard.ultimasTransacoes}
+              />
+            </div>
+            <div className="h-full p-4">
+              <CardTabelaFinancas
+                ultimasTransacoes={dashboard.ultimasTransacoesEspera}
+                titulo="Transações Em Espera"
+                redirecionar={"/transactions"}
+              />
+            </div>
+            <div className="h-full p-4">
+              <CardTabelaFinancas
+                ultimasTransacoes={dashboard.ultimasTransacoesPendentes}
+                titulo="Transações Pendentes"
+                redirecionar={"/transactions"}
               />
             </div>
           </div>

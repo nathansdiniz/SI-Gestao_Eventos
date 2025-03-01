@@ -46,7 +46,45 @@ export interface FinanceiroPropos {
   documentos_anexados: object | null;
   userID: string | null;
 }
+// Create the new interfaces
+export interface EventoPropos {
+  id: number;
+  nomeEvento: string | null;
+  dataInicio: Date | null;
+  dataFim: Date | null;
+  local: string | null;
+  descricao: string | null;
+  id_empresa: number | null;
+  userID: string | null;
+}
 
+export interface ClientePropos {
+  id: number;
+  nomeCliente: string | null;
+  telefone: string | null;
+  email: string | null;
+  cpf_cnpj: string | null;
+  endereco: string | null;
+  cidade: string | null;
+  estado: string | null;
+  pais: string | null;
+  id_empresa: number | null;
+  userID: string | null;
+}
+
+export interface FornecedorPropos {
+  id: number;
+  nomeFornecedor: string | null;
+  telefone: string | null;
+  email: string | null;
+  cnpj: string | null;
+  endereco: string | null;
+  cidade: string | null;
+  estado: string | null;
+  pais: string | null;
+  id_empresa: number | null;
+  userID: string | null;
+}
 export const formSchemaFinanceiro = z.object({
   id: z.number().optional(),
   evento: z.string().nullable(),
@@ -91,3 +129,22 @@ export const formSchemaFinanceiro = z.object({
   periodo_final: z.date().nullable(),
   documentos_anexados: z.object({}).nullable(),
 });
+
+export interface FinanceiroPropsRelatorio {
+  id?: string;
+  idevento?: number;
+  datacompetencia?: string;
+  descricao?: string;
+  tipocobranca?: string;
+  informede?: string;
+  evento?: string;
+  pago?: string;
+  datapagamento?: string;
+  valor?: string;
+  validacao?: string;
+  data_criacao?: string;
+  ultima_alteracao_validacao?: string;
+  parcelas?: any;
+  mododepagamento?: string;
+  categoria?: string;
+}

@@ -4,7 +4,14 @@ import CardMenu from "@/app/_components/cards-menu";
 import Layout from "@/app/_components/slide-bar";
 import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
-import { InfoIcon, Receipt, Users } from "lucide-react";
+import {
+  Contact2Icon,
+  FilesIcon,
+  InfoIcon,
+  ListChecksIcon,
+  Receipt,
+  Users,
+} from "lucide-react";
 import { getEventData } from "@/app/_actions/eventos";
 
 interface Props {
@@ -91,42 +98,69 @@ const PaginaInformacoesEvento = async ({ params: { id } }: Props) => {
               <div className="grid grid-cols-1 gap-6 p-4 sm:grid-cols-1 lg:grid-cols-3">
                 <CardMenu
                   title="Informações Gerais"
-                  icon={<InfoIcon size={84}></InfoIcon>}
+                  icon={
+                    <InfoIcon
+                      size={84}
+                      className="rounded-sm bg-blue-700 text-white"
+                    ></InfoIcon>
+                  }
                   descricao="Adicione informações gerais."
                   redirecionar={`/eventos/${id}/informacoes-gerais/?view=${id}`}
                   size="large"
                 ></CardMenu>
                 <CardMenu
                   title="Financeiro"
-                  icon={<Receipt size={84} />}
+                  icon={
+                    <Receipt
+                      size={84}
+                      className="rounded-sm bg-yellow-200 text-white"
+                    />
+                  }
                   descricao="Gerencie todas as movimentações financeiras do evento."
                   redirecionar={`/eventos/${id}/financeiro/?view=${id}`}
                   size="large"
                 ></CardMenu>
                 <CardMenu
                   title="Fornecedores"
-                  icon={<Users size={84} />}
+                  icon={
+                    <Contact2Icon
+                      size={84}
+                      className="rounded-sm bg-white text-black"
+                    />
+                  }
                   descricao="Todos os fornecedores relacionados ao Evento."
                   redirecionar={`/eventos/${id}/fornecedores`}
                   size="large"
                 ></CardMenu>
                 <CardMenu
                   title="Validação"
-                  icon={<Users size={84} />}
+                  icon={
+                    <ListChecksIcon
+                      size={84}
+                      className="rounded-sm bg-green-800"
+                    />
+                  }
                   descricao="Todos as validações relacionados ao Evento."
                   redirecionar={`/eventos/${id}/validacao/?view=${id}`}
                   size="large"
                 ></CardMenu>
                 <CardMenu
                   title="Documentos"
-                  icon={<Users size={84} />}
+                  icon={
+                    <FilesIcon size={84} className="rounded-sm bg-yellow-700" />
+                  }
                   descricao="Todos os documentos relacionados ao Evento."
                   redirecionar={`/eventos/${id}/documentos`}
                   size="large"
                 ></CardMenu>
                 <CardMenu
                   title="Historicos"
-                  icon={<Users size={84} />}
+                  icon={
+                    <Users
+                      size={84}
+                      className="rounded-sm bg-white text-black"
+                    />
+                  }
                   descricao="Todos os historicos relacionados ao Evento."
                   redirecionar={`/eventos/${id}/historicos`}
                   size="large"

@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ptBR } from "@clerk/localizations";
 import { dark } from "@clerk/themes";
+import CheckUserDialog from "./_components/dialog-verificarUsuario";
 
 const mulish = Mulish({
   subsets: ["latin-ext"],
@@ -28,6 +29,7 @@ export default function RootLayout({
             baseTheme: dark,
           }}
         >
+          <CheckUserDialog />
           {children}
         </ClerkProvider>
       </body>

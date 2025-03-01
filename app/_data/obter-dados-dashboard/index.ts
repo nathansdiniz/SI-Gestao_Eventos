@@ -84,6 +84,18 @@ export const obterDashboard = async (mes: string, empresa: string) => {
     orderBy: { datacompetencia: "desc" },
     take: 10,
   });
+  const ultimasTransacoesEspera = await db.financeiroME.findMany({
+    where: { ...where, validacao: "Em espera" },
+    orderBy: { datacompetencia: "desc" },
+    take: 15,
+  });
+
+  // Correctly filter for "Pendente"
+  const ultimasTransacoesPendentes = await db.financeiroME.findMany({
+    where: { ...where, validacao: "Pendente" }, // This is now correct
+    orderBy: { datacompetencia: "desc" },
+    take: 15,
+  });
   const saldo_previstoSaidas = Number(
     (
       await db.financeiroME.aggregate({
@@ -119,5 +131,11 @@ export const obterDashboard = async (mes: string, empresa: string) => {
     saldo_previstoEntradas,
     saldo_previstoSaidas,
     ultimasTransacoes: JSON.parse(JSON.stringify(ultimasTransacoes)),
+    ultimasTransacoesEspera: JSON.parse(
+      JSON.stringify(ultimasTransacoesEspera),
+    ),
+    ultimasTransacoesPendentes: JSON.parse(
+      JSON.stringify(ultimasTransacoesPendentes),
+    ),
   };
 };

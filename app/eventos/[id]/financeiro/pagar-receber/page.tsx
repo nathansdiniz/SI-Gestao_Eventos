@@ -76,7 +76,7 @@ const Financeiro = async ({ params: { id } }: Props) => {
             Contas A Pagar e A Receber
           </h1>
           <CardResumo mes="12" {...dashboard} />
-          <div className="flex space-x-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <TabelaContas
               titulo="A Receber"
               dadosfinanceiros={dadosfinanceiros.filter(

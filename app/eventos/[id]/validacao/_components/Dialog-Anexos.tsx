@@ -19,10 +19,12 @@ import {
 import { Button } from "@/app/_components/ui/button";
 import { FinanceiroPropos } from "@/app/_props";
 import { obterdados1FinanceiroEvento } from "@/app/_actions/eventos/financeiro";
+import { obterdados1Financeiro } from "@/app/_actions/criar-atualizarFinanceiro";
 
 interface FinanceiroDialogProps {
   isOpen: boolean;
   dados: FinanceiroPropos;
+  pasta: string;
   setIsOpen: (isOpen: boolean) => void;
 }
 
@@ -30,6 +32,7 @@ const FileUploadDialog = ({
   dados,
   isOpen,
   setIsOpen,
+  pasta,
 }: FinanceiroDialogProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileList, setFileList] = useState<string[]>([]);
@@ -37,7 +40,10 @@ const FileUploadDialog = ({
   // Função para buscar os arquivos existentes
   const fetchFiles = async () => {
     try {
-      const response = await obterdados1FinanceiroEvento(dados.id);
+      const response =
+        pasta === "documentosEventos"
+          ? await obterdados1FinanceiroEvento(dados.id)
+          : await obterdados1Financeiro(dados.id);
       const data = response?.[0]?.documentos_anexados;
 
       if (data) {
@@ -68,6 +74,7 @@ const FileUploadDialog = ({
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("financeiroId", dados.id.toString());
+    formData.append("pasta", pasta);
 
     try {
       const response = await fetch("/api/uploadImage", {
@@ -84,7 +91,7 @@ const FileUploadDialog = ({
       const data = await response.json();
       console.log("Resposta da API:", data);
 
-      if (!data.files || !Array.isArray(data.files)) {
+      if (data.status !== "sucess") {
         console.error("Resposta inesperada da API:", data);
         alert("Erro ao processar os arquivos.");
         return;

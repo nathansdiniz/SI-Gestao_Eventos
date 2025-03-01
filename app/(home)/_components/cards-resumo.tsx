@@ -1,5 +1,10 @@
 "use client";
-import { TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
+import {
+  HandCoinsIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
+  WalletIcon,
+} from "lucide-react";
 import CardResumido from "./card-resumido";
 import CardSaldos from "./card-saldos";
 
@@ -12,6 +17,7 @@ interface CardResumo {
   saldo_previstoEntradas: number;
   saldo_previstoSaidas: number;
   gastosTotal: number;
+  saldoEvento?: number;
 }
 
 const CardResumo = ({
@@ -21,13 +27,14 @@ const CardResumo = ({
   saldo_previsto,
   saldo_previstoEntradas,
   saldo_previstoSaidas,
+  saldoEvento,
 }: CardResumo) => {
   return (
     <>
       <div className="space-y-6">
         {/*Primeiro Card*/}
         <CardSaldos
-          icon={<WalletIcon size={16} />}
+          icon={<WalletIcon size={30} className="text-blue-500" />}
           title1="Saldo Real             "
           saldo1={saldo}
           title2="Provisonamento de Saldo"
@@ -39,14 +46,27 @@ const CardResumo = ({
           size="large"
         />
 
-        <div className="grid grid-cols-2 gap-6">
+        <div
+          className={
+            saldoEvento === null || saldoEvento === undefined
+              ? "grid grid-cols-2 gap-6"
+              : "grid grid-cols-3 gap-3"
+          }
+        >
+          {saldoEvento != null || saldoEvento != undefined ? (
+            <CardResumido
+              icon={<HandCoinsIcon size={26} className="text-yellow-500" />}
+              title="Saldo do Evento"
+              amount={saldoEvento}
+            />
+          ) : null}
           <CardResumido
-            icon={<TrendingUpIcon size={16} className="text-green-500" />}
+            icon={<TrendingUpIcon size={26} className="text-green-500" />}
             title="Entradas"
             amount={depositoTotal}
           />
           <CardResumido
-            icon={<TrendingDownIcon size={16} className="text-red-500" />}
+            icon={<TrendingDownIcon size={26} className="text-red-500" />}
             title="Saídas"
             amount={gastosTotal}
           />
