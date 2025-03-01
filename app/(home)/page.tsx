@@ -43,7 +43,7 @@ const Home = async ({ searchParams: { mes, src } }: HomeProps) => {
           <div className="flex flex-col justify-between md:flex-row">
             <h1 className="text-4xl font-bold">Dashboard</h1>
             <div className="mt-2 flex gap-4 md:mt-0">
-              <SelecionarMes />
+              <SelecionarMes key={mes} />
             </div>
           </div>
 

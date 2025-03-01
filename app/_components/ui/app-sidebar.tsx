@@ -1,3 +1,4 @@
+"use client";
 import {
   Calendar,
   Home,
@@ -22,6 +23,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/app/_components/ui/sidebar";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getEmpresas } from "@/app/_actions/criar-atualizarEmpresas";
 
 // Menu items.
 const items = [
@@ -79,11 +83,34 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const pathname = usePathname();
+  const empresaAtual = useSearchParams().get("src");
+  const [empresas, setEmpresas] = useState<
+    {
+      id: number;
+      empresa: string;
+    }[]
+  >([]);
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const res = await getEmpresas();
+        setEmpresas(res);
+      } catch (error) {
+        console.error("Erro ao buscar empresas:", error);
+      }
+    };
+
+    fetchEmpresas();
+  }, []);
+  const empresaSelecionada = empresas.find(
+    (empresa) => empresa.id === Number(empresaAtual),
+  );
   return (
     <Sidebar>
       <SidebarHeader>
         <Image
-          src="/grupo in hub.png"
+          src={`/LOGO ${empresaSelecionada?.empresa || "grupo in hub"}.png`}
           alt="logo grupo in hub"
           width={70}
           height={20}

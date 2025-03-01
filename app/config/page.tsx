@@ -23,7 +23,7 @@ const ConfiguracoesPage = () => {
             title="Usuários"
             icon={<Users size={84} />}
             descricao="Gerencie todos os usuários."
-            redirecionar="/config/"
+            redirecionar="/config/usuarios"
             size="large"
           ></CardMenu>
           <CardMenu

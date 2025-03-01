@@ -22,53 +22,89 @@ const LoginPage = async () => {
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient
+              id="goldGradient"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
               <stop
                 offset="0%"
-                style={{ stopColor: "#000000", stopOpacity: 1 }}
+                style={{ stopColor: "#FFD700", stopOpacity: 1 }}
               />
               <stop
                 offset="100%"
-                style={{ stopColor: "#FFD700", stopOpacity: 1 }}
+                style={{ stopColor: "#DAA520", stopOpacity: 1 }}
               />
             </linearGradient>
+
+            {/* Filtro de onda */}
+            <filter
+              id="waveFilter"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.01 0.01"
+                numOctaves="3"
+                seed="1"
+                result="turbulence"
+              >
+                <animate
+                  attributeName="baseFrequency"
+                  values="0.01 0.01; 0.02 0.02; 0.01 0.01"
+                  dur="10s"
+                  repeatCount="indefinite"
+                />
+              </feTurbulence>
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="turbulence"
+                xChannelSelector="R"
+                yChannelSelector="G"
+                scale="20"
+              />
+            </filter>
           </defs>
 
-          {/* Primeira onda */}
+          {/* Fundo preto */}
+          <rect width="100%" height="100%" fill="#000000" />
+
+          {/* Primeira onda dourada com filtro e animação de forma */}
           <path
-            fill="url(#gradient)"
-            d="M0,400 Q200,300 400,400 T800,400 T1200,400 T1600,400 V800 H0 Z"
+            fill="url(#goldGradient)"
+            d="M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350 Z"
+            filter="url(#waveFilter)"
           >
             <animate
               attributeName="d"
               values="
-                M0,400 Q200,300 400,400 T800,400 T1200,400 T1600,400 V800 H0 Z;
-                M0,420 Q200,320 400,420 T800,420 T1200,420 T1600,420 V800 H0 Z;
-                M0,400 Q200,300 400,400 T800,400 T1200,400 T1600,400 V800 H0 Z"
-              dur="6s"
+                M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350 Z;
+                M0,360 C200,310 400,410 600,360 C800,310 1000,410 1200,360 C1400,310 1600,410 1800,360 Z;
+                M0,350 C200,300 400,400 600,350 C800,300 1000,400 1200,350 C1400,300 1600,400 1800,350 Z"
+              dur="10s"
               repeatCount="indefinite"
               keyTimes="0; 0.5; 1"
             />
           </path>
 
-          {/* Área preta entre as ondas */}
+          {/* Segunda onda dourada com filtro e animação de forma */}
           <path
-            fill="#000000"
-            d="M0,400 Q200,300 400,400 T800,400 T1200,400 T1600,400 V800 H0 Z"
-          />
-
-          {/* Segunda onda com animação diferente */}
-          <path
-            fill="url(#gradient)"
-            d="M0,500 Q200,450 400,500 T800,500 T1200,500 T1600,500 V800 H0 Z"
+            fill="url(#goldGradient)"
+            d="M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500 Z"
+            filter="url(#waveFilter)"
           >
             <animate
               attributeName="d"
               values="
-                M0,500 Q200,450 400,500 T800,500 T1200,500 T1600,500 V800 H0 Z;
-                M0,520 Q200,470 400,520 T800,520 T1200,520 T1600,520 V800 H0 Z;
-                M0,500 Q200,450 400,500 T800,500 T1200,500 T1600,500 V800 H0 Z"
-              dur="8s"
+                M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500 Z;
+                M0,510 C200,460 400,560 600,510 C800,460 1000,560 1200,510 C1400,460 1600,560 1800,510 Z;
+                M0,500 C200,450 400,550 600,500 C800,450 1000,550 1200,500 C1400,450 1600,550 1800,500 Z"
+              dur="12s"
               repeatCount="indefinite"
               keyTimes="0; 0.5; 1"
             />
