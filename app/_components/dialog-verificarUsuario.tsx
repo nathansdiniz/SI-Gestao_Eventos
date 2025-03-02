@@ -35,7 +35,7 @@ const CheckUserDialog = () => {
     if (userData) {
       console.log("User Data:", userData);
       if (!userData.id_empresa) {
-        router.push("/select-empresa");
+        router.push("/login");
       } else {
         router.push("/");
         setIsOpen(false);
