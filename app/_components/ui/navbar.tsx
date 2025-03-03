@@ -1,5 +1,5 @@
 "use client";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { SidebarTrigger } from "./sidebar";
@@ -11,6 +11,13 @@ import { getEmpresas } from "@/app/_actions/criar-atualizarEmpresas";
 const Navbar = () => {
   const pathname = usePathname();
   const empresaAtual = useSearchParams().get("src");
+  const { user, isLoaded } = useUser();
+  let publicMetadata;
+  if (isLoaded) {
+    publicMetadata = user?.publicMetadata;
+    console.log(publicMetadata);
+  }
+
   const [empresas, setEmpresas] = useState<
     {
       id: number;
@@ -86,7 +93,10 @@ const Navbar = () => {
       </div>
 
       <div className="mt-4 flex items-center gap-2 md:mt-0 md:gap-4">
-        <SelecionarEmpresa />
+        {Number(publicMetadata?.nivelUsuario) === 11 ||
+        Number(publicMetadata?.nivelUsuario) === 12 ? (
+          <SelecionarEmpresa />
+        ) : null}
         <UserButton showName />
       </div>
     </nav>

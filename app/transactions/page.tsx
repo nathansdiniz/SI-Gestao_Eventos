@@ -2,6 +2,7 @@ import AddTransactionButton from "../_components/add-transaction-button";
 import Layout from "../_components/slide-bar";
 import minhasTransações from "../_actions/criar-atualizarFinanceiro";
 import TabelaFinanceira from "../_components/tabelaFinanceiro";
+import CheckUserDialog from "../_components/dialog-verificarUsuario";
 
 const TransactionsPage = async () => {
   try {
@@ -9,7 +10,7 @@ const TransactionsPage = async () => {
     return (
       <>
         <Layout>
-          {" "}
+          <CheckUserDialog redirecionar="transacoes"></CheckUserDialog>{" "}
           <>
             <div className="space-y-6 overflow-hidden p-6">
               {/* TÍTULO E BOTÃO */}

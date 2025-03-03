@@ -4,6 +4,7 @@ import { empresasColumns } from "./_colums/index.tsx";
 import AdicionarEmpresasButton from "./_components/add-empresas";
 import BotaoVoltar from "@/app/_components/botao-voltar";
 import { PrismaClient } from "@prisma/client";
+import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
 const db = new PrismaClient();
 const invoices = await db.empresas.findMany();
@@ -12,6 +13,7 @@ console.log(invoices);
 const Empresas = () => {
   return (
     <Layout>
+      <CheckUserDialog redirecionar="empresas"></CheckUserDialog>
       <div className="relative w-full space-y-6 p-6">
         <BotaoVoltar redirecionar="/administrativo"></BotaoVoltar>
         <div className="flex justify-between">

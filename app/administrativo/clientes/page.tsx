@@ -4,6 +4,7 @@ import { ClientesColumns } from "./_columns";
 import BotaoVoltar from "@/app/_components/botao-voltar";
 import { db } from "@/app/_lib/prisma";
 import AdicionarClienteButton from "./_components/add-Cliente";
+import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
 const Clientes = async () => {
   const invoices = await db.clientes.findMany();
@@ -11,6 +12,7 @@ const Clientes = async () => {
   return (
     <>
       <Layout>
+        <CheckUserDialog redirecionar="clientes"></CheckUserDialog>
         <div className="space-y-6 p-6">
           <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
           <div className="flex justify-between">

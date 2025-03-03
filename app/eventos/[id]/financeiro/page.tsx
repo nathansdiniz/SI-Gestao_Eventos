@@ -6,6 +6,7 @@ import { FinancasdoEvento } from "@/app/_actions/criar-atualizarFinanceiro";
 import BotaoVoltar from "@/app/_components/botao-voltar";
 import BotaoRedirecionar from "@/app/_components/ui/botao-redirecionar";
 import { SquareArrowOutUpRightIcon } from "lucide-react";
+import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
 interface Props {
   params: {
@@ -23,6 +24,7 @@ const Financeiro = async ({ params: { id } }: Props) => {
   return (
     <>
       <Layout>
+        <CheckUserDialog redirecionar="financeiroEvento"></CheckUserDialog>
         <div className="space-y-6 p-6">
           {/* Botão Voltar */}
           <div>

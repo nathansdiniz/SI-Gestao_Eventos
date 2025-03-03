@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { getEventData } from "@/app/_actions/eventos";
+import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
 interface Props {
   params: {
@@ -27,6 +28,7 @@ const PaginaInformacoesEvento = async ({ params: { id } }: Props) => {
   return (
     <>
       <Layout>
+        <CheckUserDialog redirecionar="detalhesEvento"></CheckUserDialog>
         <main>
           <div className="relative w-full space-y-4 p-4">
             <BotaoVoltar redirecionar="/eventos"></BotaoVoltar>

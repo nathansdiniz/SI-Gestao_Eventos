@@ -587,6 +587,7 @@ const EditDialogFinancas = ({
               <Button type="submit" size={"lg"}>
                 {isUpdate ? "Atualizar" : "Adicionar"}
               </Button>
+              <svg href="@/app/public/carregando.svg"></svg>
             </DialogFooter>
           </form>
         </Form>

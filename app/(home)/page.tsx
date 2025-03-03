@@ -10,6 +10,7 @@ import GastosCategoria from "./_components/tabelaGastos";
 import UltimasTransacoes from "./_components/ultimas-transacoes";
 import BotaoVoltar from "../_components/botao-voltar";
 import CardTabelaFinancas from "../_components/card-tabela";
+import CheckUserDialog from "../_components/dialog-verificarUsuario";
 
 interface HomeProps {
   searchParams: {
@@ -39,6 +40,7 @@ const Home = async ({ searchParams: { mes, src } }: HomeProps) => {
       <Layout>
         <div className="space-y-6 p-6">
           <BotaoVoltar redirecionar="/menu" />
+          <CheckUserDialog redirecionar="dashboard" />
 
           {/* Cabeçalho */}
           <div className="flex flex-col justify-between md:flex-row">

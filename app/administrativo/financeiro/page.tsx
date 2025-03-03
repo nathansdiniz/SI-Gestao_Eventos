@@ -6,6 +6,7 @@ import BotaoVoltar from "@/app/_components/botao-voltar";
 import { db } from "@/app/_lib/prisma";
 import BotaoRedirecionar from "@/app/_components/ui/botao-redirecionar";
 import { SquareArrowOutUpRightIcon } from "lucide-react";
+import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
 const Financeiro = async () => {
   const { userId } = auth();
@@ -52,6 +53,7 @@ const Financeiro = async () => {
     <>
       <Layout>
         <div className="space-y-6 p-6">
+          <CheckUserDialog redirecionar="financeiroGeral"></CheckUserDialog>
           {/* Botão Voltar */}
           <div>
             <BotaoVoltar redirecionar="/administrativo" />

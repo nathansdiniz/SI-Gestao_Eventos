@@ -2,10 +2,12 @@ import Layout from "@/app/_components/slide-bar";
 import { Building2Icon, Receipt, Users } from "lucide-react";
 import CardMenu from "./_components/cards-menu";
 import BotaoVoltar from "../_components/botao-voltar";
+import CheckUserDialog from "../_components/dialog-verificarUsuario";
 
 const Empresas = () => {
   return (
     <Layout>
+      <CheckUserDialog redirecionar="menuAdministrativo" />
       <div className="relative w-full space-y-6 p-6">
         <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
         <div className="flex justify-center p-10">

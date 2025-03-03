@@ -4,6 +4,7 @@ import BotaoVoltar from "@/app/_components/botao-voltar";
 import { db } from "@/app/_lib/prisma";
 import AdicionarFornecedorButton from "./_components/add-funcionario";
 import { fornecedoresColumns } from "./_columns";
+import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
 const Fornecedores = async () => {
   const invoices = await db.fornecedores.findMany();
@@ -11,6 +12,7 @@ const Fornecedores = async () => {
   return (
     <>
       <Layout>
+        <CheckUserDialog redirecionar="fornecedores"></CheckUserDialog>
         <div className="space-y-6 p-6">
           <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
           <div className="flex justify-between">

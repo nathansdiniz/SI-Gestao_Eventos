@@ -4,6 +4,7 @@ import { OrcamentosColumns } from "./_columns";
 import BotaoVoltar from "@/app/_components/botao-voltar";
 import { db } from "@/app/_lib/prisma";
 import AdicionarClienteButton from "./_components/add-Orcamento";
+import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
 const Clientes = async () => {
   const invoices = (await db.orcamentos.findMany()).map((invoice) => ({
@@ -20,6 +21,7 @@ const Clientes = async () => {
   return (
     <>
       <Layout>
+        <CheckUserDialog redirecionar="orcamentos"></CheckUserDialog>
         <div className="space-y-6 p-6">
           <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
           <div className="flex justify-between">
