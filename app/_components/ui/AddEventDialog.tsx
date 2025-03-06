@@ -27,7 +27,7 @@ import { Evento } from "@/app/_props";
 interface AddEventDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (eventData: Evento) => void;
+  onSave?: (eventData: Evento) => void;
   selectedDate: { start: Date; end: Date; allDay: boolean };
   defaultValues?: Evento;
 }
@@ -35,7 +35,6 @@ interface AddEventDialogProps {
 const AddEventDialog: React.FC<AddEventDialogProps> = ({
   isOpen,
   onClose,
-  onSave,
   selectedDate,
   defaultValues,
 }) => {
@@ -170,7 +169,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
       console.log("Salvando evento:", formData);
       if (formData.id === 0) {
         // Adicionar novo evento
-        const novoEvento = await adicionarEvento(formData);
+        await adicionarEvento(formData);
         toast("Evento Salvo com sucesso!", {
           description: (
             <div className="flex items-center">
@@ -183,11 +182,42 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
             textDecorationColor: "#f1f4ff",
           },
         });
-        isOpen = false;
-        onSave({ ...formData, id: novoEvento.id });
+
+        setFormData({
+          id: 0,
+          tipoEvento: "",
+          dataDeCadastro: new Date(),
+          idOrcamento: null,
+          idCliente: null,
+          nomeCliente: "",
+          dataEvento: selectedDate.start,
+          horaEvento: "",
+          localEvento: "",
+          nomeEvento: "",
+          idLocalEvento: null,
+          endereco: "",
+          numero: null,
+          complemento: "",
+          cep: "",
+          bairro: "",
+          cidade: "",
+          estado: "",
+          informacoes: "",
+          observacao: "",
+          codigoInterno: "",
+          convidados: 0,
+          datasAdicionais: "",
+          status: "Pendente",
+          id_empresa: 1, // Defina o ID da empresa conforme necessário
+          userID: null,
+          diaTodo: selectedDate.allDay,
+          horarioInicio: "", // Inicializando
+          horarioFim: "", // Inicializando
+        });
+        onClose();
       } else {
         // Atualizar evento existente
-        const eventoAtualizado = await atualizarEvento(formData);
+        await atualizarEvento(formData);
         toast("Evento Atualizado com sucesso!", {
           description: (
             <div className="flex items-center">
@@ -202,13 +232,38 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
             textDecorationColor: "#f1f4ff",
           },
         });
-        isOpen = false;
-        onSave({
-          ...eventoAtualizado,
-          horarioInicio: eventoAtualizado.horarioInicio ?? "",
-          horarioFim: eventoAtualizado.horarioFim ?? "",
-        });
       }
+      setFormData({
+        id: 0,
+        tipoEvento: "",
+        dataDeCadastro: new Date(),
+        idOrcamento: null,
+        idCliente: null,
+        nomeCliente: "",
+        dataEvento: selectedDate.start,
+        horaEvento: "",
+        localEvento: "",
+        nomeEvento: "",
+        idLocalEvento: null,
+        endereco: "",
+        numero: null,
+        complemento: "",
+        cep: "",
+        bairro: "",
+        cidade: "",
+        estado: "",
+        informacoes: "",
+        observacao: "",
+        codigoInterno: "",
+        convidados: 0,
+        datasAdicionais: "",
+        status: "Pendente",
+        id_empresa: 1, // Defina o ID da empresa conforme necessário
+        userID: null,
+        diaTodo: selectedDate.allDay,
+        horarioInicio: "", // Inicializando
+        horarioFim: "", // Inicializando
+      });
       onClose();
     } catch (error) {
       console.error("Erro ao salvar evento:", error);
