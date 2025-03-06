@@ -335,6 +335,8 @@ model Eventosme {
   datasAdicionais String
   status          String
   id_empresa      Int
+  horarioInicio String?
+  horarioFim String?
 userID    String?
 diaTodo   Boolean   @default(false)
 

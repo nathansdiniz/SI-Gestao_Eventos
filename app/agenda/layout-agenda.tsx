@@ -9,10 +9,9 @@ import interactionPlugin, {
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useEffect, useState } from "react";
 import { Button } from "../_components/ui/button";
-import { CalendarPlus, CalendarX2Icon, CircleCheckBigIcon } from "lucide-react";
+import { CalendarPlus, CircleCheckBigIcon } from "lucide-react";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core";
 import BotaoVoltar from "../_components/botao-voltar";
-import { DeleteEventDialog } from "./_components/excluir-agenda";
 import { AddEventDialog } from "./_components/add-editarAgenda"; // Importe o AddEventDialog
 import {
   adicionarEvento,
@@ -43,20 +42,22 @@ export default function Layout_Agenda() {
   const [eventos, setEventos] = useState<Agenda[]>([]);
   const [mostrarModal, setMostrarModal] = useState(false); // Estado para controlar o modal de adição
   const [mostrarModalDetalhes, setMostrarModalDetalhes] = useState(false); // Estado para controlar o modal de adição
-  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
+  const [idAgendaGeral, setIdAgendaGeral] = useState<number>(0);
+
+  console.log(idAgendaGeral);
   const [novoEvento, setNovoEvento] = useState<Agenda>({
     idAgendaGeral: 0,
     titulo_agenda: "",
     tipo_agenda: 0,
     responsavel_agenda: "",
-    datahora_inicial: "",
-    datahora_final: "",
+    datahora_inicial: new Date().toISOString(),
+    datahora_final: new Date().toISOString(),
     localizacao: "",
     informacoes_extras: "",
     userID: "",
-    data_criacao: "",
-    data_atualizacao: "",
-    status_compromisso: "",
+    data_criacao: new Date().toISOString(),
+    data_atualizacao: new Date().toISOString(),
+    status_compromisso: "Pendente",
     id_empresa: 1,
   });
 
@@ -97,7 +98,7 @@ export default function Layout_Agenda() {
   }, []);
 
   // Função para lidar com o clique em uma data no calendário
-  function aoClicarData(arg: { date: Date; allDay: boolean }) {
+  /* function aoClicarData(arg: { date: Date; allDay: boolean }) {
     setNovoEvento({
       ...novoEvento,
       datahora_inicial: new Date(arg.date).toString(),
@@ -105,7 +106,7 @@ export default function Layout_Agenda() {
       idAgendaGeral: new Date().getTime(),
     });
     setMostrarModal(true); // Abre o modal de adição
-  }
+  }*/
 
   // Função para lidar com o clique em um evento no calendário
   function aoClicarEvento(info: EventClickArg) {
@@ -116,6 +117,7 @@ export default function Layout_Agenda() {
     if (eventoClicado) {
       console.log("Evento Clicado:", eventoClicado);
       setNovoEvento(eventoClicado);
+      setIdAgendaGeral(eventoClicado.idAgendaGeral);
       setMostrarModalDetalhes(true); // Abre o modal de detalhes
     }
   }
@@ -140,6 +142,9 @@ export default function Layout_Agenda() {
       datahora_inicial: info.event.start ? info.event.start.toISOString() : "",
       datahora_final: info.event.end ? info.event.end.toISOString() : "",
       titulo_agenda: info.event.title,
+      localizacao: info.event.extendedProps.localizacao,
+      informacoes_extras: info.event.extendedProps.informacoes_extras,
+      status_compromisso: info.event.extendedProps.status_compromisso ?? "",
     });
   }
 
@@ -163,6 +168,9 @@ export default function Layout_Agenda() {
       datahora_inicial: info.event.start ? info.event.start.toISOString() : "",
       datahora_final: info.event.end ? info.event.end.toISOString() : "",
       titulo_agenda: info.event.title,
+      localizacao: info.event.extendedProps.localizacao,
+      informacoes_extras: info.event.extendedProps.informacoes_extras,
+      status_compromisso: info.event.extendedProps.status_compromisso ?? "",
     });
     toast("agenda salvo com sucesso!", {
       description: (
@@ -190,6 +198,10 @@ export default function Layout_Agenda() {
           ? new Date(evento.datahora_final).toISOString()
           : "",
         titulo_agenda: evento.titulo_agenda ?? "",
+        responsavel_agenda: evento.responsavel_agenda ?? "",
+        localizacao: evento.localizacao ?? "",
+        informacoes_extras: evento.informacoes_extras ?? "",
+        status_compromisso: evento.status_compromisso ?? "",
       });
       setEventos([
         ...eventos,
@@ -227,13 +239,6 @@ export default function Layout_Agenda() {
           <CalendarPlus />
           Adicionar Agenda
         </Button>
-        <Button
-          className="w-40 rounded-xl bg-red-900 font-bold text-white"
-          onClick={() => setMostrarModalExcluir(true)}
-        >
-          <CalendarX2Icon />
-          Excluir Agenda
-        </Button>
       </div>
 
       <div className="w-full">
@@ -252,7 +257,20 @@ export default function Layout_Agenda() {
               title: e.titulo_agenda || undefined,
               start: e.datahora_inicial || undefined,
               end: e.datahora_final || undefined,
-              backgroundColor: e.tipo_agenda === 1 ? "blue" : "green", // Exemplo de cor baseado no tipo_agenda
+              color: (() => {
+                switch (e.status_compromisso) {
+                  case "Pendente":
+                    return "yellow";
+                  case "Confirmado":
+                    return "green";
+                  case "Concluido":
+                    return "green";
+                  case "Cancelado":
+                    return "red";
+                  default:
+                    return "#007300"; // Cor padrão
+                }
+              })(),
               extendedProps: {
                 responsavel_agenda: e.responsavel_agenda,
                 localizacao: e.localizacao,
@@ -260,7 +278,6 @@ export default function Layout_Agenda() {
                 status_compromisso: e.status_compromisso,
               },
             }))}
-          dateClick={aoClicarData}
           eventClick={aoClicarEvento}
           editable={true}
           droppable={true}
@@ -276,13 +293,17 @@ export default function Layout_Agenda() {
         onSubmit={(data) => {
           const evento: Agenda = {
             idAgendaGeral: novoEvento.idAgendaGeral,
-            titulo_agenda: data.titulo,
+            titulo_agenda: data.titulo_agenda,
             tipo_agenda: novoEvento.tipo_agenda,
-            responsavel_agenda: data.nomeCliente,
-            datahora_inicial: data.inicio,
-            datahora_final: data.fim,
-            localizacao: data.localEvento,
-            informacoes_extras: data.descricao ?? "",
+            responsavel_agenda: data.responsavel_agenda,
+            datahora_inicial: data.datahora_inicial
+              ? data.datahora_inicial.toString()
+              : new Date().toISOString(),
+            datahora_final: data.datahora_final
+              ? data.datahora_final.toString()
+              : new Date().toISOString(),
+            localizacao: data.localEvento ?? "",
+            informacoes_extras: data.informacoes_extras ?? "",
             userID: novoEvento.userID,
             data_criacao: novoEvento.data_criacao,
             data_atualizacao: novoEvento.data_atualizacao,
@@ -293,12 +314,6 @@ export default function Layout_Agenda() {
           handleAdicionarEvento(evento);
         }}
         defaultValues={{
-          titulo: novoEvento.titulo_agenda ?? "",
-          inicio: novoEvento.datahora_inicial ?? "",
-          fim: novoEvento.datahora_final ?? "",
-          nomeCliente: novoEvento.responsavel_agenda ?? "",
-          localEvento: novoEvento.localizacao ?? "",
-          descricao: novoEvento.informacoes_extras ?? "",
           ...novoEvento,
         }}
       />
@@ -306,14 +321,15 @@ export default function Layout_Agenda() {
         isOpen={mostrarModalDetalhes}
         onClose={() => setMostrarModalDetalhes(false)}
         evento={novoEvento}
+        onConfirm={(idAgendaGeral) => {
+          setEventos(
+            eventos.filter((evento) => evento.idAgendaGeral !== idAgendaGeral),
+          );
+          setMostrarModalDetalhes(false);
+        }}
       />
 
       {/* Modal de Excluir Evento */}
-      <DeleteEventDialog
-        isOpen={mostrarModalExcluir}
-        onClose={() => setMostrarModalExcluir(false)}
-        onConfirm={() => {}}
-      />
     </main>
   );
 }

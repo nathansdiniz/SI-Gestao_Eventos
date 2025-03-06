@@ -49,7 +49,7 @@ const CheckUserDialog = ({ id, redirecionar }: redirecionarUsuario) => {
     relatorios: "/relatorios",
     dashboard: "/",
     eventos: "/eventos",
-    detalhesEvento: `/evento/${id}/`,
+    detalhesEvento: `/eventos/${id}`,
     agenda: "/agenda",
     clientes: "/administrativo/clientes",
     fornecedores: "/administrativo/fornecedores",

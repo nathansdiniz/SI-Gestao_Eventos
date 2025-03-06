@@ -108,3 +108,7 @@ export const addUpdateClientes = async (params: ClientesProps) => {
 
   revalidatePath("/administrativo/Clientes");
 };
+
+export const getClientes = async () => {
+  return await db.clientes.findMany();
+};

@@ -28,7 +28,10 @@ const PaginaInformacoesEvento = async ({ params: { id } }: Props) => {
   return (
     <>
       <Layout>
-        <CheckUserDialog redirecionar="detalhesEvento"></CheckUserDialog>
+        <CheckUserDialog
+          redirecionar="detalhesEvento"
+          id={id}
+        ></CheckUserDialog>
         <main>
           <div className="relative w-full space-y-4 p-4">
             <BotaoVoltar redirecionar="/eventos"></BotaoVoltar>
@@ -52,6 +55,20 @@ const PaginaInformacoesEvento = async ({ params: { id } }: Props) => {
                       <span className="text-xs">
                         {dadosEvento?.dataEvento?.toLocaleString()}
                       </span>
+                      <p>
+                        <strong className="text-sm">Horário de Início:</strong>{" "}
+                        <span className="text-sm">
+                          {dadosEvento?.horarioInicio?.toLocaleString() ||
+                            "Não definido"}
+                        </span>
+                      </p>
+                      <p>
+                        <strong className="text-sm">Horário de Fim:</strong>{" "}
+                        <span className="text-sm">
+                          {dadosEvento?.horarioFim?.toLocaleString() ||
+                            "Não definido"}
+                        </span>
+                      </p>
 
                       <span className="text-sm font-bold">Informações:</span>
                       <span className="text-xs">

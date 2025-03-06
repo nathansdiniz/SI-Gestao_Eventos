@@ -40,6 +40,8 @@ interface Evento {
   id_empresa: number;
   userID?: string | null;
   diaTodo: boolean;
+  horarioInicio?: string;
+  horarioFim?: string;
 }
 
 const Calendar: React.FC = () => {
@@ -62,7 +64,7 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     const loadEventos = async () => {
       const eventos = await fetchEventos();
-      const formattedEvents = eventos.map((evento: Evento) => ({
+      const formattedEvents = eventos.map((evento) => ({
         id: evento.id.toString(),
         title: evento.nomeEvento ?? "Sem título",
         start: evento.dataEvento
@@ -77,7 +79,21 @@ const Calendar: React.FC = () => {
           localEvento: evento.localEvento,
           status: evento.status,
           diaTodo: evento.diaTodo,
+          horarioInicio: evento.horarioInicio,
+          horarioFim: evento.horarioFim,
         },
+        color: (() => {
+          switch (evento.status) {
+            case "Confirmado":
+              return "green";
+            case "Cancelado":
+              return "red";
+            case "Pendente":
+              return "yellow";
+            default:
+              return "#007300"; // Cor padrão
+          }
+        })(),
       }));
       setCurrentEvents(formattedEvents as unknown as EventApi[]);
     };
@@ -185,6 +201,22 @@ const Calendar: React.FC = () => {
                   start: event.start || new Date(),
                   end: event.end || undefined,
                   allDay: event.allDay,
+                  extendedProps: {
+                    horarioInicio: event.extendedProps.horarioInicio,
+                    horarioFim: event.extendedProps.horarioFim,
+                  },
+                  color: (() => {
+                    switch (event.extendedProps.status) {
+                      case "Confirmado":
+                        return "green";
+                      case "Cancelado":
+                        return "red";
+                      case "Pendente":
+                        return "yellow";
+                      default:
+                        return "#007300"; // Cor padrão
+                    }
+                  })(),
                 }))
               : []
           }
@@ -196,6 +228,19 @@ const Calendar: React.FC = () => {
             list: "Lista",
           }}
         />
+        <style>
+          {`
+            .fc-event-title {
+              color: white; /* Define a cor do texto do título do evento para branco */
+            }
+            .fc-event-main {
+              padding: 2px; /* Ajusta o preenchimento do título do evento */
+            }
+            .fc-daygrid-day-events .fc-daygrid-event-harness {
+              color: black;
+            }
+          `}
+        </style>
       </div>
 
       <AddEventDialog
@@ -204,7 +249,10 @@ const Calendar: React.FC = () => {
         selectedDate={
           selectedDate || { start: new Date(), end: new Date(), allDay: true }
         }
-        onSave={function (): void {
+        onSave={(eventData: Evento) => {
+          // Atualize o estado local ou faça uma nova chamada para buscar os eventos atualizados
+          console.log("Evento salvo:", eventData);
+          // Aqui você pode atualizar o estado local ou fazer uma nova chamada para buscar os eventos atualizados
           throw new Error("Function not implemented.");
         }}
       />

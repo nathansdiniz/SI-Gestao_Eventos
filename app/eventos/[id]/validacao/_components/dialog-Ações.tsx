@@ -29,6 +29,7 @@ import { formSchemaFinanceiro } from "@/app/_props";
 import { Textarea } from "@/app/_components/ui/textarea";
 import { Input } from "@/app/_components/ui/input";
 import { atualizarFinanceiroEvento } from "@/app/_actions/eventos/financeiro";
+import { addUpdateFinanceiro } from "@/app/_actions/criar-atualizarFinanceiro";
 
 type FormSchema = z.infer<typeof formSchemaFinanceiro>;
 
@@ -101,6 +102,12 @@ const ValidacaoDialogFinancas = ({
       cor = "green";
       console.log(eventos);
       break;
+    case "Enviar pro Financeiro":
+      acaoValidada = "Aprovado e Enviado";
+      acaoBotao = "Encaminhar para Financeiro";
+      cor = "blue";
+      console.log(eventos);
+      break;
     case "Rejeitar Registro":
       acaoValidada = "Recusado";
       acaoBotao = "Rejeitar";
@@ -152,6 +159,12 @@ const ValidacaoDialogFinancas = ({
         ...data,
         id: data.id ?? 0,
       });
+      if (acaoValidada === "Aprovado e Enviado") {
+        await addUpdateFinanceiro({
+          ...data,
+          id: 0,
+        });
+      }
       toast(`Estado do Registro Financeiro atualizado com sucesso!`, {
         description: (
           <div className="flex items-center">

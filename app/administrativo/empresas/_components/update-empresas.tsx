@@ -19,6 +19,7 @@ import {
   FormLabel,
 } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -26,41 +27,29 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
-  id: z.number(),
-  userID: z.string(),
+  id: z.number().optional(),
+  userID: z.string().optional(),
   empresa: z.string().trim().min(1, {
     message: "Empresa é obrigatório.",
   }),
   cnpj: z.string().trim().min(1, {
     message: "CNPJ é obrigatório.",
   }),
-  inscricaoEstadual: z.string().trim().min(1, {
-    message: "Inscrição Estadual é obrigatório.",
-  }),
   dataAbertura: z.date({
     required_error: "A data é obrigatório.",
   }),
-  data_created: z.date(),
-  data_updated: z.date(),
-  site: z.string(),
-  email: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  localizacao_empresa: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  ramo_empresa: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  gestor_responsavel: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  telefone: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
+  ramo_empresa: z.string().optional().or(z.literal("")),
+  localizacao_empresa: z.string().optional().or(z.literal("")),
+  gestor_responsavel: z.string().optional().or(z.literal("")),
+  email: z.string().optional().or(z.literal("")),
+  inscricaoEstadual: z.string().optional().or(z.literal("")),
+  inscricaoMunicipal: z.string().optional().or(z.literal("")),
+  site: z.string().optional().or(z.literal("")),
+  telefone: z.string().optional().or(z.literal("")),
+  data_created: z.date().optional(),
+  data_updated: z.date().optional(),
 });
 type FormSchema = z.infer<typeof formSchema>;
-
 interface UpdateDialogProps {
   isOpen: boolean;
   defaultValues?: Partial<FormSchema>;
@@ -76,15 +65,18 @@ const UpdateEmpresasButton = ({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
       id: 0,
-      userID: "",
+      userID: "Indefinido",
       empresa: "",
       cnpj: "",
-      inscricaoEstadual: "",
+      ramo_empresa: "Indefinido",
+      localizacao_empresa: "Indefinido",
       dataAbertura: new Date(),
-      site: "",
-      email: "",
-      localizacao_empresa: "",
-      gestor_responsavel: "",
+      gestor_responsavel: "Indefinido",
+      email: "email@exemplo.com",
+      inscricaoEstadual: "Indefinido",
+      inscricaoMunicipal: "Indefinido",
+      site: "https://exemplo.com",
+      data_created: new Date(),
       telefone: "",
     },
   });
@@ -92,7 +84,17 @@ const UpdateEmpresasButton = ({
   const onSubmit = async (data: FormSchema) => {
     console.log(data);
     try {
-      await addUpdateEmpresas(data);
+      await addUpdateEmpresas({
+        ...data,
+        email: data.email ?? "",
+        ramo_empresa: data.ramo_empresa ?? "",
+        localizacao_empresa: data.localizacao_empresa ?? "",
+        gestor_responsavel: data.gestor_responsavel ?? "",
+        inscricaoEstadual: data.inscricaoEstadual ?? "",
+        inscricaoMunicipal: data.inscricaoMunicipal ?? "",
+        site: data.site ?? "",
+        telefone: data.telefone ?? "",
+      });
       console.log("Dados salvos com sucesso!");
       toast("Empresa Salva com sucesso!", {
         description: (
@@ -176,18 +178,6 @@ const UpdateEmpresasButton = ({
             />
             <FormField
               control={form.control}
-              name="inscricaoEstadual"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Inscrição Estadual</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="dataAbertura"
               render={({ field }) => (
                 <FormItem>
@@ -202,7 +192,7 @@ const UpdateEmpresasButton = ({
                             : ""
                         }
                         onChange={(e) => {
-                          const date = new Date(e.target.value); // Converter para Date
+                          const date = new Date(e.target.value);
                           field.onChange(
                             isNaN(date.getTime()) ? undefined : date,
                           ); // Validar se é uma data válida
@@ -214,39 +204,14 @@ const UpdateEmpresasButton = ({
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="localizacao_empresa"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Endereço</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="ramo_empresa"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ramo Empresa</FormLabel>
+                  <FormLabel>Ramo da Empresa</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Ramo da Empresa" />
                   </FormControl>
                 </FormItem>
               )}
@@ -256,9 +221,45 @@ const UpdateEmpresasButton = ({
               name="gestor_responsavel"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gestor Responsavel</FormLabel>
+                  <FormLabel>Gestor Responsável</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Gestor Responsável" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="E-mail" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="inscricaoEstadual"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Inscrição Estadual</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Inscrição Estadual" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="inscricaoMunicipal"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Inscrição Municipal</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Inscrição Municipal" />
                   </FormControl>
                 </FormItem>
               )}
@@ -271,7 +272,19 @@ const UpdateEmpresasButton = ({
                 <FormItem>
                   <FormLabel>Telefone</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Telefone" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="site"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Site</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Site" />
                   </FormControl>
                 </FormItem>
               )}

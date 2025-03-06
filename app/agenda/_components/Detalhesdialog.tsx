@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import { Button } from "@/app/_components/ui/button";
 import {
   Dialog,
@@ -31,12 +33,14 @@ import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
 import { z } from "zod";
 import { Agenda } from "../layout-agenda";
 import { atualizarAgenda } from "@/app/_actions/agenda";
-import { useEffect } from "react"; // Importe o useEffect
+import { useEffect } from "react";
+import { DeleteEventDialog } from "./excluir-agenda";
 
 interface EditEventDialogProps {
   isOpen: boolean;
   onClose: () => void;
   evento: Agenda;
+  onConfirm: (idAgendaGeral: number) => void;
 }
 
 const eventSchema = z.object({
@@ -61,16 +65,23 @@ export function EditEventDialog({
   isOpen,
   onClose,
   evento,
+  onConfirm,
 }: EditEventDialogProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const form = useForm<Agenda>({
     defaultValues: evento,
     resolver: zodResolver(eventSchema),
   });
+  console.log(evento);
 
   // Atualiza os valores do formulário quando `evento` muda
   useEffect(() => {
     form.reset(evento);
   }, [evento, form]);
+
+  const handleDeleteClick = () => {
+    setIsDeleteDialogOpen(true);
+  };
 
   const onSubmit = async (data: FormSchema) => {
     try {
@@ -99,6 +110,15 @@ export function EditEventDialog({
     }
   };
 
+  const handleConfirmDelete = (idAgendaGeral: number) => {
+    onConfirm(idAgendaGeral);
+    setIsDeleteDialogOpen(false);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] max-w-[200vh] overflow-y-auto">
@@ -121,7 +141,7 @@ export function EditEventDialog({
                 <FormItem>
                   <FormLabel>Título</FormLabel>
                   <FormControl>
-                    <Input {...field} value={field.value ?? ""} readOnly />
+                    <Input {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,8 +158,11 @@ export function EditEventDialog({
                     <Input
                       type="datetime-local"
                       {...field}
-                      value={field.value ? field.value.slice(0, 16) : ""}
-                      readOnly
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().slice(0, 16)
+                          : ""
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -157,8 +180,11 @@ export function EditEventDialog({
                     <Input
                       type="datetime-local"
                       {...field}
-                      value={field.value ? field.value.slice(0, 16) : ""}
-                      readOnly
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().slice(0, 16)
+                          : ""
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -171,9 +197,9 @@ export function EditEventDialog({
               name="localizacao"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Local</FormLabel>
+                  <FormLabel>Local da Agenda</FormLabel>
                   <FormControl>
-                    <Input {...field} value={field.value ?? ""} readOnly />
+                    <Input {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,9 +211,9 @@ export function EditEventDialog({
               name="informacoes_extras"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Informações Adicionais</FormLabel>
+                  <FormLabel>Informações Extras</FormLabel>
                   <FormControl>
-                    <Input {...field} value={field.value ?? ""} readOnly />
+                    <Input {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -199,7 +225,7 @@ export function EditEventDialog({
               name="status_compromisso"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>Status do Compromisso</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
@@ -209,11 +235,26 @@ export function EditEventDialog({
                         <SelectValue placeholder="Selecione um status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pendente">Pendente</SelectItem>
-                        <SelectItem value="confirmado">Confirmado</SelectItem>
-                        <SelectItem value="concluido">Concluído</SelectItem>
+                        <SelectItem value="Pendente">Pendente</SelectItem>
+                        <SelectItem value="Confirmado">Confirmado</SelectItem>
+                        <SelectItem value="Concluído">Concluído</SelectItem>
+                        <SelectItem value="Cancelado">Cancelado</SelectItem>
                       </SelectContent>
                     </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="responsavel_agenda"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Responsável pela Agenda</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} readOnly />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -226,6 +267,21 @@ export function EditEventDialog({
                   Cancelar
                 </Button>
               </DialogClose>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDeleteClick}
+              >
+                Excluir
+              </Button>
+              {isDeleteDialogOpen && (
+                <DeleteEventDialog
+                  isOpen={isDeleteDialogOpen}
+                  onClose={handleCloseDeleteDialog}
+                  evento={evento}
+                  onConfirm={handleConfirmDelete}
+                />
+              )}
               <Button type="submit">Salvar</Button>
             </DialogFooter>
           </form>

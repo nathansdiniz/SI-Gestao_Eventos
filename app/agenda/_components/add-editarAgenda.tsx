@@ -24,21 +24,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
+import { Agenda } from "../layout-agenda";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/_components/ui/select";
 
 // Schema atualizado para a nova interface
 const formSchema = z.object({
-  titulo: z.string().min(1, "Título é obrigatório"),
-  inicio: z.string().min(1, "Data de início é obrigatória"),
-  fim: z.string().min(1, "Data de fim é obrigatória"),
-  descricao: z.string().optional(),
-  nomeCliente: z.string().min(1, "Nome do cliente é obrigatório"),
-  localEvento: z.string().min(1, "Local da Agenda é obrigatório"),
-  cidade: z.string().min(1, "Cidade é obrigatória"),
-  estado: z
-    .string()
-    .min(1, "Estado é obrigatório")
-    .max(2, "Use a sigla do estado"),
-  observacao: z.string().optional(),
+  idAgendaGeral: z.number().optional(), // Adicionando idAgendaGeral
+  titulo_agenda: z.string().min(1, "Título é obrigatório"),
+  datahora_inicial: z.string(), // Altera para string
+  datahora_final: z.string(), // Altera para string
+  informacoes_extras: z.string().optional(),
+  responsavel_agenda: z.string().min(1, "Nome do cliente é obrigatório"),
+  localEvento: z.string().optional(),
+  status_compromisso: z.string().optional(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -47,7 +51,7 @@ interface AddEventDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: FormSchema) => void;
-  defaultValues?: Partial<FormSchema>;
+  defaultValues?: Partial<Agenda>; // Alterando para Agenda
 }
 
 export function AddEventDialog({
@@ -59,16 +63,17 @@ export function AddEventDialog({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      titulo: "",
-      inicio: "",
-      fim: "",
-      descricao: "",
-      nomeCliente: "",
-      localEvento: "",
-      cidade: "",
-      estado: "",
-      observacao: "",
-      ...defaultValues,
+      idAgendaGeral: defaultValues?.idAgendaGeral || undefined, // Define o idAgendaGeral
+      titulo_agenda: defaultValues?.titulo_agenda ?? "", // Usa titulo_agenda
+      datahora_inicial:
+        defaultValues?.datahora_inicial ??
+        new Date().toISOString().slice(0, 16), // Mantém como string
+      datahora_final:
+        defaultValues?.datahora_final ?? new Date().toISOString().slice(0, 16), // Mantém como string
+      informacoes_extras: defaultValues?.informacoes_extras ?? "", // Usa informacoes_extras
+      responsavel_agenda: defaultValues?.responsavel_agenda ?? "", // Usa responsavel_agenda
+      localEvento: defaultValues?.localizacao ?? "", // Usa localizacao
+      status_compromisso: defaultValues?.status_compromisso ?? "Pendente", // Valor padrão
     },
   });
 
@@ -79,7 +84,7 @@ export function AddEventDialog({
         description: (
           <div className="flex items-center">
             <CircleCheckBigIcon className="mr-2 text-white" />
-            <span>{`${data.titulo} salvo em ${new Date().toLocaleString()}`}</span>
+            <span>{`${data.titulo_agenda} salvo em ${new Date().toLocaleString()}`}</span>
           </div>
         ),
         style: {
@@ -87,6 +92,7 @@ export function AddEventDialog({
           color: "#fff",
         },
       });
+      form.reset();
       onClose();
     } catch (error) {
       toast("Falha ao salvar o agenda!", {
@@ -116,7 +122,7 @@ export function AddEventDialog({
             {/* Campos do formulário atualizados */}
             <FormField
               control={form.control}
-              name="titulo"
+              name="titulo_agenda"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Título</FormLabel>
@@ -130,7 +136,7 @@ export function AddEventDialog({
 
             <FormField
               control={form.control}
-              name="inicio"
+              name="datahora_inicial"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Data e Hora de Início</FormLabel>
@@ -144,7 +150,7 @@ export function AddEventDialog({
 
             <FormField
               control={form.control}
-              name="fim"
+              name="datahora_final"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Data e Hora de Término</FormLabel>
@@ -158,7 +164,7 @@ export function AddEventDialog({
 
             <FormField
               control={form.control}
-              name="nomeCliente"
+              name="responsavel_agenda"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Cliente</FormLabel>
@@ -183,16 +189,28 @@ export function AddEventDialog({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
-              name="cidade"
+              name="status_compromisso"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cidade</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Cidade da agenda" {...field} />
-                  </FormControl>
+                  <FormLabel>Status do Compromisso</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Pendente">Pendente</SelectItem>
+                      <SelectItem value="Confirmado">Confirmado</SelectItem>
+                      <SelectItem value="Concluído">Concluído</SelectItem>
+                      <SelectItem value="Cancelado">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -200,42 +218,7 @@ export function AddEventDialog({
 
             <FormField
               control={form.control}
-              name="estado"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estado (UF)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Sigla do estado (ex: SP)"
-                      maxLength={2}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Descrição detalhada da agenda"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="observacao"
+              name="informacoes_extras"
               render={({ field }) => (
                 <FormItem className="md:col-span-2">
                   <FormLabel>Observações</FormLabel>
@@ -261,3 +244,5 @@ export function AddEventDialog({
     </Dialog>
   );
 }
+
+export default AddEventDialog;

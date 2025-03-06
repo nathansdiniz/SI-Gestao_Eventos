@@ -15,6 +15,14 @@ const TiposValidacaoBadge = ({ validacao }: TiposCobrancaBadgeProps) => {
       </Badge>
     );
   }
+  if (validacao === "Aprovado e Enviado") {
+    return (
+      <Badge className="bg-muted font-bold text-blue-500 hover:bg-muted">
+        <CircleIcon className="mr-2 fill-blue-500" size={10} />
+        Aprovado e Enviado
+      </Badge>
+    );
+  }
   if (validacao === "Recusado") {
     return (
       <Badge className="font bold bg-danger bg-opacity-10 text-danger">

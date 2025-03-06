@@ -17,6 +17,7 @@ interface EmpresasProps {
   data_created: Date;
   data_updated: Date;
   inscricaoEstadual: string;
+  inscricaoMunicipal: string;
   gestor_responsavel: string;
   userID: string;
 }

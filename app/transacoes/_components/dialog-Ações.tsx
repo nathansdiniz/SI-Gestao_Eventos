@@ -101,6 +101,12 @@ const ValidacaoDialogFinancas = ({
       cor = "green";
       console.log(eventos);
       break;
+    case "Enviar pro Financeiro":
+      acaoValidada = "Aprovado e Enviado";
+      acaoBotao = "Enviar pro Financeiro";
+      cor = "blue";
+      console.log(eventos);
+      break;
     case "Rejeitar Registro":
       acaoValidada = "Recusado";
       acaoBotao = "Rejeitar";

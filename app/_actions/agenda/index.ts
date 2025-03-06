@@ -3,6 +3,7 @@ import { db } from "@/app/_lib/prisma";
 import { Agenda } from "@/app/agenda/layout-agenda";
 import { auth } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,10 @@ interface Evento {
   datahora_final: string;
   localizacao?: string;
   informacoes_extras?: string;
+  status_compromisso?: string;
+  userID?: string;
+  id_empresa?: number;
+  responsavel_agenda?: string;
 }
 const { userId } = auth();
 if (!userId) {
@@ -45,8 +50,12 @@ export const adicionarEvento = async (evento: Evento) => {
       datahora_final: new Date(evento.datahora_final),
       localizacao: evento.localizacao,
       informacoes_extras: evento.informacoes_extras,
+      status_compromisso: evento.status_compromisso,
       userID: userId,
       id_empresa: 1,
+      data_criacao: new Date(),
+      responsavel_agenda: evento.responsavel_agenda,
+      data_atualizacao: new Date(),
     },
   });
 };
@@ -62,8 +71,24 @@ export const atualizarEvento = async (evento: Evento) => {
       informacoes_extras: evento.informacoes_extras,
       userID: userId,
       id_empresa: 1,
+      data_atualizacao: new Date(),
+      responsavel_agenda: evento.responsavel_agenda,
+      status_compromisso: evento.status_compromisso,
     },
   });
+};
+export const excluirAgenda = async (idAgendaGeral: number) => {
+  try {
+    await db.agendaGeral.delete({
+      where: { idAgendaGeral: idAgendaGeral },
+    });
+
+    revalidatePath("/agenda"); // Atualiza a página após a exclusão
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao excluir agenda:", error);
+    return { success: false, error: "Erro ao excluir agenda" };
+  }
 };
 
 export const excluirEvento = async (id: number) => {
@@ -84,6 +109,9 @@ export const atualizarAgenda = async (evento: Agenda) => {
       informacoes_extras: evento.informacoes_extras,
       userID: userId,
       id_empresa: 1,
+      data_atualizacao: new Date(),
+      responsavel_agenda: evento.responsavel_agenda,
+      status_compromisso: evento.status_compromisso,
     },
   });
 };
