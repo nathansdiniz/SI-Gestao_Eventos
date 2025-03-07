@@ -1,5 +1,6 @@
 "use client";
-import { addUpdateOrcamentos } from "@/app/_actions/orcamentos";
+import { addUpdateOrcamentos, getClientes } from "@/app/_actions/orcamentos";
+import UpdateClienteButton from "@/app/administrativo/clientes/_components/update-Cliente";
 import { MoneyInput } from "@/app/_components/money-input";
 import { Button } from "@/app/_components/ui/button";
 import {
@@ -18,6 +19,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +27,15 @@ import { AlertTriangleIcon, CircleCheckBigIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/_components/ui/select";
+import { ClientesProps } from "@/app/administrativo/clientes/_columns";
+import { useEffect, useState } from "react";
 
 const OrcamentosSchema = z.object({
   id: z.number(),
@@ -88,6 +99,9 @@ const UpdateOrcamentoButton = ({
   setIsOpen,
   defaultValues,
 }: UpdateDialogProps) => {
+  const [clientes, setClientes] = useState<ClientesProps[]>([]);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+
   const form = useForm<OrcamentosForm>({
     resolver: zodResolver(OrcamentosSchema),
     defaultValues: defaultValues ?? {
@@ -139,6 +153,17 @@ const UpdateOrcamentoButton = ({
     },
   });
 
+  useEffect(() => {
+    const loadClientes = async () => {
+      const clientesData = await getClientes();
+      const clientesFormatados = clientesData.map((cliente) => ({
+        ...cliente,
+      }));
+      setClientes(clientesFormatados);
+    };
+    loadClientes();
+  }, []);
+
   const onSubmit = async (data: OrcamentosForm) => {
     console.log(data);
     try {
@@ -188,6 +213,7 @@ const UpdateOrcamentoButton = ({
         if (!open) form.reset();
       }}
     >
+      <UpdateClienteButton isOpen={dialogIsOpen} setIsOpen={setDialogIsOpen} />
       <DialogTrigger></DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-[90vw] overflow-y-auto">
         <DialogHeader>
@@ -220,9 +246,37 @@ const UpdateOrcamentoButton = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Cliente</FormLabel>
-                  <FormControl>
-                    <Input {...field} value={field.value ?? ""} />
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value ?? ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um cliente" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem
+                        onClick={() => setDialogIsOpen(true)}
+                        onSelect={(e) => {
+                          if (e) {
+                            setDialogIsOpen(true);
+                          }
+                        }}
+                        value="novo"
+                      >
+                        Novo Cliente
+                      </SelectItem>
+                      {clientes.map((cliente) => (
+                        <SelectItem
+                          key={cliente.id.toString()}
+                          value={cliente.id.toString()}
+                        >
+                          {cliente.cliente ?? ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />
@@ -233,17 +287,18 @@ const UpdateOrcamentoButton = ({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} value={field.value ?? ""} />
+                    <Input type="email" {...field} value={field.value ?? ""} />
                   </FormControl>
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="vendedor"
+              name="tipo_evento"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Vendedor</FormLabel>
+                  <FormLabel>Tipo de Evento</FormLabel>
                   <FormControl>
                     <Input {...field} value={field.value ?? ""} />
                   </FormControl>
@@ -252,10 +307,10 @@ const UpdateOrcamentoButton = ({
             />
             <FormField
               control={form.control}
-              name="tipo_evento"
+              name="assunto"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Evento</FormLabel>
+                  <FormLabel>Assunto</FormLabel>
                   <FormControl>
                     <Input {...field} value={field.value ?? ""} />
                   </FormControl>
@@ -308,6 +363,243 @@ const UpdateOrcamentoButton = ({
                   <FormLabel>Status</FormLabel>
                   <FormControl>
                     <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="mensagem"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mensagem</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tipo_orcamento"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Orçamento</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="forma_pagamento"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Modo de Pagamento</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value ?? undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o modo de pagamento" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem key={"Dinheiro"} value={"Dinheiro"}>
+                        {"Dinheiro"}
+                      </SelectItem>
+                      <SelectItem key={"PIX"} value={"PIX"}>
+                        {"PIX"}
+                      </SelectItem>
+                      <SelectItem
+                        key={"Cartão de Crédito"}
+                        value={"Cartão de Crédito"}
+                      >
+                        {"Cartão de Crédito"}
+                      </SelectItem>
+                      <SelectItem
+                        key={"Cartão de Débito"}
+                        value={"Cartão de Débito"}
+                      >
+                        {"Cartão de Débito"}
+                      </SelectItem>
+                      <SelectItem
+                        key={"Boleto Bancário"}
+                        value={"Boleto Bancário"}
+                      >
+                        {"Boleto Bancário"}
+                      </SelectItem>
+                      <SelectItem key={"Transfêrencia"} value={"Transfêrencia"}>
+                        {"Transfêrencia"}
+                      </SelectItem>
+                      <SelectItem key={"Não Informado"} value={"Não Informado"}>
+                        {"Não Informado"}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="parcelas_orcamento"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parcelas</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="max_participantes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Máximo de Participantes</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="valor_negociado"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor Negociado</FormLabel>
+                  <FormControl>
+                    <MoneyInput
+                      placeholder="Digite o valor..."
+                      value={field.value}
+                      onValueChange={({ floatValue }) =>
+                        field.onChange(floatValue)
+                      }
+                      onBlur={field.onBlur}
+                      disabled={field.disabled}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="forma_pagamento_negociado"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Forma de Pagamento Negociado</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="parcelas_negociadas"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parcelas Negociadas</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="data_negociacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Data da Negociação</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      {...field}
+                      value={
+                        field.value ? field.value.toString().split("T")[0] : ""
+                      }
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="data_principal_evento"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Data Principal do Evento</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      {...field}
+                      value={
+                        field.value ? field.value.toString().split("T")[0] : ""
+                      }
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="observacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Observação</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="codigoInterno"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Código Interno</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="numeroConvidados"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Número de Convidados</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="valorInicial"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor Inicial</FormLabel>
+                  <FormControl>
+                    <MoneyInput
+                      placeholder="Digite o valor..."
+                      value={field.value}
+                      onValueChange={({ floatValue }) =>
+                        field.onChange(floatValue)
+                      }
+                      onBlur={field.onBlur}
+                      disabled={field.disabled}
+                    />
                   </FormControl>
                 </FormItem>
               )}

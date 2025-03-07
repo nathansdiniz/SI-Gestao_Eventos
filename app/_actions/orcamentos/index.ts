@@ -131,3 +131,20 @@ export const addUpdateOrcamentos = async (params: OrcamentosProps) => {
 
   revalidatePath("/administrativo/Orcamentos");
 };
+
+export const deleteOrcamentos = async (id: number) => {
+  try {
+    await db.orcamentos.delete({
+      where: {
+        id,
+      },
+    });
+    return true;
+  } catch {
+    return false;
+  }
+};
+export const getClientes = async () => {
+  const clientes = await db.clientes.findMany();
+  return clientes;
+};

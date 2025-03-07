@@ -29,6 +29,15 @@ export const addUpdateEmpresas = async (params: ParametrosEmpresas) => {
     throw new Error("Unauthorized");
   }
   console.log(params.id);
+  const maxIdRecord = await db.empresas.findFirst({
+    orderBy: {
+      id: "desc", // Ordena pelo id em ordem decrescente
+    },
+    select: {
+      id: true,
+    },
+  });
+  const nextId = maxIdRecord ? maxIdRecord.id + 1 : 1; // Se não houver id, começa com 1
 
   // Preenchendo os campos obrigatórios
   const dataToSave = {
@@ -46,7 +55,7 @@ export const addUpdateEmpresas = async (params: ParametrosEmpresas) => {
         id: params.id,
       },
       update: dataToSave,
-      create: dataToSave,
+      create: { ...dataToSave, id: nextId },
     });
     await Novo_UP_historicoLogs({
       acao_realizada: "Atualizar Empresa",
@@ -57,7 +66,7 @@ export const addUpdateEmpresas = async (params: ParametrosEmpresas) => {
       status: "Sucesso",
     });
   } else {
-    const maxIdRecord = await db.contasBancarias.findFirst({
+    const maxIdRecord = await db.empresas.findFirst({
       orderBy: {
         id: "desc", // Ordena pelo id em ordem decrescente
       },

@@ -12,7 +12,7 @@ import { PlusIcon } from "lucide-react";
 import { fetchEventos, excluirEvento } from "@/app/_actions/eventos";
 
 // Interface correspondente ao modelo do Prisma
-interface Evento {
+export interface Evento {
   id: number;
   tipoEvento: string;
   dataDeCadastro: Date;
@@ -182,6 +182,7 @@ const Calendar: React.FC = () => {
           }}
           initialView="dayGridMonth"
           locale="pt-br"
+          themeSystem="Dark"
           editable={true}
           selectable={true}
           dayMaxEvents={true}

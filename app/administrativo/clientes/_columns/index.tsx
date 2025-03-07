@@ -5,7 +5,7 @@ import { ArrowUpDownIcon } from "lucide-react";
 import BotaoEditarFuncionario from "../_components/botao-update";
 import ExcluirClientesButton from "../_components/botao-exclusaoCliente";
 
-interface ClientesProps {
+export interface ClientesProps {
   id: number;
   tipoCadastro: string | null;
   cliente: string;

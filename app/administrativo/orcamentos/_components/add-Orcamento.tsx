@@ -14,7 +14,7 @@ const AdicionarClienteButton = () => {
         onClick={() => setDialogIsOpen(true)}
       >
         <PlusCircleIcon></PlusCircleIcon>
-        Adicionar Cliente
+        Novo Orçamento
       </Button>
       <UpdateClienteButton
         isOpen={dialogIsOpen}
