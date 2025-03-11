@@ -213,7 +213,11 @@ const UpdateOrcamentoButton = ({
         if (!open) form.reset();
       }}
     >
-      <UpdateClienteButton isOpen={dialogIsOpen} setIsOpen={setDialogIsOpen} />
+      <UpdateClienteButton
+        isOpen={dialogIsOpen}
+        setIsOpen={setDialogIsOpen}
+        defaultValues={undefined}
+      />
       <DialogTrigger></DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-[90vw] overflow-y-auto">
         <DialogHeader>

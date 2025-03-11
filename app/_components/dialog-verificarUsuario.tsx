@@ -37,12 +37,16 @@ type Data11Keys =
   | "usuarios"
   | "orcamentos"
   | "clientes"
+  | "validacaoEvento"
+  | "validacaoGeral"
   | "empresas";
 
 const CheckUserDialog = ({ id, redirecionar }: redirecionarUsuario) => {
   const data11: Record<Data11Keys, string> = {
-    financeiroEvento: `/evento/${id}/financeiro`,
+    financeiroEvento: `/eventos/${id}/financeiro`,
+    validacaoEvento: `/eventos/${id}/validacao`,
     financeiroGeral: "/administrativo/financeiro",
+    validacaoGeral: "/administrativo/validacao",
     menuAdministrativo: "/administrativo",
     menuConfig: "/config",
     transacoes: "/transactions",

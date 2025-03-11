@@ -20,15 +20,18 @@ const Financeiro = async ({ params: { id } }: Props) => {
   }
   const operacaoId = Number(id);
   console.log(operacaoId, "id aqui");
-  const dadosfinanceiros = await FinancasdoEvento();
+  const dadosfinanceiros = await FinancasdoEvento(id);
   return (
     <>
       <Layout>
-        <CheckUserDialog redirecionar="financeiroEvento"></CheckUserDialog>
+        <CheckUserDialog
+          redirecionar="financeiroEvento"
+          id={id}
+        ></CheckUserDialog>
         <div className="space-y-6 p-6">
           {/* Botão Voltar */}
           <div>
-            <BotaoVoltar redirecionar="/administrativo" />
+            <BotaoVoltar redirecionar={`/eventos/${operacaoId}`} />
           </div>
 
           {/* Título */}

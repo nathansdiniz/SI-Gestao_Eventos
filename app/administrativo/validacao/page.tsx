@@ -6,35 +6,26 @@ import TabelaFinanceira from "./_components/tabelaFinanceiro";
 import BotaoVoltar from "@/app/_components/botao-voltar";
 import BotaoRedirecionar from "@/app/_components/ui/botao-redirecionar";
 import { SquareArrowOutUpRightIcon } from "lucide-react";
-import { FinancasdoEvento } from "@/app/_actions/criar-atualizarFinanceiro";
+import { FinancasGerais } from "@/app/_actions/criar-atualizarFinanceiro";
 import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
 
-interface Props {
-  params: {
-    id: string; // Ou 'number', dependendo do tipo esperado para 'id'
-  };
-}
-const Financeiro = async ({ params: { id } }: Props) => {
+const Financeiro = async () => {
   const { userId } = await auth();
   if (!userId) {
     redirect("/login");
   }
-  const operacaoId = Number(id);
 
   // Chamada da API para obter os dados
-  const dadosfinanceiros = await FinancasdoEvento(id);
+  const dadosfinanceiros = await FinancasGerais();
 
   return (
     <>
       <Layout>
-        <CheckUserDialog
-          redirecionar="validacaoEvento"
-          id={id}
-        ></CheckUserDialog>
+        <CheckUserDialog redirecionar="validacaoGeral"></CheckUserDialog>
         <div className="space-y-6 p-6">
           {/* Botão Voltar */}
           <div>
-            <BotaoVoltar redirecionar={`/eventos/${operacaoId}`} />
+            <BotaoVoltar redirecionar={`/administrativo`} />
           </div>
           <h1 className="text-center text-2xl font-bold">
             Validações Financeiras
@@ -44,7 +35,7 @@ const Financeiro = async ({ params: { id } }: Props) => {
             icone={
               <SquareArrowOutUpRightIcon size={34}></SquareArrowOutUpRightIcon>
             }
-            redirecionar={`/eventos/${operacaoId}/financeiro/pagar-receber`}
+            redirecionar={`/administrativo/financeiro/pagar-receber`}
           ></BotaoRedirecionar>
 
           {/* Filtros: Mês e Ano */}

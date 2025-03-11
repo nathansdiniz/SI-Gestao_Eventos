@@ -1,7 +1,7 @@
 "use server";
 import { db } from "@/app/_lib/prisma";
 import { Agenda } from "@/app/agenda/layout-agenda";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -23,8 +23,16 @@ const { userId } = auth();
 if (!userId) {
   throw new Error("Unauthorized");
 }
+const user = await clerkClient.users.getUser(userId);
+const publicMetadata = user?.publicMetadata;
+const idEmpresa = Number(publicMetadata?.idEmpresa) || null;
 
 export const dadosAgenda = async () => {
+  if (publicMetadata) {
+    const where = { id_empresa: idEmpresa !== 1 ? idEmpresa : undefined };
+    const dados = await db.agendaGeral.findMany({ where: where });
+    return dados;
+  }
   const dados = await db.agendaGeral.findMany();
   return dados;
 };

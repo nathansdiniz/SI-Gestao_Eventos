@@ -179,8 +179,45 @@ export const FinancasEventoPagarReceber = async () => {
   }));
   return dadosConvertidos;
 };
-export const FinancasdoEvento = async () => {
+export const FinancasdoEvento = async (id: string) => {
   const transactions = await db.financeiroEventos.findMany({
+    where: {
+      idevento: id,
+    },
+    orderBy: { datacompetencia: "desc" },
+  });
+  console.log(id, transactions);
+  const dadosConvertidos = transactions.map((dado) => ({
+    ...dado,
+    valor: dado.valor ? Number(dado.valor.toString()) : null,
+    juros: dado.juros ? Number(dado.juros.toString()) : null,
+    multa: dado.multa ? Number(dado.multa.toString()) : null,
+    desconto: dado.desconto ? Number(dado.desconto.toString()) : null,
+    documentos_anexados:
+      typeof dado.documentos_anexados === "string"
+        ? JSON.parse(dado.documentos_anexados)
+        : dado.documentos_anexados,
+    parcelas:
+      dado.parcelas === 1
+        ? 1
+        : dado.parcelas &&
+            typeof dado.parcelas === "string" &&
+            dado.parcelas.trim() !== ""
+          ? JSON.parse(dado.parcelas)
+          : dado.parcelas,
+    recorrencia:
+      (dado.recorrencia as
+        | "Nenhuma"
+        | "Semanal"
+        | "Mensal"
+        | "Diaria"
+        | "Quinzenal"
+        | undefined) || "Nenhuma",
+  }));
+  return dadosConvertidos;
+};
+export const FinancasGerais = async () => {
+  const transactions = await db.financeiroME.findMany({
     orderBy: { datacompetencia: "desc" },
   });
   const dadosConvertidos = transactions.map((dado) => ({

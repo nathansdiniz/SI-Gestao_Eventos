@@ -1,5 +1,11 @@
 import Layout from "@/app/_components/slide-bar";
-import { Building2Icon, Receipt, ReceiptTextIcon, Users } from "lucide-react";
+import {
+  Building2Icon,
+  ListChecksIcon,
+  Receipt,
+  ReceiptTextIcon,
+  Users,
+} from "lucide-react";
 import CardMenu from "./_components/cards-menu";
 import BotaoVoltar from "../_components/botao-voltar";
 import CheckUserDialog from "../_components/dialog-verificarUsuario";
@@ -40,6 +46,15 @@ const Empresas = () => {
             icon={<ReceiptTextIcon size={84} />}
             descricao="Gerencie todas os Orcamentos."
             redirecionar="/administrativo/orcamentos"
+            size="large"
+          ></CardMenu>
+          <CardMenu
+            title="Validação"
+            icon={
+              <ListChecksIcon size={84} className="rounded-sm bg-green-800" />
+            }
+            descricao="Gerencie todas as validações do Financeiro Geral."
+            redirecionar="/administrativo/validacao"
             size="large"
           ></CardMenu>
         </div>

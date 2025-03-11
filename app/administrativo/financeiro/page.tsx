@@ -22,7 +22,7 @@ const Financeiro = async () => {
         gte: new Date(`${ano - 1}-06-01`).toISOString(), // Data inicial do mês
         lt: new Date(`${ano}-12-01`).toISOString(), // Data do próximo mês (exclusivo)
       },
-      validacao: "Aprovado",
+      OR: [{ validacao: "Aprovado" }, { validacao: "Aprovado e Enviado" }],
     },
   });
 

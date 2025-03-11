@@ -18,23 +18,37 @@ export async function POST(req: Request) {
       });
     }
 
-    // Define diretório de upload
-    const uploadDir = path.join(process.cwd(), "uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
+    // Define diretório de upload dentro de public
+    const publicUploadDir = path.join(
+      process.cwd(),
+      "public",
+      "uploads",
+      pasta,
+    );
+    await fs.mkdir(publicUploadDir, { recursive: true });
 
-    // Salva o arquivo no servidor
-    const filePath = path.join(uploadDir, file.name);
-    await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
+    // Salva o arquivo no servidor dentro de public
+    const fileName = `id_${documentId}_${file.name}`;
+    const filePath = path.join(publicUploadDir, fileName);
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    await fs.writeFile(filePath, fileBuffer);
 
     // Caminho relativo salvo no banco
-    const fileUrl = `/uploads/${pasta}/id_${documentId}_${file.name}`;
+    const fileUrl = `/public/uploads/${pasta}/id_${documentId}_${file.name}`;
 
     // Atualiza ou cria registro no banco de dados
     if (pasta === "documentosEventos") {
       const existingDocument = await db.financeiroEventos.findUnique({
         where: { id: Number(documentId) },
       });
-      const anexos = (existingDocument?.documentos_anexados as string[]) || [];
+      let anexos = [];
+      if (existingDocument?.documentos_anexados) {
+        if (typeof existingDocument.documentos_anexados === "string") {
+          anexos = JSON.parse(existingDocument.documentos_anexados);
+        } else if (Array.isArray(existingDocument.documentos_anexados)) {
+          anexos = existingDocument.documentos_anexados;
+        }
+      }
 
       anexos.push(fileUrl);
       // Atualiza documentos_anexados se já existir
@@ -48,9 +62,17 @@ export async function POST(req: Request) {
       const existingDocument = await db.financeiroME.findUnique({
         where: { id: Number(documentId) },
       });
-      const anexos = (existingDocument?.documentos_anexados as string[]) || [];
+      let anexos = [];
+      if (existingDocument?.documentos_anexados) {
+        if (typeof existingDocument.documentos_anexados === "string") {
+          anexos = JSON.parse(existingDocument.documentos_anexados);
+        } else if (Array.isArray(existingDocument.documentos_anexados)) {
+          anexos = existingDocument.documentos_anexados;
+        }
+      }
 
       anexos.push(fileUrl);
+      console.log(anexos);
       // Atualiza documentos_anexados se já existir
 
       await db.financeiroME.update({
