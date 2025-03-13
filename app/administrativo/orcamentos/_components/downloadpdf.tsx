@@ -91,7 +91,6 @@ const DownloadOrcamentoPdf = ({ orcamento }: DownloadOrcamentoPdfProps) => {
           : "N/A",
       ],
       ["Observação", orcamento.observacao || "N/A"],
-      ["Código Interno", orcamento.codigoInterno || "N/A"],
       ["Número de Convidados", orcamento.numeroConvidados?.toString() || "N/A"],
       [
         "Valor Inicial",
@@ -108,7 +107,6 @@ const DownloadOrcamentoPdf = ({ orcamento }: DownloadOrcamentoPdfProps) => {
       ["Obs3", orcamento.obs3 || "N/A"],
       ["Obs4", orcamento.obs4 || "N/A"],
       ["Nome do Evento", orcamento.nomeDoEvento || "N/A"],
-      ["Funil", orcamento.funil || "N/A"],
     ];
 
     // Add table

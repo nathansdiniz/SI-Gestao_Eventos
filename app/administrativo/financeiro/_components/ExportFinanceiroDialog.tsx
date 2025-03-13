@@ -1,4 +1,3 @@
-// app/administrativo/financeiro/_components/ExportFinanceiroDialog.tsx
 "use client";
 import {
   Dialog,
@@ -23,6 +22,35 @@ import { FinanceiroPropos } from "@/app/_props";
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
 
+// Mapeamento entre os nomes das colunas e os rótulos dos formulários
+const columnLabelMap: { [key: string]: string } = {
+  descricao: "Descrição",
+  idevento: "Id Evento",
+  valor: "Valor",
+  juros: "Juros",
+  multa: "Multa",
+  desconto: "Desconto",
+  tipocobranca: "Tipo de Cobrança",
+  pago: "Status",
+  mododepagamento: "Modo de Pagamento",
+  datacompetencia: "Data de Vencimento",
+  datapagamento: "Data de Pagamento",
+  recorrencia: "Recorrente",
+  periodo_final: "Data Final",
+  idrecebidode: "Recebido de",
+  informede: "Informe de",
+  idconta: "Id Conta",
+  idcategoria: "Categoria",
+  idcentrodecusto: "Centro de Custo",
+  data_criacao: "Data de Criação",
+  data_update: "Data de Atualização",
+  validacao: "Validação",
+  informacoes_extras: "Informações Extras",
+  ultima_alteracao_validacao: "Última Alteração de Validação",
+  userID: "ID do Usuário",
+  documentos_anexados: "Documentos Anexados",
+};
+
 interface ExportFinanceiroDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -40,24 +68,15 @@ const ExportFinanceiroDialog = ({
     if (firstItem) {
       return Object.keys(firstItem).map((key) => ({
         value: key,
-        label: formatColumnLabel(key),
+        label: columnLabelMap[key] || key,
       }));
     }
     return [];
   }, [data]);
+
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     allColumns.map((column) => column.value),
   );
-  function formatColumnLabel(columnName: string): string {
-    const formattedName = columnName
-      .replace(/_/g, " ")
-      .replace(/([a-z])([A-Z])/g, "$1 $2")
-      .toLowerCase()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-    return formattedName;
-  }
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prev) =>
@@ -72,7 +91,7 @@ const ExportFinanceiroDialog = ({
     return data.map((item) => {
       const formattedItem: any = {};
       selectedColumns.forEach((column) => {
-        formattedItem[formatColumnLabel(column)] =
+        formattedItem[columnLabelMap[column] || column] =
           item[column as keyof FinanceiroPropos] || "";
 
         if (
@@ -80,7 +99,7 @@ const ExportFinanceiroDialog = ({
           column === "datapagamento" ||
           column === "data_criacao"
         ) {
-          formattedItem[formatColumnLabel(column)] = item[
+          formattedItem[columnLabelMap[column] || column] = item[
             column as keyof FinanceiroPropos
           ]
             ? new Date(
@@ -98,13 +117,11 @@ const ExportFinanceiroDialog = ({
           column === "multa" ||
           column === "desconto"
         ) {
-          formattedItem[formatColumnLabel(column)] = new Intl.NumberFormat(
-            "pt-BR",
-            {
+          formattedItem[columnLabelMap[column] || column] =
+            new Intl.NumberFormat("pt-BR", {
               style: "currency",
               currency: "BRL",
-            },
-          ).format(Number(item[column as keyof FinanceiroPropos]));
+            }).format(Number(item[column as keyof FinanceiroPropos]));
         }
       });
       return formattedItem;
@@ -131,12 +148,12 @@ const ExportFinanceiroDialog = ({
             widths: selectedColumns.map(() => "auto"),
             body: [
               selectedColumns.map((column) => ({
-                text: formatColumnLabel(column),
+                text: columnLabelMap[column] || column,
                 style: "tableHeader",
               })),
               ...formattedData.map((item) =>
                 selectedColumns.map((column) => ({
-                  text: item[formatColumnLabel(column)],
+                  text: item[columnLabelMap[column] || column],
                   style: "tableBody",
                 })),
               ),
