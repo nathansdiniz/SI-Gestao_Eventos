@@ -29,6 +29,7 @@ import TiposValidacaoBadge from "@/app/eventos/[id]/financeiro/_components/tipoV
 import PaymentConfirmationDialog from "./dialog-confirmar-pag";
 import TiposPagosBadge from "@/app/_components/PagoouNao";
 import Link from "next/link";
+import ExportFinanceiroDialog from "./ExportFinanceiroDialog";
 
 // Configuração do pdfmake
 pdfMake.vfs = pdfFonts.vfs;
@@ -574,6 +575,7 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
       },
     });
   };
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false); // New state
 
   return (
     <>
@@ -643,6 +645,26 @@ const TabelaFinanceira = ({ dadosfinanceiros }: TabelaFinanceiraProps) => {
         </Button>
       </div>
 
+      <ExportFinanceiroDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        data={dadosFiltrados}
+        filters={filters}
+      />
+      {/* ... Other code */}
+      {/* Botões de Ação */}
+      <div className="flex flex-col justify-end gap-4 p-4 md:flex-row">
+        <BotaoAdicionarFinancas />
+        {/* ... Other code */}
+        <Button
+          onClick={() => setIsExportDialogOpen(true)} // Open dialog instead of export directly
+          className="flex items-center gap-2 text-white"
+          variant={"outline"}
+        >
+          <FileTextIcon size={32} className="md:size-40" />
+          Exportar Dados
+        </Button>
+      </div>
       {/* Botões de Ação */}
       <div className="flex flex-col justify-end gap-4 p-4 md:flex-row">
         <BotaoAdicionarFinancas />

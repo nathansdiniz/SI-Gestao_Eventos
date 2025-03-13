@@ -50,6 +50,8 @@
     "decimal.js": "^10.4.3",
     "formidable": "^3.5.2",
     "git-commit-msg-linter": "^5.0.8",
+    "jspdf": "^3.0.0",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.454.0",
     "moment": "^2.30.1",
     "next": "^14.2.24",

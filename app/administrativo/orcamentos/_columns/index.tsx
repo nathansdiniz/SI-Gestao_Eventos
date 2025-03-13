@@ -4,8 +4,9 @@ import { Button } from "@/app/_components/ui/button";
 import { ArrowUpDownIcon } from "lucide-react";
 import BotaoEditarOrcamento from "../_components/botao-update";
 import ExcluirOrcamentoButton from "../_components/botao-exclusaoOrcamento";
+import DownloadOrcamentoPdf from "../_components/downloadpdf";
 
-interface OrcamentosProps {
+export interface OrcamentosProps {
   id: number;
   nome_orcamento: string | null;
   cliente_orcamento: string | null;
@@ -120,6 +121,7 @@ export const OrcamentosColumns: ColumnDef<OrcamentosProps>[] = [
       <div className="flex flex-row space-x-2">
         <BotaoEditarOrcamento dados={row.original}></BotaoEditarOrcamento>
         <ExcluirOrcamentoButton dados={row.original}></ExcluirOrcamentoButton>
+        <DownloadOrcamentoPdf orcamento={row.original}></DownloadOrcamentoPdf>
       </div>
     ),
   },
