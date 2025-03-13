@@ -1,135 +1,92 @@
 "use client";
 import { Button } from "@/app/_components/ui/button";
 import {
-  DialogHeader,
-  DialogTitle,
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
 } from "@/app/_components/ui/dialog";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-const ClientesSchema = z.object({
-  id: z.number(),
-  tipoCadastro: z.string().nullable(),
-  cliente: z.string(),
-  cpf_cnpj_cliente: z.string().nullable(),
-  razaoSocial: z.string().nullable(),
-  nomeFantasia: z.string().nullable(),
-  inscricaoMunicipal: z.string().nullable(),
-  inscricaoEstadual: z.string().nullable(),
-  data_nasc: z.date().nullable(),
-  estadoCivil: z.string().nullable(),
-  email: z.string().email().nullable(),
-  telefone: z.string().nullable(),
-  endereco: z.string().nullable(),
-  cep: z.string().nullable(),
-  complemento: z.string().nullable(),
-  cidade: z.string().nullable(),
-  estado: z.string().nullable(),
-  pais: z.string().nullable(),
-  pontoReferencia: z.string().nullable(),
-  anotacoes: z.string().nullable(),
-  dataCadastro: z.date(),
-  ddiTelefone: z.string().nullable(),
-  ddiTelefone2: z.string().nullable(),
-  telefone2: z.string().nullable(),
-  ddiCelular: z.string().nullable(),
-  celular: z.string().nullable(),
-  redeSocial: z.string().nullable(),
-  id_empresa: z.number().nullable(),
-  userID: z.string().nullable(),
-});
+import { deleteCliente } from "@/app/_actions/clientes";
+import { toast } from "sonner";
 
-// Tipo inferido a partir do schema Zod
-type ClientesForm = z.infer<typeof ClientesSchema>;
-
-interface UpdateDialogProps {
-  isOpen: boolean;
-  defaultValues?: Partial<ClientesForm>;
-  setIsOpen: (isOpen: boolean) => void;
+interface ClientesProps {
+  id: number;
+  tipoCadastro: string | null;
+  cliente: string; // Ensure this is present
+  cpf_cnpj_cliente: string | null;
+  razaoSocial: string | null;
+  nomeFantasia: string | null;
+  inscricaoMunicipal: string | null;
+  inscricaoEstadual: string | null;
+  data_nasc: Date | null;
+  estadoCivil: string | null;
+  email: string | null;
+  telefone: string | null;
+  endereco: string | null;
+  cep: string | null;
+  complemento: string | null;
+  cidade: string | null;
+  estado: string | null;
+  pais: string | null;
+  pontoReferencia: string | null;
+  anotacoes: string | null;
+  dataCadastro: Date;
+  ddiTelefone: string | null;
+  ddiTelefone2: string | null;
+  telefone2: string | null;
+  ddiCelular: string | null;
+  celular: string | null;
+  redeSocial: string | null;
+  id_empresa: number | null;
+  userID: string | null;
 }
 
-const ExcluirClientesDialog = ({
+interface ExcluirClientesDialogProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  defaultValues: ClientesProps;
+}
+
+const ExcluirClientesDialog: React.FC<ExcluirClientesDialogProps> = ({
   isOpen,
   setIsOpen,
   defaultValues,
-}: UpdateDialogProps) => {
-  const form = useForm<ClientesForm>({
-    resolver: zodResolver(ClientesSchema),
-    defaultValues: defaultValues ?? {
-      id: 0,
-      tipoCadastro: null,
-      cliente: "",
-      cpf_cnpj_cliente: null,
-      razaoSocial: null,
-      nomeFantasia: null,
-      inscricaoMunicipal: null,
-      inscricaoEstadual: null,
-      data_nasc: null,
-      estadoCivil: null,
-      email: null,
-      telefone: null,
-      endereco: null,
-      cep: null,
-      complemento: null,
-      cidade: null,
-      estado: null,
-      pais: null,
-      pontoReferencia: null,
-      anotacoes: null,
-      dataCadastro: new Date(),
-      ddiTelefone: null,
-      ddiTelefone2: null,
-      telefone2: null,
-      ddiCelular: null,
-      celular: null,
-      redeSocial: null,
-      id_empresa: null,
-      userID: null,
-    },
-  });
-
-  const onSubmit = (data: ClientesForm) => {
-    console.log(data);
+}) => {
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteCliente(defaultValues.id);
+      toast.success("Cliente excluído com sucesso!");
+      setIsOpen(false); // Fecha o diálogo após a exclusão
+    } catch (error) {
+      toast.error("Erro ao excluir o cliente.");
+      console.error(error);
+    }
   };
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (!open) {
-          form.reset();
-        }
-      }}
-    >
-      <DialogTrigger></DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirmação de exclusão</DialogTitle>
-          <DialogDescription className="text-center text-lg font-semibold text-white">
-            Tem certeza que deseja excluir esse funcionário?
+          <DialogTitle>Excluir Cliente</DialogTitle>
+          <DialogDescription>
+            Tem certeza de que deseja excluir o cliente{" "}
+            <span className="font-bold">{defaultValues.cliente}</span>? Esta
+            ação não pode ser desfeita.
           </DialogDescription>
         </DialogHeader>
-
-        <DialogFooter className="mt-4 flex items-center justify-center gap-4">
+        <DialogFooter>
           <DialogClose asChild>
-            <Button
-              variant={"default"}
-              className="bg-red-700 px-6 py-3 text-lg text-white"
-            >
+            <Button type="button" variant="secondary">
               Cancelar
             </Button>
           </DialogClose>
           <Button
-            variant={"secondary"}
-            className="px-6 py-3 text-lg"
-            onClick={() => onSubmit}
+            type="button"
+            variant="destructive"
+            onClick={handleConfirmDelete}
           >
             Excluir
           </Button>

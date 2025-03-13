@@ -3,8 +3,9 @@ import { DataTable } from "@/app/_components/ui/data-table";
 import { OrcamentosColumns } from "./_columns";
 import BotaoVoltar from "@/app/_components/botao-voltar";
 import { db } from "@/app/_lib/prisma";
-import AdicionarClienteButton from "./_components/add-Orcamento";
 import CheckUserDialog from "@/app/_components/dialog-verificarUsuario";
+import AdicionarOrcamentoButton from "./_components/add-Orcamento";
+import AdicionarClienteButton from "../clientes/_components/add-Cliente";
 
 const Clientes = async () => {
   const invoices = (await db.orcamentos.findMany()).map((invoice) => ({
@@ -26,7 +27,10 @@ const Clientes = async () => {
           <BotaoVoltar redirecionar="/menu"></BotaoVoltar>
           <div className="flex justify-between">
             <h1 className="text-4xl font-bold">Orçamentos</h1>
-            <AdicionarClienteButton></AdicionarClienteButton>
+            <div>
+              <AdicionarOrcamentoButton></AdicionarOrcamentoButton>
+              <AdicionarClienteButton></AdicionarClienteButton>
+            </div>
           </div>
           <DataTable columns={OrcamentosColumns} data={invoices}></DataTable>
         </div>

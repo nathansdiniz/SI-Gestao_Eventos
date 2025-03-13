@@ -1,18 +1,20 @@
 "use client";
 import { Button } from "@/app/_components/ui/button";
 import {
-  DialogHeader,
-  DialogTitle,
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
 } from "@/app/_components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { deleteOrcamento } from "@/app/_actions/orcamentos"; // Import the function to delete
+import { toast } from "sonner"; // Import for displaying messages
+import { AlertTriangleIcon } from "lucide-react";
 
 const OrcamentosSchema = z.object({
   id: z.number(),
@@ -67,7 +69,7 @@ type OrcamentosForm = z.infer<typeof OrcamentosSchema>;
 
 interface ExcluirDialogProps {
   isOpen: boolean;
-  defaultValues?: Partial<OrcamentosForm>;
+  defaultValues: Partial<OrcamentosForm>; // Make defaultValues required
   setIsOpen: (isOpen: boolean) => void;
 }
 
@@ -127,9 +129,26 @@ const ExcluirOrcamentoButton = ({
     },
   });
 
-  const onSubmit = (data: OrcamentosForm) => {
-    console.log(data);
-    // Aqui você pode adicionar a lógica para excluir o orçamento
+  const handleConfirmDelete = async () => {
+    try {
+      const data = form.getValues();
+      await deleteOrcamento(data.id);
+      toast.success("Orçamento excluído com sucesso!");
+      setIsOpen(false);
+      form.reset();
+    } catch (error) {
+      toast.error("Erro ao excluir o Orçamento!", {
+        description: <AlertTriangleIcon />,
+        action: {
+          label: "X",
+          onClick: () => console.log(error),
+        },
+        style: {
+          background: "#af080d",
+          textDecorationColor: "#f1f4ff",
+        }, // Cor de fundo e texto
+      });
+    }
   };
 
   return (
@@ -142,12 +161,14 @@ const ExcluirOrcamentoButton = ({
         }
       }}
     >
-      <DialogTrigger></DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Confirmação de exclusão</DialogTitle>
           <DialogDescription className="text-center text-lg font-semibold text-white">
             Tem certeza que deseja excluir esse orçamento?
+            {defaultValues?.nome_orcamento &&
+              ` ${defaultValues.nome_orcamento}`}
+            Esta ação não pode ser desfeita.
           </DialogDescription>
         </DialogHeader>
 
@@ -163,7 +184,7 @@ const ExcluirOrcamentoButton = ({
           <Button
             variant={"secondary"}
             className="px-6 py-3 text-lg"
-            onClick={() => onSubmit(form.getValues())}
+            onClick={handleConfirmDelete}
           >
             Excluir
           </Button>

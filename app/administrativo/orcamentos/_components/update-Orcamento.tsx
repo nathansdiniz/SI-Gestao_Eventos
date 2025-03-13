@@ -8,7 +8,6 @@ import {
   DialogTitle,
   Dialog,
   DialogContent,
-  DialogTrigger,
   DialogDescription,
   DialogFooter,
   DialogClose,
@@ -213,12 +212,6 @@ const UpdateOrcamentoButton = ({
         if (!open) form.reset();
       }}
     >
-      <UpdateClienteButton
-        isOpen={dialogIsOpen}
-        setIsOpen={setDialogIsOpen}
-        defaultValues={undefined}
-      />
-      <DialogTrigger></DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-[90vw] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Registro de Orçamento</DialogTitle>
@@ -249,10 +242,12 @@ const UpdateOrcamentoButton = ({
               name="cliente_orcamento"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cliente</FormLabel>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Cliente</FormLabel>
+                  </div>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value ?? ""}
+                    defaultValue={field.value?.toString() ?? ""}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -260,17 +255,7 @@ const UpdateOrcamentoButton = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem
-                        onClick={() => setDialogIsOpen(true)}
-                        onSelect={(e) => {
-                          if (e) {
-                            setDialogIsOpen(true);
-                          }
-                        }}
-                        value="novo"
-                      >
-                        Novo Cliente
-                      </SelectItem>
+                      <SelectItem value="novo">Novo Cliente</SelectItem>
                       {clientes.map((cliente) => (
                         <SelectItem
                           key={cliente.id.toString()}
@@ -283,6 +268,11 @@ const UpdateOrcamentoButton = ({
                   </Select>
                 </FormItem>
               )}
+            />
+            <UpdateClienteButton
+              isOpen={dialogIsOpen}
+              setIsOpen={setDialogIsOpen}
+              defaultValues={undefined}
             />
             <FormField
               control={form.control}

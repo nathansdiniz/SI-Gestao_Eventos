@@ -148,3 +148,19 @@ export const getClientes = async () => {
   const clientes = await db.clientes.findMany();
   return clientes;
 };
+
+export async function deleteOrcamento(id: number) {
+  try {
+    await db.orcamentos.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    // Handle errors (log, throw, etc.)
+    console.error("Error deleting orcamento:", error);
+    throw error;
+  }
+}
+
+// ... other actions

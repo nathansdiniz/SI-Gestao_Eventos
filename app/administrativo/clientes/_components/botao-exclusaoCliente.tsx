@@ -56,7 +56,7 @@ const ExcluirClientesButton = ({ dados }: dadosCliente) => {
         isOpen={dialogIsOpen}
         setIsOpen={setDialogIsOpen}
         defaultValues={dados}
-      ></ExcluirClientesDialog>
+      />
     </>
   );
 };

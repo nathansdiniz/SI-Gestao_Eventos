@@ -114,18 +114,8 @@ export const ClientesColumns: ColumnDef<ClientesProps>[] = [
     header: "celular",
   },
   {
-    accessorKey: "funcao",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Função
-          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    accessorKey: "cidade",
+    header: "Cidade",
   },
   {
     accessorKey: "estado",

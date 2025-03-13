@@ -2,7 +2,7 @@
 import { Button } from "@/app/_components/ui/button";
 import { PencilIcon } from "lucide-react";
 import { useState } from "react";
-import UpdateFuncionarioButton from "./update-Cliente";
+import UpdateClienteButton from "./dialogAddUpCliente";
 
 interface ClientesProps {
   id: number;
@@ -51,11 +51,11 @@ const BotaoEditarFuncionario = ({ dados }: dadosFuncionario) => {
       >
         <PencilIcon />
       </Button>
-      <UpdateFuncionarioButton
+      <UpdateClienteButton
         isOpen={dialogIsOpen}
         setIsOpen={setDialogIsOpen}
         defaultValues={dados}
-      ></UpdateFuncionarioButton>
+      ></UpdateClienteButton>
     </>
   );
 };

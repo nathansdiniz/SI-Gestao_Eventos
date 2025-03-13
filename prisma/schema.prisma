@@ -484,6 +484,7 @@ model Clientes {
   inscricaoEstadual  String?
   data_nasc          DateTime?
   estadoCivil        String?
+  sexo        String?
   email              String?
   telefone           String?
   endereco           String?
